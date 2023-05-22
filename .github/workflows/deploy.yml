@@ -39,5 +39,5 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build
-          cname: docs.tcadmin.com
+        #   cname: docs.tcadmin.com
           
