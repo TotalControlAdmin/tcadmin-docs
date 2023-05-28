@@ -1,47 +1,25 @@
 ---
 sidebar_position: 1
+sidebar_label: Introduction
+slug: /
 ---
 
-# Tutorial Intro
+TCAdmin is the leading game server control panel designed to streamline the management of game servers. Developed with advanced features and user-friendly interfaces, TCAdmin offers comprehensive control over game server hosting. With its robust architecture, TCAdmin ensures secure and efficient server management, providing a seamless experience for both administrators and users. Why wait any longer? Elevate your platform by incorporating TCAdmin and make game servers a top priority for your community.
 
-Let's discover **Docusaurus in less than 5 minutes**.
+## Games Supported
 
-## Getting Started
+TCAdmin is a versatile game hosting platform that provides support for a wide range of games, making it suitable for hosting virtually any game you desire.
 
-Get started by **creating a new site**.
+Officially, TCAdmin supports the following popular games:
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+- Ark Survival Evovled
+- Minecraft
+- Rust
+- 7 Days to Die
+- Valheim
+- Counter-Strike: Global offensive
+- Fivem
 
-### What you'll need
+However, this is just a small selection from the extensive list of games supported. For a comprehensive list of supported games, you can visit our official website [here](https://www.tcadmin.com/features/)
 
-- [Node.js](https://nodejs.org/en/download/) version 16.14 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
-
-## Generate a new site
-
-Generate a new Docusaurus site using the **classic template**.
-
-The classic template will automatically be added to your project after you run the command:
-
-```bash
-npm init docusaurus@latest my-website classic
-```
-
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
-
-The command also installs all necessary dependencies you need to run Docusaurus.
-
-## Start your site
-
-Run the development server:
-
-```bash
-cd my-website
-npm run start
-```
-
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
-
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
-
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+Furthermore, TCAdmin offers a vibrant community that has contributed numerous game configurations and templates. These community-made resources can be found [here](https://community.tcadmin.com/files/category/1-game-configs) providing even more options to enhance your game hosting experience.

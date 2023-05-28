@@ -1,41 +1,23 @@
-# Website
+# TCAdmin Documentation
 
-This website is built using [Docusaurus 2](https://docusaurus.io/), a modern static website generator.
+Welcome to the official documentation for TCAdmin! This repository contains comprehensive documentation for TCAdmin, a leading control panel for game server hosting. This README provides an overview of the documentation structure and how to contribute to its improvement.
 
-### Installation
+## Table of Contents
 
-```
-$ yarn
-```
+**TO DO STILL**
 
-### Local Development
+## About TCAdmin
 
-```
-$ yarn start
-```
+TCAdmin is a powerful and user-friendly control panel designed for game server administrators and hosting providers. It offers a wide range of features to simplify the management of game servers, including server deployment, configuration, monitoring, and more. With TCAdmin, you can easily manage multiple game server instances, control access and permissions, and provide an intuitive user interface for your customers.
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+For more information about TCAdmin, please visit the [official website](https://www.tcadmin.com/).
 
-### Build
+## Documentation Structure
 
-```
-$ yarn build
-```
+The TCAdmin documentation is organized into the following main sections:
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
+**TO DO STILL**
 
-### Deployment
+## Contributing
 
-Using SSH:
-
-```
-$ USE_SSH=true yarn deploy
-```
-
-Not using SSH:
-
-```
-$ GIT_USER=<Your GitHub username> yarn deploy
-```
-
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+We welcome contributions to enhance the TCAdmin documentation. If you find any errors, typos, or missing information, or if you would like to propose improvements
