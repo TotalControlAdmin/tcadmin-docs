@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunktcadmin_docs=self.webpackChunktcadmin_docs||[]).push([[8848],{797:a=>{a.exports=JSON.parse('{"label":"facebook","permalink":"/tcadmin-docs/blog/tags/facebook","allTagsPath":"/tcadmin-docs/blog/tags","count":1}')}}]);

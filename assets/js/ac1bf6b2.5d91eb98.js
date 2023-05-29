@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunktcadmin_docs=self.webpackChunktcadmin_docs||[]).push([[5877],{214:e=>{e.exports=JSON.parse('{"permalink":"/tcadmin-docs/blog/tags/hello","page":1,"postsPerPage":10,"totalPages":1,"totalCount":2,"blogDescription":"Blog","blogTitle":"Blog"}')}}]);
