@@ -4,3 +4,53 @@ sidebar_label: Linux Installation
 ---
 
 # Linux Installation
+
+### Automated TCAdmin installer for Linux
+The automated installer will automatically install TCAdmin and all of the dependencies.
+
+:::info
+Run the installer below as root or sudo.
+:::
+
+```bash
+cd /home && curl -o tcadmin-installer.sh https://downloads.tcadmin.net/installer/tcadmin-installer.sh && sh tcadmin-installer.sh -i
+```
+<br />
+
+:::tip
+
+If you want to run the command above with sudo, cd first to home & then run the curl command
+
+:::
+
+```bash
+cd /home
+```
+then
+
+```bash
+sudo curl -o tcadmin-installer.sh https://downloads.tcadmin.net/installer/tcadmin-installer.sh && sh tcadmin-installer.sh -i
+```
+
+Should you run into any issues, please post them in [this thread:](https://community.tcadmin.com/topic/11831-automated-linux-installer/)
+
+### Manual installation
+
+1. Make sure you have installed the [System Requirements](/getting-started/system-requirements).
+2. Download and install the TCAdmin package for your Linux distro.
+
+:::info
+Run the TCAdmin package commands below as root or sudo.
+:::
+
+
+### CentOS / Fedora / Redhat
+
+```bash
+wget https://downloads.tcadmin.net/installer/tcadmin-2-bi.noarch.rpm;yum -y install tcadmin-2-bi.noarch.rpm --nogpgcheck
+```
+### Debian / Ubuntu
+
+```bash
+wget https://downloads.tcadmin.net/installer/tcadmin-2-bi.noarch.deb;dpkg -i tcadmin-2-bi.noarch.deb
+```
