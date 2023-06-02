@@ -1,0 +1,101 @@
+---
+sidebar_position: 5
+sidebar_label: Server Management
+---
+
+# Server Management
+
+## Datacenters
+
+Datacenters are used to organize your servers and Teamspeak servers by location. To create a new datacenter go to `Server Management` (on the left hand navigation) > `Datacenters` > `New.` A datacenter can't be deleted if it is currently assigned to a server or Teamspeak server.
+
+## Servers
+
+Each server represents a dedicated or virtual server. Your primary server is named `Master.` This server usually runs the TCAdmin website and database. Additional servers are `remote` servers. They require a connection to the `master` to function properly.
+
+## Creating a New Server
+:::tip
+If you have a SQLite database it is recommended that you convert it to MySQL.
+:::
+
+Before adding a new server make sure you have enough remote licenses. Go to `System` (on the left hand navigation) > `License Info.` If you recently added a new remote license and it does show up yet click on the Update License button. The number of remote licenses should increase.
+
+If you have a MySQL database go to `Server Management` (on the left hand navigation) > `Remote DB Connections.` Enable and configure the database connection. This is the information used by the remotes to connect to the master's MySQL database.
+
+Go to `Server Management` (on the left hand navigation) > `Servers` > `New.` The following information is required:
+
+- Server Settings
+  - `Datacenter` : Select the datacenter where the server is located.
+  - `Operating System` : Select the server's operating system.
+  - `Primary IP` : Enter the server's primary IP. If the server is behind a hardware firewall/router enter the private IP.
+  - `Firewall IP` : Only enter the firewall IP if your server is behind a hardware firewall/router.
+  - `Name` : Enter the name that will identify the server.
+
+- Router/Firewall settings
+  - Enable support for `Windows Firewall` : Enable this option if the server is running Windows Firewall. Required ports will be opened automatically. If you enable this option and the firewall is disabled you might receive errors in the monitor console.
+  - Enable support for `uPnP port forwarding` : Enable this option if the server is behind a hardware firewall/router with uPnP enabled. Required ports will be opened automatically.
+
+- Game & Voice Settings
+  - Enable the `game monitor service` : Enable this option if you want game/voice servers to be monitored for crashes and configuration changes.
+  - `Game Files Path` : Enter the path where the game files are located. Make sure the folder exists.
+  - `User Files Path` : Enter the path where the user files are stored. Make sure the folder exists.
+
+  :::note
+
+   On Linux User Files Path is only used if the game is configured to run as root **(not recommended).** Files will be copied to the home folder of the user that runs the service. By default this folder is `/home/tcagame.`
+
+  :::
+
+  - `Get Files From` : If you want the server to download the game files from another server select it from the list.
+  - `Keep a local copy of downloaded files` : Check this option if you want to save the files locally after they have been downloaded. This only works if your game files are compressed.
+
+Save the server and click on Config File to generate the server's configuration file.
+
+Install TCAdmin on the new server. To configure the server quickly simply place the generated ConfigUtility.config in the Monitor folder and restart the monitor.
+
+:::info 
+For an advanced configuration start the monitor and service manager. Then view the configuration utility using your browser: `http://REMOTEIP:8880.` Select remote configuration. It will ask you to upload the ConfigUtility.config that you generated along with other options. **Remote servers must connect to the master's database.**
+:::
+
+:::tip
+It is **recommended** to start the remote monitor in console mode first to make sure it starts without any errors.
+:::
+
+## IPs
+
+When modifying or after saving a new server, an icon for Server IPs will appear at the bottom. If you click on it you can specify all the server's IPs.
+
+:::tip 
+ It is **recommended** that you only use the import button, when adding IP addresses to TCAdmin
+:::
+:::note
+If the IPs are not importing you need to configure them in the network adapter first.
+:::
+
+## Router/Hardware Firewall
+
+If your server is behind a router or hardware firewall when you click on the import button it will add the private network IPs. This is not an error. Game servers must bind to the private IP since that it is actually configured in the server's network adapter.
+
+:::tip
+If you want TCAdmin to display the public IP enter it in the Hostname field.
+:::
+
+## Test Connectivity
+
+To confirm that the `master` server is communicating with the `remote` servers correctly go to `Server Management` (on the left hand navigation) > `Servers` and click on the Show Versions button.
+
+## Override Settings
+
+To override settings on a specific server use Override.config
+
+## Server Owner
+
+A user or reseller can be assigned to one or more servers. This allows the user to create game and voice servers on his servers. When a server is assigned to a user it is not used by the billing API or by reseller packages. For more information read User_Assigned_Servers.
+
+## Remote DB Connections
+
+You can enable this feature if you are running a MySQL database. This feature can improve performance by allowing remote servers to connect directly to the database.
+
+## File Servers
+
+With the File Servers feature you can place your game files in an external FTP server and have all monitors download the files from there. After adding a file server go to the server settings and configure it to download the files from the file server.

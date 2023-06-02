@@ -1,0 +1,92 @@
+---
+sidebar_position: 5
+sidebar_label: Updating
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+Learn how to update to newer versions of TCAdmin
+
+# Updating
+
+## Update Mono from 2.x or 4.x to 5.x
+
+- Add the Xamarin repository to your server's Configuration: https://www.mono-project.com/download/stable/#download-lin
+
+### Install Mono (CentOS)
+
+```bash
+yum install mono-complete mono-basic xsp
+```
+
+### Install Mono (Debian/Ubuntu)
+
+```bash
+apt-get install mono-complete mono-vbnc mono-xsp
+```
+
+- Edit **/home/tcadmin/Monitor/mono-config.** Change the value of **MONO_FOLDER** to **/usr**
+- Reinstall your current TCAdmin files with this command:
+
+:::tip
+(replace **2.0.119** with your current version):
+:::
+
+```bash
+/home/tcadmin/Monitor/updatetool 2.0.119
+```
+## Automatic Update
+
+TCAdmin's automatic update feature updates the master and all remote servers with a few clicks. To update automatically follow these steps:
+
+1. Select **System** > **Check for Updates** on the sidebar.
+2. Click on the **Check for Updates** button.
+3. Select the **first** update available at the top of the list.
+4. Click on the **Install Selected Update** button.
+5. After a few minutes the update will be completed and you will be redirected to the admin home page.
+
+![Image Alt Text](/img/docs/WebUpdate.png)
+
+## Manual Update
+
+:::danger
+It is recommended to perform a manual update only in two scenarios: when a new remote server has been added or when the web update process has failed. The web update ensures that your database is updated before updating the files. Neglecting to update the database while updating may result in TCAdmin failing to start or encountering unpredictable errors.
+:::
+
+### Manual Update Procedures
+
+<Tabs>
+  <TabItem value="windows" label="Windows">
+
+- Log in to your server's remote desktop.
+- Go to **Start** > **Run** and enter the following command. Replace **C:\Program Files\TCAdmin2** with the path to your TCAdmin installation folder
+- If the update completes successfully you should not see any errors in the update console and the Monitor and Service Manager services should be started automatically.
+
+:::tip
+Replace **2.0.173.0** with the version you want to update to:
+:::
+
+```shell
+"C:\Program Files\TCAdmin2\Monitor\TCAdminUpdateTool.exe" 2.0.173.0
+```
+
+
+  </TabItem>
+    <TabItem value="linux" label="Linux">
+
+- Log in to your server with ssh
+- Execute the following command
+- If the update completes successfully you should not see any errors in the update console and the Monitor and Service Manager services should be started automatically.
+
+:::tip
+Replace **2.0.173.0** with the version you want to update to:
+:::
+
+```shell
+/home/tcadmin/Monitor/updatetool 2.0.173.0
+```
+
+
+  </TabItem>
+</Tabs>

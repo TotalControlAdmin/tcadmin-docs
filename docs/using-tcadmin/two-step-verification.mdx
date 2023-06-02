@@ -1,0 +1,65 @@
+---
+sidebar_position: 2
+sidebar_label: Two-Step Verification
+---
+
+# Two-Step Verification
+
+## Configuration
+
+- Install an authenticator app on your smartphone. You may use other OTP software or hardware.
+
+:::info
+Here are some popular authenticator apps we recommend:
+
+[Authy Android](https://play.google.com/store/apps/details?id=com.authy.authy&hl=en&gl=US) | [Authy IOS](https://apps.apple.com/us/app/twilio-authy/id494168017)
+
+[Google authenticator Android](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en&gl=US) | [Google authenticator IOS](https://apps.apple.com/us/app/google-authenticator/id388497605)
+:::
+
+- Log in to TCAdmin.
+- Select `Account Security` from the menu options.
+- Select the `Two-Step Verification` tab.
+- Check `Enable two-step verification`
+
+![2FA](/img/using-tca/2FA.png)
+
+If you want to enable two-step for FTP access check `Enable two-step verification for FTP connections.`
+
+:::tip
+If you enable this option configure your FTP client to send the password in the following format: `YourPassword#GeneratedToken`
+:::
+
+:::tip
+If your software has scanning capabilities you can scan the QR-code.
+:::
+
+- Type the verification key in your Authenticator app or other software/hardware.
+- Generate a token and type it in the "Generated Token" field.
+- Click on Save.
+
+## Common Errors
+
+#### All generated tokens are expired
+
+The token is generated based on the current time and is valid for 30 seconds. This required that both the client and server have the correct time.
+
+:::tip
+Use NTP to synchronize your date and time on the server:
+
+[How to configure NTP for Linux](https://www.digitalocean.com/community/tutorials/how-to-set-up-time-synchronization-on-ubuntu-20-04)
+
+[How to configure NTP for Windows](https://www.vultr.com/docs/how-to-set-the-timezone-and-configure-ntp-on-windows-server/)
+:::
+
+#### User lost their verification key
+
+You can disable two-step verification by selecting the user, select the `Actions` tab and click on `Disable two-step.` If the action is not visible it means the user doesn't have two-step authentication enabled.
+
+#### Admin lost their verification key
+
+Start the monitor in console mode. Execute this command in the console:
+
+```
+disable-two-step Admin
+```
