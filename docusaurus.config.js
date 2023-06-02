@@ -58,23 +58,23 @@ const config = {
           position: "right",
         },
         {
-          href: "https://github.com/TotalControlAdmin/tcadmin-docs",
+          href: "https://discord.gg/ptN2pGf",
           label: "Discord",
           position: "right",
 
         },
         {
-          href: "https://github.com/TotalControlAdmin/tcadmin-docs",
+          href: "https://community.tcadmin.com",
           label: "Forums",
           position: "right",
         },
         {
-          href: "https://github.com/TotalControlAdmin/tcadmin-docs",
+          href: "https://www.tcadmin.com/",
           label: "Main Website",
           position: "right",
         },
         {
-          href: "https://github.com/TotalControlAdmin/tcadmin-docs",
+          href: "https://clients.tcadmin.com/billing",
           label: "Billing",
           position: "right",
         },
