@@ -7,7 +7,7 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 const config = {
   title: "TCAdmin Documentation",
   tagline: "TCAdmin Documentation",
-  favicon: "img/favicon.ico",
+  favicon: "img/cropped-tcadmin-favicon-32x32.png",
 
   url: "https://docs.tcadmin.com",
   baseUrl: "/",
@@ -61,6 +61,7 @@ const config = {
           href: "https://github.com/TotalControlAdmin/tcadmin-docs",
           label: "Discord",
           position: "right",
+
         },
         {
           href: "https://github.com/TotalControlAdmin/tcadmin-docs",

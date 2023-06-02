@@ -1,0 +1,81 @@
+---
+sidebar_position: 5
+sidebar_label: Server Components
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+Learn all the components that are associated with TCAdmin
+
+# Server Components
+
+TCAdmin consists of two major components. The monitor and the service manager. They can run in either service mode or console mode. When a server is restarted the monitor and service manager are started automatically in service mode.
+
+## Monitor
+
+The monitor runs the control panel website, game monitor, task scheduler and FTP services. It also sends and receives commands from other servers that you have configured.
+
+## Service Manager
+
+The service manager is in charge of starting the game/voice services automatically after restarting the server. It also receives start/stop commands from the monitor. You can also use the service browser to manage the services from remote desktop or ssh.
+
+## Start/Stop in Service Mode
+
+<Tabs>
+  <TabItem value='windows' label='Windows'>
+
+To start/stop a service go to **Start** > **Control Panel** > **Administrative Tools** > **Services.** Find the service named **TCAdmin 2.0 Monitor** or **TCAdmin 2.0 Service Manager** and **stop**, **start** or **restart** it.
+
+  </TabItem>
+
+  <TabItem value='linux' label='Linux'>
+
+To **start/stop** a service execute **/home/tcadmin/Monitor/monitor-service** or **/home/tcadmin/Monitor/serviceman-service** with **stop**, **start** or **restart** as commandline parameters. For example:
+
+```bash
+/home/tcadmin/Monitor/monitor-service start
+/home/tcadmin/Monitor/serviceman-service start
+```
+
+  </TabItem>
+</Tabs>
+
+## Start/Stop in Console Mode
+
+Console mode is useful for troubleshooting. Enable debugging so you can see additional messages that can be used to figure out why something is not working correctly.
+
+To exit the monitor console enter **quit** and press enter. To exit the service manager console press enter.
+
+:::tip
+Before starting in console mode make sure it is not running in service mode.
+:::
+
+### 
+
+<Tabs>
+  <TabItem value='windows' label='Windows'>
+
+To start a console go to **Start** > **Programs** > **TCAdmin** > **Start Monitor Console** or **Start Service Manager Console.**
+
+  </TabItem>
+
+  <TabItem value='linux' label='Linux'>
+
+To start the monitor console execute:
+
+```bash
+cd /home/tcadmin/Monitor
+./monitor-service stop
+./monitor-console
+```
+To start the service manager console execute:
+
+```bash
+cd /home/tcadmin/Monitor
+./serviceman-service stop
+./serviceman-console
+```
+
+  </TabItem>
+</Tabs>
