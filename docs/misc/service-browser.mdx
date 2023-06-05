@@ -1,0 +1,96 @@
+---
+sidebar_position: 5
+sidebar_label: Service Browser
+---
+# Service Browser
+
+## Using the Service Browser on Windows
+
+To start the service manager log in to remote desktop and click on `Start` > `Programs` > `TCAdmin` > `Service Browser.`
+
+## Start/Stop a Service
+
+Select the service from the list and click on the `start/stop/restart` toolbar button.
+
+## View Interactive Services
+
+- Select the service from the list. Then click on the `Show Interactive Service` toolbar button.
+- The service's console should be visible so you can troubleshoot it.
+
+![windows Service Browser](/img/Misc/WindowsServiceBrowser.png)
+
+## Using the Service Browser on Linux
+
+To start the service manager log in to ssh and execute the following commands. Replace `/Path/To/TCAdmin/Monitor` with the path to your TCAdmin Monitor folder.
+
+:::tip
+Typically, the default installation directory is `/home/tcadmin/Monitor`
+:::
+
+to get the these paths you can run the following commands:
+
+
+```bash title="first cd to the path"
+cd /Path/To/TCAdmin/Monitor
+```
+```bash title="then run the below command to enter the service browser"
+./servicebrowser
+```
+## Start/Stop a Service
+
+- Select the service from the list and click on the `start/stop/restart` button.
+
+![Linux Service Browser](/img/Misc/LinuxServiceBrowser.png)
+
+## Commandline Parameters
+
+The service browser can be used from the commandline to `start`, `stop` and `restart` a service.
+
+### Service
+
+- Specify the service id that you want to control. You can specify "all" to execute the command on all services.
+
+### Command
+
+Specify the command to execute. Valid commands are:
+
+- `stop` : Stops the specified service.
+- `start` : Starts the specified service.
+- `restart` : Restarts the specified service.
+- `write` : Writes to the specified service's console. If the server has Linux the option `Control console's input` must be enabled in the game's settings.
+
+## Examples
+
+Stop the service with id 2 **(Windows)**
+
+```
+TCAdminServiceBrowser.exe -service=2 -command=stop
+```
+
+Stop the service with id 2 **(Linux)**
+
+```bash
+./servicebrowser -service=2 -command=stop
+```
+
+Writes "quit" to service's console **(Linux)**
+
+```bash
+./servicebrowser -service=2 -command=write -write=quit
+```
+
+Writes `say hello world` to service's console **(Linux)**. 
+
+:::note
+Notice double quotes need to be escaped (\")
+:::
+
+```bash
+./servicebrowser -service=2 -command=write -write=\"say hello world\"
+```
+
+Writes `say hello world` to service's console **(Windows)**.
+
+```
+TCAdminServiceBrowser.exe -service=2 -command=write -write="say hello world"
+```

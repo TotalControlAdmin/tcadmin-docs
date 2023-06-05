@@ -1,0 +1,26 @@
+---
+sidebar_label: Game Information
+sidebar_position: 1
+---
+
+# Game Information
+
+- `Game Id` - The id used to identify the game.
+- `Name` - The name used to identify the game.
+- `Short Name` - The short name used to identify the game.
+- `Operating System` - The operating system where this game can be installed.
+- `Min Slots` - The minimum number of slots supported by this game.
+- `Max Slots` - The maximum number of slots supported by this game. Set to `0` for no limit.
+- `Default Slots` - The default number of slots shown when creating this game.
+- `Query Protocol` - Select the type of query used to get the status of the game server. If there is no compatible query try using `Config file parser`. This will attempt to read server rules directly from the game's config files.
+- `Private Server Variable` - The name of the server variable used to determine if the game server is private.
+- `Private Rule Value` - The value of the server variable used to determine if the game server is private.
+- `Show in create list` - Enable if you want the game to show up in the games available for auto setup. The game files must exist in the specified folder or file.
+- `RCon Protocol` - Select the rcon protocol used to execute console commands.
+  - If you select 'ConsoleInput' the game server must have a text console. On Windows, `General Settings` > `Interact with Desktop` is required. On Linux, `Text Console` > `Control Console's` Input is required. Some games are not compatible with this option.
+- `Is a voice server` - Specifies if the game server will show up under the voices services list instead of the game services list.
+- `Can be used as a game template` - Enable if you want other games to use some or all of this game's settings. This allows you to update all the common settings for an engine or games with multiple configurations in a single place.
+
+:::info example
+Usually the Windows and Linux versions of a game share all the settings except the executable file name. You can create the full game configuration for Windows and enable it as a template. When you create the Linux configuration select the Templates tab. Configure it to use all the settings from the Windows configuration except Files & Directories. Then in the Files & Directories tab you can configure the specific executable and folder where the Linux files are located.
+:::

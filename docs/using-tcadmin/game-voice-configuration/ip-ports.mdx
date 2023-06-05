@@ -1,0 +1,31 @@
+---
+sidebar_label: IP & Ports
+sidebar_position: 2
+---
+
+# IP & Ports
+
+- `Only use the server's primary IP` - Enable if the game server should only use the server's primary IP. Some game servers only work correctly with the primary IP.
+- `Only use the default ports` - Enable if the game server should only use the default ports. Some game servers have no way of changing the default ports.
+- `Game Port` - The default game port used by the game server.
+- `Query Port` - The default query port used by the game server. Use the query port expression below to specify a formula to get the query port.
+- `RCon Port` - The default rcon port used by the game server. Use the rcon port expression below to specify a formula to get the rcon port.
+
+:::info examples
+game port + 10
+
+Rcon port + 10
+:::
+
+- `Custom Port 1 - 5` - Use the custom ports for any additional ports you might need.
+- `Port Increment` - The value added to the default ports if they are not available.
+- `Query Port Expression` - An expression used to generate the query port.
+- `RCon Port Expression` - An expression used to generate the rcon port.
+
+:::info examples
+$[Service.QueryPort] + 10
+
+$[Service.RconPort] + 10
+:::
+
+- `Custom Port 1 - 5 Expression` - Use the custom port expressions for any additional ports that require a special formula.

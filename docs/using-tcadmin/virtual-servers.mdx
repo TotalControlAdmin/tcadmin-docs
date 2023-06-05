@@ -1,0 +1,56 @@
+---
+sidebar_position: 6
+sidebar_label: Virtual Servers
+---
+
+# Virtual Servers
+
+TCAdmin allows you to split your server's resources into virtual servers. This feature does not use virtualization software. Basically you can create a virtual server with 1 or more IPs, cores, x amount of ram and x amount of disk space. In TCAdmin manages the virtual server's disk space and CPU usage. In the control panel it will look like a normal server. You can assign this virtual server to a user. The user does not get `root/administrator` access to his virtual server.
+
+## Requirements
+
+### Windows
+
+- Enable quotas on the drive where the services will be created. The configuration shown in the screenshot is recommended. This is only required if you want to limit a virtual server's disk space.
+
+![WindowsQuotas](/img/using-tca/WindowsQuotas.png)
+
+### Linux
+
+- [Linux Quotas](#) must be enabled on the file systems where virtual server's space will be located. This is only required if you want to limit a virtual server's disk space.
+- [schedutils](#) must be installed to set process affinity.
+
+## Possible Implementations
+
+- `Sell dedicated cores and memory` - Assign a virtual server to a user or reseller so he can create game servers.
+- `Distribute your game servers across different drives.` - If you have 3 hard drives you can create 2 additional virtual servers with unlimited memory and disk space. Set the user files path of each virtual server to different drives.
+- `Configure game servers on specific IPs.` - If you want a game type to only use a specific IP you can create a virtual server with that IP. In the virtual server's game and voice settings only allow that game to be created. In the main server's settings allow all games except that one. In the main server's IP settings disable game and voice servers for the virtual server's IP
+
+## Limitations
+
+- `Windows Service Manager` - On Windows, the service manager must always run in service mode. If you start a service that is assigned to a virtual server while the service manager is running in console mode it will be stopped after a few seconds.
+- `Games and Services` - The game must be able to run as a guest (non-root) user. Each virtual server has its own user. The game servers run as that user, overriding any setting in the game's Run As tab.
+The game server must be able to run with affinity set to a single CPU. For example MW3 is not compatible with the virtual server feature. It has a CPU check at start up. It will show an error if it detects there is not enough CPU power.
+- `IP Usage` - If each virtual server has a different IP the game must support running on a specific IP instead of binding to all IPs.
+- `CPU usage shown in the System Resources Widget` - There are 2 different ways CPU usage is displayed for a virtual server.
+  - If the virtual server only has 1 core it will show CPU usage of all the services in that virtual server.
+  - If the virtual server has 2 or more cores it will display the actual CPU usage of those cores. If other processes are running on that core their CPU usage will be visible even if it does not belong to that virtual server.
+
+In other words, you can only oversell virtual servers that have one core assigned.
+
+
+
+- `Memory Usage` - Services running in the virtual server may use more memory than assigned. Memory limits are enforced by the system monitor depending on your configuration. Configure the system monitor in the main server's settings.
+- `Linux Disk Usage` - The quota package must be installed and configured so TCAdmin can restrict disk usage according to the virtual server's configuration. For more information read your distro's documentation.
+- `Service Affinity` - It is up to you to set the affinity of existing game servers that run on the main server so they don't use cores assigned to virtual servers. You can set the default affinity of new services in the main server's Game and Voice Settings tab.
+- `SSH/Remote Desktop Access` - The virtual server created by TCAdmin is not a standard VPS. TCAdmin manages the main server's resources so it looks like more than one server in the control panel. Your client can't have access to SSH or remote desktop.
+
+## Recommendations
+
+If you plan on selling dedicated cores, It is recommended that you assign TCAdmin to CPU0 and sell the others. That way TCAdmin will not use the other CPUs. The monitor affinity can be configured in the main server's settings.
+
+## Licensing
+
+Virtual servers do not require additional licenses. You only need 1 license for the parent server.
+
+Enterprise licenses are limited to 10 user assigned servers or dedicated reseller packages. If one or more virtual server are assigned to a user the parent server will be counted towards your limit only once. To increase the limit add a leased or purchased remote to your master license.

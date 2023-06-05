@@ -1,0 +1,26 @@
+---
+sidebar_position: 7
+sidebar_label: Mail Server Configuration
+---
+
+# Mail Server Configuration
+
+To configure your mail server go to `System` (on the left-hand navigation) > `Settings` > `Mail Server Settings`. If your server requires authentication make sure you enter the correct `username` and `password`.
+
+If your server requires or supports secure connections you can select a secure method next to `SSL/TLS` Mode.
+
+![MailServerSettings](/img/using-tca/MailServerSettings.png)
+
+## Send Email with Gmail
+
+First [enable POP](http://mail.google.com/support/bin/answer.py?answer=13273) and [enable less secure apps](https://www.google.com/settings/security/lesssecureapps) in your gmail account
+
+- Use the following settings to send email with your gmail account:
+  - Send Method : `SMTP`
+  - SSL/TLS Mode : `Explicit`
+  - Server : `smtp.gmail.com`
+  - Port : `587`
+  - User : your full email address `(including @gmail.com or @your_domain.com)`
+  - Password : `your Gmail password`
+  - Default "From" Email : your full email address `(including @gmail.com or @your_domain.com)`
+  - Default "From" Name : Your name or organization

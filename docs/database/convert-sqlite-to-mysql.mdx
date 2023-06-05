@@ -1,0 +1,25 @@
+---
+sidebar_label: Convert SQLite Database to MySQL
+---
+
+# Convert SQLite Database to MySQL
+
+## Convert your Database
+
+You can convert your SQLite database to MySQL using the tool available at `General Settings` > `Tools`.
+
+- Install MySQL on your master server.
+- Create an empty MySQL database and user.
+- Go to `General Settings` > `Tools.` Select `Convert SQLite Database to MySQL`.
+- Enter the required information and click on Execute.
+- After the process completes run the configuration utility and configure TCAdmin to use the MySQL database and restart. [http://x.x.x.x:8880/Interface/Config/Default](http://x.x.x.x:8880/Interface/Config/Default) for MVC and [http://x.x.x.x:8880/Interface/Configuration/Default.aspx](http://x.x.x.x:8880/Interface/Configuration/Default.aspx) for ASP.NET
+
+:::tip
+If you get an error about missing tables uninstall any modules that you have installed. Then install them again after converting the database successfully.
+:::
+
+## Configure Remote Servers
+
+After you have configured your master it is recommended that you enable remote db connections. Go to `Server Management` > `Remote DB Connections`. Enter the information required to connect to the database there.
+
+Generate a new `ConfigUtility.config` for each of your remote servers. Place it in the remote's Monitor folder (`/home/tcadmin/Monitor` or `Program Files\TCAdmin2\Monitor`) and restart the monitor. It is recommended that you start the monitor in [console mode](/getting-started/server-components#startstop-in-console-mode) first to make sure it connects to the database correctly.
