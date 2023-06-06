@@ -1,0 +1,43 @@
+---
+sidebar_label: Compression
+---
+
+# Compression
+
+The following file formats and extensions are supported. No additional software is required.
+
+### Windows and Linux
+
+- `.zip`
+- `.rar`
+
+### Linux Only
+
+- `Tarball` : `.tar`
+- `Gzip compressed tarball`: `.tar.gz`, `.tgz`
+- `BZip compressed tarball` : `tar.bz2`, `.tbz2`
+- `Lzma compressed tarball` : `.tar.lzma`, `.tlz`
+
+## Compressed Game Files
+
+Game files can be compressed to improve transfer speed between servers. The compressed file should not include the `TCA.*` sub folders.
+
+### Linux
+
+First make sure the game's folder is not empty. You can run the compress scripts located in `/home/tcadmin/tcafiles/games`. The file name is `compress_<game>.sh`. If you run the compress script and the folder is empty it will create an empty file.
+
+This example compressed the files for Counterstrike.
+
+```bash title="cd to path"
+cd /home/tcadmin/tcafiles/games
+```
+
+```bash title="execute sh script"
+./compress_cs-linux.sh
+```
+
+### Windows
+
+- Go to `C:\TCAFiles\Games\<game>`. Select all files and folders except the `TCA.*` folders.
+- To compress the files to ZIP right click on the selected files and select `Send To` > `Compressed (zipped) Folder`. Move the created zip file to` C:\TCAFiles\Games`. Name it `<game>.zip`
+- If you have Winrar installed right click on the selected files and select Add To > `<game>.rar`. Move the created rar file to `C:\TCAFiles\Games`.

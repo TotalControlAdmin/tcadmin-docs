@@ -1,0 +1,26 @@
+---
+sidebar_position: 8
+sidebar_label: Game/Voice Configuration
+---
+
+# Game/Voice Configuration
+
+With TCAdmin, you don't need to wait for us to add support when a new game is released. Any game new or old can be easily configured with the basic features. As long as the game can be run from a commandline or batch file, TCAdmin can control it.
+
+## Templates
+
+Game templates allow you to use the same configuration settings across one or more game.
+
+:::info example
+You have a game that runs on Windows and Linux. They both use the same commandline, config files, etc except for the executable name. In this case you can check `Can be used as a game template` for the Windows configuration. When creating the Linux configuration select the `Files and Directories` tab and enter the required values. Then select the `Templates` tab. Select the Windows configuration for each item except for `Files and Directories`.
+:::
+
+## Game Configurations
+
+- `Importing` - To import game configuration files go to `System` (on the left-hand navigation) > `Settings` > `Game & Other Voice Servers` and click on the `Import button`. v1 and v2 configuration files are supported.
+
+- `Exporting` - To export a game configuration go to `System` (on the left-hand navigation) > `Settings` > `Game & Other Voice Servers` > `Select a game` and click on the `Export button`. Before sharing a configuration make sure it does not contain any sensitive information like a password for the Run As feature. You can edit the file in notepad if needed.
+
+## Creating
+
+To create a new game configuration manually, follow these steps: go to `System` (located on the left-hand navigation), then select `Settings`, followed by `Game & Other Voice Servers`. Click on the `New` button. If you need an explanation of each feature, review the sub-categories within this category.

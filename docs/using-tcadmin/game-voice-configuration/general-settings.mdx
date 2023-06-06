@@ -1,0 +1,19 @@
+---
+sidebar_label: General Settings
+sidebar_position: 4
+---
+
+# General Settings
+
+- `Always start on CPU 0` - Enable if you want the game server to be started using CPU 0. The game server is set to use all CPUs after a few seconds. This can fix a problem with CPU affinity on Halflife games.
+- `Enable interact with desktop` - Enable if you want to be able to view the game server's console in remote desktop. You must be logged in to the server's desktop console.
+- `Enable the configuration files icon` - Enable if you want the user to be able to view a list of the game server's configuration files.
+- `Enable the log viewer` - Enable if you want the user to be able to view a list of the game server's log files and download or view them from the server.
+- `Log Extensions` - Enter the extensions of the game server's log files. You can specify more than one extension by separating with `;`. For example `.log;``.txt`
+- `Branded Text` - Enter a regular expression used to check if the hostname has the specified branding. If no regular expression is specified a text search will be used.
+- `Add a space between brand and hostname` - Enable if a space should be added between the game server's hostname and brand.
+- `Place branded text at the end` - Enable if the brand should be placed at the end of the hostname.
+- `Brand Regular Exp` - Enter a regular expression used to check if the hostname has the specified branding. If no regular expression is specified a text search will be used.
+- `Regular expression is case insensitive` - Enable if you want the regular expression to be case insensitive.
+- `Stop Delay` - The number of seconds TCAdmin will wait after stopping a game server. Sometimes the server needs time to release the port and resources. 2 seconds or more is recommended.
+- `Scheduled Tasks Limit` - Specify the number or scheduled tasks that are allowed. Set to 0 to have no limit. Enable task types in the Feature Permissions tab.

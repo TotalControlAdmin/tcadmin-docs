@@ -1,0 +1,61 @@
+---
+sidebar_label: Configuration Files
+sidebar_position: 17
+---
+
+# Configuration Files
+
+- `Relative Path` - The relative path to this config file. Include the file name.
+- `Description` - A description for this config file.
+- `View Order` - Set the order in which the config file is shown. Config files that have the same view order will be ordered by relative path.
+- `Enable the configuration editor` - Specify if the configuration editor will be available for this file. To create the editor select the Configuration Editor icon at the bottom of the page.
+- `Read variable values from file` - Specify if the variables will be read back from the file. That way the user can edit the files manually or with the configuration editor. Not all item types or file formats are compatible.
+
+## Template
+
+Configure a template for this file. If the template is blank the original file will not be overwritten and will not be created if it does not exist. To use a variable select one from the list and click on Insert. The variable will be inserted into the template.
+
+## Configuration Editor
+
+Instead of editing the text file directly, you may choose to build a configuration editor. This makes it easier for your clients to configure their service. If the game server is ranked, it allows you to limit what the user can edit according to the developer's instructions.
+
+To build a configuration editor follow these steps:
+
+- Configure the [custom variables](#) that will be used in the configuration file.
+- Configure the configuration file template. Insert the custom variables where needed and save.
+- Click on the Configuration Editor at the bottom.
+- Select New Item. Add items in the order that you want to display them.
+- Reorder existing items dragging an item to a position.
+- Use the parent variable value to specify when to display an item. For example you can configure it to ask for the private password only when `Is Private` equals `1`.
+- Each item type has its own unique settings.
+
+### Item Types
+
+- `Header` - Display a centered text.
+- `Blank Row` - Leave a space between the controls.
+- `Textbox` - Allow the user to enter text. The textbox can be configured to capture a single line, multiple lines or a password.
+- `Numeric textbox` - Allow the user to enter a numeric value.
+- `Checkbox` - Allow the user to enable/disable an option.
+- `Combobox` - Allow the user to select a value from a list. A custom list can be specified or it can be configured to display a list of files or directories.
+- `Multiple selection` - Allow the user to select one or more values. Th value can be generated in 3 different ways:
+   - `Normal` : Selected item values are separated by the specified character.
+   - `Bit flags` : Adds all the selected values. All values must be numeric.
+   - `String flags`: Adds all selected values into a single string without the separator.
+- `Label` - Display a variable's value. It will not be editable.
+
+### Repeat section
+
+This is an advanced feature only recommended if you know how to create regular expressions. It is used to create editors for parts of a file that require more than one line or block of text. For
+
+:::note examples
+
+- map rotations, ban and admin lists.
+- For examples on its usage see the following editors:
+   - `Wolfenstein Enemy Territory`: campaigncycle.cfg, stopwatchcycle.cfg, objectivecycle.cfg, lmscycle.cfg
+   - `Counterstrike`: banned.cfg, listip.cfg
+   - `Metamod`: plugins.ini
+   - `AMX ModX`: users.ini
+
+:::
+
+![ConfigEditor](/img/using-tca/ConfigEditor.png)

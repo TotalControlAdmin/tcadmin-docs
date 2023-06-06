@@ -1,0 +1,112 @@
+---
+sidebar_label: This Service
+sidebar_position: 4
+---
+
+# This Service
+
+## Properties
+
+- `Affinity` - Get/set the game service's processor affinity.
+
+- `BillingId` - The service's id in your billing software.
+
+- `BillingStatus` - The service's status in your billing software.
+
+- `Branded` - Get/set if the game service is branded.
+
+- `ConnectionInfo` - Get the IP and port of the game server.
+
+- `CurrentPid` - Current process id of the game server.
+
+- `CustomPort1` - Get/set the game service's custom port 1.
+
+- `CustomPort2` - Get/set the game service's custom port 2.
+
+- `CustomPort3` - Get/set the game service's custom port 3.
+
+- `CustomPort4` - Get/set the game service's custom port 4.
+
+- `CustomPort5` - Get/set the game service's custom port 5.
+
+- `Executable` - Get/set the executable of this game service.
+
+- `FtpInfo` - Get the IP and port of the FTP server.
+
+- `GameId` - Get/set this service's game id.
+
+- `GameKey` - The game key assigned to this service.
+
+- `GameName` - Get this service's game name.
+
+- `GamePort` - Get/set the game service's game port.
+
+- `GameShortName` - Get this service's game short name.
+
+- `GameShortNameAndConnectionInfo` - Get the game type and IP and port of the game server.
+
+- `IpAddress` - Get/set if the game service's IP address.
+
+- `IpHostname` - Get the IP's hostname. If the IP does not have a hostname, the IP is returned.
+
+- `IsVoiceServer` - Get if this service is a voice server.
+
+- `Name` - Get/set the name of this game service.
+
+- `NameNoHtml` - Get the name of this service without HTML tags.
+
+- `OverrideCommandLine` - Specify if the service uses a custom commandline.
+
+- `Priority` - Get/set the game service's process priority.
+
+- `Private` - Get/set if the game service is private.
+
+- `PublicIpAddress` - Returns the service's public IP address (resolves the IP's configured hostname).
+
+- `QueryPort` - Get/set the game service's query port.
+
+- `RConPort` - Get/set the game service's RCon port.
+
+- `RootDirectory` - Get/set the root directory of this game service.
+
+- `RunAsUserName` - Get the Windows/Linux user that executes the process.
+
+- `ServerId` - Get/set the server where this game service is located.
+
+- `ServerName` - Get this service's server name.
+
+- `ServiceId` - Get/set the game service id.
+
+- `Slots` - Get/set the slots for this game service.
+
+- `Startup` - Get/set the game service's startup type.
+
+- `Status` - Get the service status information.
+
+- `StatusFromCache` - Get the service status information from cache if available.
+
+- `UnparsedCommandLine` - Get/set the command line of this game service.
+
+- `UserId` - Get/set the owner of this game service.
+
+- `UserName` - Get this service's user name.
+
+- `UserPackageId` - Get/set the user package id assigned to this service.
+
+- `Variables` - Get/set the service variables. This field is in XML format.
+
+- `WorkingDirectory` - Get/set the working directory of this game service.
+
+## Custom Variables
+
+Custom variable values can be accessed from scripts using the following formats.
+
+```py title="Iron Python"
+ThisService.Variables["CustomVariableName"]
+```
+```bash title="Windows batch script"
+%ThisService_CustomVariableName%
+```
+```bash title="Linux shell script"
+${ThisService_CustomVariableName}
+```

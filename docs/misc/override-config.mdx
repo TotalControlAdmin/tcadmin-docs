@@ -1,0 +1,37 @@
+---
+sidebar_label: Override config
+---
+
+# Override config
+
+To disable or override specific features on a single server create a file named `Override.config` in `/home/tcadmin/Monitor` or `Program Files\TCAdmin2\Monitor`. The available options are:
+
+- `RestrictedFileNames` - The files that will always be restricted. These can't be `uploaded`, `downloaded`, `modified` or `deleted`. Specify more than one file by separating them with `;` Wildcards are supported.
+- `RestrictServiceExe` - `True/False` : The service's executable will always be restricted. The file can't be `downloaded`, `modified` or `deleted`.
+- `RestrictLinuxExe` - `True/False` : On Linux, all files with execute permissions are restricted. If you set this value to False it is recommended that you set `RestrictServiceExe` to `True` and use the game's File System Permissions and restrict access to the game's main executables.
+- `DisableServiceChanges` - `True/False` : Prevent a service's executable file and paths from being changed in the service settings.
+- `DisableNewService` - `True/False` : Prevent manual service creation.
+- `DisableCustomFtpDirectories` - `True/False` : Disable custom `FTP` directories for all users.
+- `DisableScripts` - `True/False` : It is not recommended to disable this feature. Disable execution of scripts that execute on install, uninstall and other events for this server.
+- `DisableUnsafeTasks` - `True/False` : Disable creation of recurring tasks that can be unsafe (`database backup`, `ftp upload`, etc).
+- `DisableDownloads` - `True/False` : Disables automatic download of files from external servers.
+- `AllowedLinkPaths` - Paths separated by semicolon. List of paths allowed for symlink targets. Wildcards are supported
+
+## Example
+
+```xml
+<?xml version="1.0" encoding="utf-16" standalone="yes"?>
+<values>
+	<add key="RestrictedFileNames" value="" type="System.String,mscorlib" />
+	<add key="RestrictServiceExe" value="True" type="System.Boolean,mscorlib" />
+	<add key="RestrictLinuxExe" value="True" type="System.Boolean,mscorlib" />
+	<add key="DisableServiceChanges" value="False" type="System.Boolean,mscorlib" />
+	<add key="DisableNewService" value="False" type="System.Boolean,mscorlib" />
+	<add key="DisableCustomFtpDirectories" value="False" type="System.Boolean,mscorlib" />
+	<add key="DisableScripts" value="False" type="System.Boolean,mscorlib" />
+	<add key="DisableUnsafeTasks" value="False" type="System.Boolean,mscorlib" />
+	<add key="DisableDownloads" value="False" type="System.Boolean,mscorlib" />
+	<add key="AllowedLinkPaths" value="" type="System.String,mscorlib" />
+</values>
+```
+

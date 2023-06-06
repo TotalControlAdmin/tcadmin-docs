@@ -1,0 +1,35 @@
+---
+sidebar_position: 5
+sidebar_label: Debug Mode
+---
+# Debug Mode
+
+## Monitor Debugging
+
+To configure the monitor in debug mode edit `C:\Program Files\TCAdmin2\Monitor\TCAdminMonitor.exe.config` or `/home/tcadmin/Monitor/TCAdminMonitor.exe.config`. Change this line:
+
+```
+<add key="TCAdmin.Debug" value="False" />
+```
+To
+
+```
+<add key="TCAdmin.Debug" value="True" />
+```
+Stop the monitor service and start it in [console mode](/getting-started/server-components#startstop-in-console-mode). When the monitor starts up or a task is executed you should see debug messages.
+
+## Website Debugging
+
+To configure the website in debug mode edit `ControlPanel\Windows.config` or `ControlPanel\Linux.config` depending on your operating system. Change this line:
+
+```
+<compilation debug="false" strict="true" explicit="true">
+```
+
+To:
+
+```
+<compilation debug="true" strict="true" explicit="true">
+```
+
+Then restart the monitor. When an error occurs you should see the stack trace so we can help you troubleshoot. Also additional information is shown in the footer.

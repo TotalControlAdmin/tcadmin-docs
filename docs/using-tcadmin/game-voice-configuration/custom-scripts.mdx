@@ -1,0 +1,447 @@
+---
+sidebar_label: Custom Scripts
+sidebar_position: 18
+---
+
+# Custom Scripts
+
+TCAdmin supports the following scripting engines:
+
+- [Iron Python](https://ironpython.net/)
+- [C#](https://learn.microsoft.com/en-us/dotnet/csharp/)
+- [Powershell](https://learn.microsoft.com/en-us/powershell/)
+- [Javascript](https://www.javascript.com/)
+- [Lua](https://www.lua.org/)
+
+Access object properties and method according to each language's syntax.
+
+[Batch](http://technet.microsoft.com/en-us/library/bb490869.aspx)/[Shell](https://www.tutorialspoint.com/unix/shell_scripting.htm) script Object properties and variables are converted to environment variables.
+
+You can specify if you want to run your script on Windows servers, Linux servers, or both.
+
+## Script Events
+
+The following events are supported:
+
+- `Before created`
+
+  - Occurs before any files and folders have been created.
+  - `Available objects`:
+    - [ThisServer](/customizations/scripts/script-objects/this-server)
+    - [ThisGame](/customizations/scripts/script-objects/this-game)
+    - [ThisUser](/customizations/scripts/script-objects/this-user)
+    - [ThisService](/customizations/scripts/script-objects/this-service)
+
+- `After created`
+
+  - Occurs after the service files have been created but before it has been configured as a service. The script is executed in the service's root directory.
+  - `Available objects`:
+    - [ThisServer](/customizations/scripts/script-objects/this-server)
+    - [ThisGame](/customizations/scripts/script-objects/this-game)
+    - [ThisUser](/customizations/scripts/script-objects/this-user)
+    - [ThisService](/customizations/scripts/script-objects/this-service)
+
+- `Before deleted`
+
+  - Occurs before the delete process is started. The script is executed in the service's root directory.
+  - `Available objects`:
+    - [ThisServer](/customizations/scripts/script-objects/this-server)
+    - [ThisGame](/customizations/scripts/script-objects/this-game)
+    - [ThisUser](/customizations/scripts/script-objects/this-user)
+    - [ThisService](/customizations/scripts/script-objects/this-service)
+
+- `After deleted`
+
+  - Occurs after the service files have been deleted and it has been removed from the database.
+  - `Available objects`:
+    - [ThisServer](/customizations/scripts/script-objects/this-server)
+    - [ThisGame](/customizations/scripts/script-objects/this-game)
+    - [ThisUser](/customizations/scripts/script-objects/this-user)
+    - [ThisService](/customizations/scripts/script-objects/this-service)
+
+- `Before reinstall`
+
+  - Occurs before the service files have been deleted. The script is executed in the service's root directory.
+  - `Available objects`:
+    - [ThisServer](/customizations/scripts/script-objects/this-server)
+    - [ThisGame](/customizations/scripts/script-objects/this-game)
+    - [ThisUser](/customizations/scripts/script-objects/this-user)
+    - [ThisService](/customizations/scripts/script-objects/this-service)
+    - [Game Switcher Scripting Variables](/customizations/scripts/script-objects/game-switcher-scripting-variables)
+
+- `After reinstall`
+
+  - Occurs after the service has been reinstalled but before it has been configured as a service. The script is executed in the service's root directory.
+  - `Available objects`:
+    - [ThisServer](/customizations/scripts/script-objects/this-server)
+    - [ThisGame](/customizations/scripts/script-objects/this-game)
+    - [ThisUser](/customizations/scripts/script-objects/this-user)
+    - [ThisService](/customizations/scripts/script-objects/this-service)
+    - [Game Switcher Scripting Variables](/customizations/scripts/script-objects/game-switcher-scripting-variables)
+
+- `Before move`
+
+  - Occurs before the service has been moved. It is executed on the server where the service is currently located. The script is executed in the service's root directory.
+  - `Available objects`:
+    - [ThisServer](/customizations/scripts/script-objects/this-server)
+    - [ThisGame](/customizations/scripts/script-objects/this-game)
+    - [ThisUser](/customizations/scripts/script-objects/this-user)
+    - [ThisService](/customizations/scripts/script-objects/this-service)
+
+- `After move`
+  - Occurs after the service has been moved. It is executed on the server where the service was moved to. The script is executed in the service's root directory.
+  - `Available objects`:
+    - [ThisServer](/customizations/scripts/script-objects/this-server)
+    - [ThisGame](/customizations/scripts/script-objects/this-game)
+    - [ThisUser](/customizations/scripts/script-objects/this-user)
+    - [ThisService](/customizations/scripts/script-objects/this-service)
+
+:::note
+The `Custom icon` & `Custom action` script events can also be configured as a scheduled task. This requires the `Scheduled Script` feature permission in the game's settings. The script is executed in the service's root directory.
+:::
+
+- `Custom icon` - Allows the user to execute the script by clicking on an icon in the service's home page
+
+  - `Available objects`:
+    - [ThisServer](/customizations/scripts/script-objects/this-server)
+    - [ThisGame](/customizations/scripts/script-objects/this-game)
+    - [ThisUser](/customizations/scripts/script-objects/this-user)
+    - [ThisService](/customizations/scripts/script-objects/this-service)
+    - The variables `ExecUser` and `ExecUserId` can be used to know the user id that executed the script.
+
+- `Custom action` - Allows the user to execute the script by clicking on the link in the service's Actions tab
+
+  - `Available objects`:
+    - [ThisServer](/customizations/scripts/script-objects/this-server)
+    - [ThisGame](/customizations/scripts/script-objects/this-game)
+    - [ThisUser](/customizations/scripts/script-objects/this-user)
+    - [ThisService](/customizations/scripts/script-objects/this-service)
+    - The variables `ExecUser` and `ExecUserId` can be used to know the user id that executed the script.
+
+- `Query monitoring` - Occurs after the service has been queried by the game monitor. If there is an error and `Ignore execution errors` is unchecked it will cancel all other query monitoring checks.
+
+  - `Available objects`:
+    - [ThisServer](/customizations/scripts/script-objects/this-server)
+    - [ThisGame](/customizations/scripts/script-objects/this-game)
+    - [ThisUser](/customizations/scripts/script-objects/this-user)
+    - [ThisService](/customizations/scripts/script-objects/this-service)
+    - [QueryResults](/customizations/scripts/script-objects/query-results)
+    - StatusInfo_CpuLastSecond
+    - StatusInfo_MemoryLastSecond
+    - Scripts can also be configured for each detection type in the game's query monitoring configuration. Each detection type has additional variables that are available:
+      - `Query Failure`: `ThisService_TimesNotResponding`
+      - `Slot Detection`: `ThisService_MaxSlotsAllowed`, `ThisService_SlotsDetected`
+      - `Brand Detection`: `ThisService_UnbrandedHostname`
+      - `Rule Detection`: `Rule`, `RuleVariable`, `RuleOperator`, `RuleValue`, `DetectedValue`
+
+- `Before started` **(executed by the Service Manager)** - Occurs before the service is started. The script is executed in the service's working directory. After creating or updating a script with this event go to the game's settings and click on Update Existing Services or go to a game server's service settings and click on Save.
+
+  - `Available objects`:
+    - [Service Manager Scripting Variables](/customizations/scripts/script-objects/service-manager-scripting-variables)
+
+- `After started` **(executed by the Service Manager)** - Occurs after the service is started. The script is executed in the service's working directory. After creating or updating a script with this event go to the game's settings and click on Update Existing Services or go to a game server's service settings and click on Save.
+
+  - `Available objects`:
+    - [Service Manager Scripting Variables](/customizations/scripts/script-objects/service-manager-scripting-variables)
+
+- `Before stopped` **(executed by the Service Manager)** - Occurs before the service is stopped. The script is executed in the service's working directory. After creating or updating a script with this event go to the game's settings and click on Update Existing Services or go to a game server's service settings and click on Save.
+
+  - `Available objects`:
+    - [Service Manager Scripting Variables](/customizations/scripts/script-objects/service-manager-scripting-variables)
+
+- `After stopped` **(executed by the Service Manager)** - Occurs after the service is stopped. The script is executed in the service's working directory. After creating or updating a script with this event go to the game's settings and click on Update Existing Services or go to a game server's service settings and click on Save.
+
+  - `Available objects`:
+    - [Service Manager Scripting Variables](/customizations/scripts/script-objects/service-manager-scripting-variables)
+
+- `After process crashed` **(executed by the Service Manager)** - Occurs after the service's process has crashed. The script is executed in the service's working directory. After creating or updating a script with this event go to the game's settings and click on Update Existing Services or go to a game server's service settings and click on Save.
+
+  - `Available objects`:
+    - [Service Manager Scripting Variables](/customizations/scripts/script-objects/service-manager-scripting-variables)
+
+- `External Download Script` - This script is executed when a game server has `Enable external download` checked and the local game files don't exist.
+
+  - Available variables:
+    - `FilesFolderName`
+    - `FilesFolderFullName `
+    - `GameFilesPath `
+    - `DownloadedFile `
+    - `DownloadedFileWithoutExtension`
+
+- `Global Recurring Task` - This script will available in `System` (on the left-hand navigation) > `Settings` > `Recurring tasks` when you select the action `Execute a script`.
+  - Available variables:
+    - All global variables with `Script parameter` checked that are used by the script. You will be asked for the value when configuring the recurring task.
+
+## Troubleshooting Scripts
+
+- Enable [debug mode](#) on the server.
+- [Stop](#) the Monitor or Service Manager service depending on the script's event.
+- [Start](#) the Monitor or Service Manager console depending on the script's event.
+- When the script is executed the console will show the output of the batch/shell script or any iron python error.
+- On Linux if the script executes without printing any output make sure you have specified the shell interpreter at the top of the script. For example: #!/bin/bash
+
+## Common Errors and How to Fix Them
+
+### Prevent scripts from hanging
+
+TCAdmin will wait forever until the script completes. To prevent TCAdmin from hanging you need to make sure the commands that you execute never ask for any input from the user. Most commands have a `quiet` mode that disables the user prompts.
+
+:::info examples
+
+- rd (Windows) has a /q command line switch to prevent asking to confirm if you want to delete the directory.
+- rm (Linux) has a -f command to force the command to execute without any prompts.
+  :::
+
+### Script causes FTP to fail after restarting the monitor
+
+If your script starts a process that will be left running in the background it is recommended to start the process like this:
+
+```bash
+"%TCAdminFolder%\Monitor\Tools\StartProcess.bat" -exec c:\myscripts\myexe.exe -workdir c:\myscripts
+```
+
+:::caution
+Doing it any other way may prevent the FTP server to start correctly if the monitor is restarted.
+:::
+
+If you must execute the script as TCAGame copy `StartProcess.bat` to the game server's folder or any other folder that TCAGame can access.
+
+### Hide the commands being executed in a Window batch script
+
+Add `@echo off` to the start of your script.
+
+```bash
+@echo off
+echo You should not see the actual command that is being executed.
+```
+
+### Get the TCAdmin installation folder
+
+You can use the `TCAdminFolder` variable.
+
+- Windows batch script: `%TCAdminFolder%`
+- Linux shell script: `${TCAdminFolder}`
+- Iron Python: `TCAdminFolder`
+
+### Capture values before executing the script
+
+1. Create the variables in the game's custom variables page. In the variable's Options tab check `Script parameter`. If you want TCAdmin to save the value entered by the user check `Save script parameter value`.
+2. Create a script for the Custom Icon or Custom Action event.
+3. Use the variable in your script and check `Prompt for variable values`. TCAdmin will only as for the values of the variables used in the script.
+4. Select the game server. Click on the custom icon or action. It will ask for the variable values.
+
+### Secure your script
+
+An invalid value could cause your script to behave in a way that was not intended.
+
+- Make sure you validate the user's input using the validation options provided by TCAdmin and from your script. You can use the regular expression field to enter an advanced validation. If you don't know how to create regular expressions you can usually find what you want by searching on any search engine. [regexlib.com](http://regexlib.com/Search.aspx) has a large collection of regular expressions: [http://regexlib.com/Search.aspx](http://regexlib.com/Search.aspx)
+- Use numeric textbox, checkbox and combobox instead of textbox whenever possible.
+  - A numeric textbox makes sure that the user enters a numeric value.
+  - A checkbox allows you to ask for simple yes/no 1/0 values.
+  - A combobox makes the user select from a predefined list of values. If the value sent is not in the list it will be rejected.
+- Make sure the variable does not contain back quotes `command here` or any other method of executing a string.
+- Check Execute as the service's user in the script's settings. Even if your script has a vulnerability the damage that can be done will be limited to the guest user's permissions.
+  - Note: In some cases it is not possible to run the script as the user that runs the service. For example if you have the game configured to create a user for each service this user does not exist yet when the `before created` scripts are executed.
+  - You can confirm the user that is executing a script with the follow commands
+    - Windows: `echo %USERNAME%`
+    - Linux: `whoami`
+
+:::info example
+You create a backup script for Minecraft. You want your user to enter the name of their world folder. You create a texbox for this.
+:::
+
+If you don't validate the input the user could enter `..` This will make your script create a backup of the game server root's parent folder. It could create a backup of all services.
+
+In this case the recommended way to capture a folder name is by using a combobox with `Source=File` System and `FilterType=Directories`. This way the user will be shown a list of folders in their game server's root folder. Any value that is not in the list is automatically detected as invalid.
+
+## IronPython how To
+
+### Print messages from an Iron Python script
+
+```py title="Use the Script.WriteToConsole function"
+Script.WriteToConsole("Hello World");
+```
+
+```py title="To update the message shown in the task popup window use:"
+ThisTaskStep.WriteLog("Hello World")
+```
+
+### Throw an exception from an Iron Python script
+
+```py showLineNumbers
+import clr;
+from System import Exception;
+raise Exception("CUSTOM ERROR MESSAGE HERE");
+```
+
+### Exit from an Iron Python script
+
+```py title="Use the Script.Exit function:"
+Script.Exit();
+```
+
+### Import a .py
+
+Place your custom `.py` scripts in `C:\Program Files\TCAdmin2\Monitor\Shared\Lib` or `/home/tcadmin/Monitor/Shared/Lib`. `Python 2.7` is supported.
+
+### Use a module that is not included in Iron Python
+
+```py title="Install Python 2.7 and add the Lib to the search path. Not all modules are supported." showLineNumbers
+import sys
+sys.path.append("C:\\Python27\\Lib")
+import os
+Script.WriteToConsole("Current process id is " + str(os.getpid()))
+```
+
+### Use Iron Python scripting in a config file
+
+```py title="You can use the following syntax:" showLineNumbers
+$ipy<%=ThisService.RootDirectory.Replace("\\", "\\\\"); %>
+
+$ipy<%
+...
+...
+...
+ReturnValue="xyz"
+%>
+```
+
+If you need the code to execute when the user saves the file using the config editor you need to have `Read variable values from file` unchecked.
+
+### Demo scripts for the "Execute script in popup window" feature
+
+**This feature is only available for MVC**. These are Iron Python scripts but the same can be done with batch/shell scripts. Make sure you have `Ignore execution errors` unchecked.
+
+:::caution
+This feature is not compatible with `Enable dynamic content compression` in IIS
+:::
+
+```py title="Success Script" showLineNumbers
+import clr
+from System.Threading import Thread
+
+Script.WriteToConsole("Downloading files...")
+Thread.Sleep(2000)
+Script.WriteToConsole("Extracting...")
+Thread.Sleep(2000)
+Script.WriteToConsole("Writing configuration files...")
+Thread.Sleep(2000)
+Script.WriteToConsole(
+    '<span style="color:orange">This is a warning message! Please wait...</span>'
+)
+Thread.Sleep(2000)
+Script.WriteToConsole("Deleting temporary files...")
+Thread.Sleep(2000)
+Script.WriteToConsole('<span style="color:green">I\'m done. Thanks for waiting!</span>')
+
+```
+
+```py title="Failure Script" showLineNumbers
+import clr
+from System.Threading import Thread
+from System import Exception
+
+Script.WriteToConsole("Downloading files...")
+Thread.Sleep(2000)
+Script.WriteToConsole("Extracting...")
+Thread.Sleep(2000)
+Script.WriteToConsole("Writing configuration files...")
+Thread.Sleep(2000)
+Script.WriteToConsole(
+    '<span style="color:orange">This is a warning message! Please wait...</span>'
+)
+Thread.Sleep(2000)
+Script.WriteToConsole("Deleting temporary files...")
+Thread.Sleep(2000)
+raise Exception(
+    "An error occurred. Please <a href='https://yoursupportwebsite'>contact support.</a>"
+)
+
+```
+
+### Execute a script from another script
+
+This feature requires `2.0.159.6` and greater. Use the following method. To execute a global script send a value of `0` for GameId:
+
+```py
+Script.Execute(GameId, ScriptId)
+```
+
+### Access Custom Variables from IronPython
+
+```py title="To get the value use:"
+abc = ThisService.Variables["VariableName"]
+```
+
+```py title="To set a value use:"
+ThisService.Variables["VariableName"] = "value"
+```
+
+### Capture output from a console program
+
+```py showLineNumbers
+import subprocess
+try:
+  output = subprocess.check_output("\"C:\\Program Files\\TCAdmin2\\Monitor\\Tools\\SteamCmd\\steamcmd.exe\" +exit") #Gets output from cmd
+  Script.WriteToConsole(output) 
+except Exception as e:
+    if hasattr(e, "returncode") :
+      Script.WriteToConsole(str(e.returncode)) #Gets return code from cmd
+      Script.WriteToConsole(str(e.output)) #Gets error output from cmd
+    else :
+      Script.WriteToConsole(str(e)) #Other errors
+```
+
+## Powershell How To
+
+### Get output similar to what you see with Powershell.exe
+
+To get the same output your would get from Powershell.exe add |Out-String to the command. For example:
+
+```bash
+dir|Out-String
+```
+
+### Print messages from a Powershell script
+
+```bash title="Use Write-Host or Write-Output"
+Write-Host "Hello World"
+```
+
+### Show output from command in real time
+
+By default the script will print the output of a command until the command has finished executing. Use this syntax to write each line as it becomes available.
+
+```bash
+& <command or executable> <arguments>|%{Write-Host $_}
+```
+
+```bash title="Example:"
+& ping 127.0.0.1|%{Write-Host $_}
+```
+
+### Access Custom Variables from Powershell
+
+```bash title="To get the value use:"
+$ThisService.Variables.GetValue("VariableName")
+```
+
+```bash title="alternative you can use:"
+$ThisService.Variables.Values["VariableName"]
+```
+
+```bash title="To set a value use:"
+$ThisService.Variables["VariableName"] = "value
+```
+
+## Batch/Shell How To
+
+### Get variable value on Linux
+
+```bash title="On Linux use environment variables like this:"
+${ThisService_VariableName}
+```
+
+```bash title="On Windows use environment variables like this"
+%ThisService_ServiceId%
+```

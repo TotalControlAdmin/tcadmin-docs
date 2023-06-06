@@ -1,0 +1,27 @@
+---
+sidebar_label: Variables
+sidebar_position: 16
+---
+
+# Variables
+
+Variables allow you to have addtional values that the user can input when creating or configuring a service. These can be used in the game's configuration files (via the config editor) or in commandlines.
+
+To use custom variables in the command line or in configuration use this format:
+
+```
+![VariableName]
+```
+
+## Custom Variable
+
+- `Variable Name` - The unformatted name of the variable. You should not change the name if this variable is already in use.
+- `Default Value` - The default value for this variable. `For example 'changeme'.`
+
+## Commandline Parameter Options
+
+- `User access` - Specify if the user is able to set the value of this variable when using the commandline builder.
+- `Value is required` - Specify if the value is required.
+- `Item Type` - Select the type of item that will be used to capture the user's input.
+- `Parent Variable` - Select the item's parent value.
+- `Parent Value` - The item will only be displayed if the parent variable has this value.
