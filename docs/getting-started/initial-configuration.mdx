@@ -1,0 +1,132 @@
+---
+sidebar_position: 4
+sidebar_label: Initial Configuration
+---
+
+# Inital Configuration
+
+How to get going with TCAdmin once installed
+
+## Access your Control Panel
+
+:::info
+
+The default **username** and **password** is the following
+
+Username: **admin**
+
+Password: **password**
+
+:::
+
+:::tip
+
+if you are using NAT make sure you have port forworded in windows firewall, your router, or IPtables/ufw
+
+If you are sure the port is not being blocked by a firewall enable debug mode to figure out what's wrong.
+
+:::
+
+### Windows Servers
+
+View http://127.0.0.1:8880 using the server's browser or [http://public_server_ip:8880](http://public_server_ip:8880) using your PC's browser.
+
+### Linux Servers
+
+View [http://public_server_ip:8880](http://public_server_ip:8880) using your PC's browser.
+
+## License Information
+
+Select **"The master server"** and click on Next. Enter your TCAdmin key, name and company information and click on Next again.
+
+## Database Configuration
+
+Select SQLite or MySQL database. ODBC drivers are not required. Click on Next when you are done.
+
+**SQLite** - The database has already been created for you. Just click on Next.
+
+**MySQL** - You must create an empty database and database user. TCAdmin will execute the database script automatically. Enter the required information and click on Next.
+
+## IP and Ports
+
+Select the server's primary IP, firewall IP and ports that TCAdmin will use. If you change the secure and standard ports make sure they are available.
+
+**Primary IP** - Select the server's primary IP.
+
+**Router/Hardware Firewall IP** - If this server is behind a hardware firewall enter the external IP. Leave blank if there is no hardware firewall configured.
+
+**Standard Port** - The port used by the TCAdmin monitor for standard connections. This port is used for http uploads and downloads. Default port is **8880** on Windows and **8890** on Linux.
+
+**Secure Port** - The port used by the TCAdmin monitor for secure connections. Default port is **8881** on Windows and **8891** on Linux.
+
+**Enable support for Windows Firewall** - If enabled, ports required by TCAdmin and game servers will be opened in Windows Firewall automatically.
+
+**Enable support for uPnP port forwarding** - If enabled, required ports will be forward in the router/firewall automatically. Only enable if the server is behind a router or hardware firewall with uPnP enabled.
+
+:::caution
+The below feature is only supported on Windows
+:::
+
+**Use custom server certificate** - TCAdmin creates a default certificate for secure connections. With a valid certificate you can access your control panel with a secure connection without receiving a security warning. If you have installed a custom certificate you can select it.
+
+## Override Configuration
+
+Select the features that you want to disable or override on this server (Override.config). These will always override the settings specified in the database. Use these features in case you have access to files that you have to protect because they can't be made available publicly. If someone gains admin access to your control panel they will be limited by this configuration even if they try to change the settings from the control panel.
+
+## Apply Settings and Restart the Monitor
+
+Click on Finish to apply your configuration and restart the monitor. After the monitor is restarted you will be redirected to the Admin home page.
+
+## Change your Password
+
+While logged in to your control panel click on **Account Security** on the menu and change the default admin password.
+
+## Update the Admin Profile
+
+Click on **My Profile.** Enter your email and select your time zone. All times shown in the control panel will appear in your time zone.
+
+## Enable support for Let's Encrypt
+
+[Follow these instructions](http://null)
+
+## Mail Server Configuration
+
+Navigate to **System** > **General Settings** > **Mail Server** Settings and configure your mail server.
+
+## Company Information
+
+Navigate to **System** > **General Settings** > **Company** information and enter your company's details. This information is used in the mail templates.
+
+## Server Configuration
+
+:::tip
+If you want to use the default paths you don't need to make any changes.
+
+On Windows the default paths are **C:\TCAFiles\Games** and **C:\TCAFiles\Users**
+
+On Linux the default paths are **/home/tcadmin/tcafiles/games** and **/home/tcadmin/tcafiles/users**.
+:::
+
+Navigate to **Server Management** > **Servers** and select the master server.
+
+- In the **Game & Voice Settings** tab configure the paths for the game and user files. Make sure they exist on the server or restart the monitor and they will be created automatically.
+
+## Server IPs
+
+If you made any changes to the server settings click on Save. Then click on the **Server IPs** icon at the bottom of the page. Click on **Import IPs** and configure the hostnames as needed.
+
+**It is recommended that you only use the Import button to add IPs.** Normally you should not have to add any IPs manually. If all the server's IPs are not imported this means you need to configure them in your server's network settings first. After they have been configured you can try importing them again.
+
+If you are behind a router/hardware firewall only the server's private IP will be imported. **Do not add the public IP manually.** Set the value of hostname to the public IP or a hostname that resolves to the public IP. Game servers should be configured to use the private IP. Ports in the public IP should be manually forwarded to the private IP or enable uPnP support in the server settings and in your firewall.
+
+## Download Steam Games
+
+For your convenience, the steam game files are downloaded the first time you create a game server. Each Steam game also has a batch/shell script that you can execute to download the game files. If you imported a Steam game config and you don't see this file restart the monitor and it will be created. The files are created in **C:\TCAFiles\Games** and **/home/tcadmin/tcafiles/games** by default. See Game/Voice_Configuration and Create Game, Voice & Teamspeak Services for more information on configuring additional games.
+
+## Other Games
+
+Other games require you to place the files in the **C:\TCAFiles\Games** or **/home/tcadmin/tcafiles/games.** Each game has its own sub folder.
+
+## Install Plugins
+
+You can go to Settings > [Plugin Repository](http://null) and install plugins shared by the community (games, themes, languages, modules.)
