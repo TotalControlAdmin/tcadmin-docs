@@ -1,0 +1,106 @@
+---
+sidebar_label: Query Monitoring
+sidebar_position: 15
+---
+
+# Query Monitoring
+
+The built-in game monitor continuously queries the services to make sure they are running perfectly and checks for configuration changes that are not allowed.
+
+`Enable the game monitor service` must be checked in the Game & Voice Hosting tab in each of your server settings. **This is enabled by default.**
+
+## Query Interval
+
+- `Query Interval` - The seconds between queries. The default is `5 minutes` `(300 seconds)`. Set to `0` to disable.
+- `Query Interval` Retry - If the first query fails, the seconds to wait before trying again. The default is `30` seconds. If the query fails the second time the configured actions are taken. Set to `0` to disable.
+
+## Query Failure Detection
+
+- `Enable query failure detection` - Enables actions to be taken when the query does not return any results.
+- `Failure Actions` - The actions to take when the query fails.
+- `Max Failures` - The maximum number of restarts when the query does not respond. Set to `0` to disable.
+- `Max Failure Actions` - The actions to take when the query failures reaches the maximum allowed.
+
+## Slot Detection
+
+- `Enable slot detection` - Enables actions to be taken when the slots have been increased.
+- `Additional Allowed` - The number of additional slots that are allowed for this game. For example this can be used to allow an additional slot for HLTV.
+- `Actions` - The actions to take when the slots have been increased.
+
+## Private Detection
+
+- `Enable private detection` - Enables actions to be taken when the service's branding has been removed.
+- `Actions` - The actions to take when the service's branding has been removed.
+
+## Rule Detection
+
+You can get a list of rules available for a game type by querying a game server using Game Query Tool at `System` (on the left hand navigation) > `settings` > `Game Query Tool` or by clicking on the `Current Activity icon` of an existing service. The selected actions will be taken if the rule matches the specified condition.
+
+- `Enable rule detection` - Enables actions to be taken when the game service's rules have changed.
+
+### Rule Detection Examples
+
+```bash title="Restart the game server if it is using more than 1GB total."
+Server Variable: Service.CurrentMemory
+Operator: >=
+Value: 1024
+Actions: [] StopService  [x] RestartService  [ ] DisableService  [ ] EmailUser
+```
+
+```bash title="Stop the game server if bot_quota is higher than 5."
+Server Variable: bot_quota
+Operator: >
+Value: 5
+Actions: [x] StopService  [ ] RestartService  [ ] DisableService  [ ] EmailUser
+```
+
+```bash title="Email admins if the game server is using more than 50% CPU."
+Server Variable: Service.CurrentCpu
+Operator: >
+Value: 50
+Actions: [] StopService  [] RestartService  [ ] DisableService  [ ] EmailUser
+```
+
+```py title="Stops the game server if it is using 15% more memory than assigned. This example assumes you have a variable named Xmx with value specified in megabytes. An Iron Python script is used to get the value of the Xmx variable and increase it by 15%."
+Server Variable: Service.CurrentMemory
+Operator: >=
+Value: $ipy<%=float(ThisService.Variables["Xmx"]) * 1.15; %>
+Actions: [x] StopService  [] RestartService  [ ] DisableService  [ ] EmailUser
+```
+
+```py title="Stops the game server if it is using more than 250MB for each connected player. If no players are connected it calculates the maximum memory using the assigned slots. An Iron Python script is used to calculate the maximum allowed memory."
+Server Variable: Service.CurrentMemory
+Operator: >=
+Value: $ipy<%=(QueryResults.NumPlayers if QueryResults.NumPlayers > 0 else ThisService.Slots) * 250; %>
+Actions: [x] StopService  [] RestartService  [ ] DisableService  [ ] EmailUser
+```
+
+```py title="Stops the game server if it is using more than 250MB for each assigned slot. An Iron Python script is used to calculate the maximum allowed memory."
+Server Variable: Service.CurrentMemory
+Operator: >=
+Value: $ipy<%=ThisService.Slots * 250; %>
+Actions: [x] StopService  [] RestartService  [ ] DisableService  [ ] EmailUser
+```
+
+## Server Variables for Resource Usage
+
+The following server variables are available to monitor/restrict high resource usage on game/voice services:
+
+- `Service.CurrentCpu` - The CPU usage of the service's process and sub processes.
+- `Service.CurrentMemoryBytes` - The memory usage `(in bytes)` of the service's process and sub processes.
+- `Service.CurrentMemory` - The memory usage `(in megabytes)` of the service's process and sub processes.
+- `Service.CurrentBandwidthBytes` - The bandwidth usage `(in bytes/per second)` of the service's process and sub processes.
+- `Service.CurrentBandwidth` - The bandwidth usage `(in megabytes/per second)` of the service's process and sub processes.
+- `Service.MaxPlayers` - The maximum number of players according to the query results.
+- `Service.NumPlayers` - The number of players connected according to the query results.
+
+## Stats
+
+- `Enable live stats` - Saves the last query results to tc_game_service_live_stats. This allows custom coding on your website that shows the list of active services.
+- `Enable activity and resource usage stats` - Enables the collection of player activity and resource usage for this game.
+- `Collection Interval` - The interval in seconds at which the stats are collected. The default is 15 minutes (900 seconds). This value must be equal or greater than 'Query Interval'.
+  - The lower the value, the more space and CPU time it will take to store this information.
+- `Max Detailed Days` - The maximum number of days that the detailed data is kept in the database. The default is 7 days.
+  - Records older than the specified number of days will be converted to historical information. Set to 0 to never convert to historical stats.
+- `Max Historical Days` - The maximum number of days that the historical data is kept in the database.
+  - The default is 30 days. Historical data uses less disk space, only 1 database record per service per hour. Set to 0 to never delete historical stats.

@@ -1,0 +1,17 @@
+---
+sidebar_label: Text Console
+sidebar_position: 9
+---
+
+# Text Console
+
+The Text Console options allow you to execute console commands to stop a service instead of killing the process. You can also configure TCAdmin to control the console's input and output. The console output can be used by the log viewer or web console features.
+
+- `Control console's input` - Enable to have the service manager control the console's input. This is required on Linux if you specify stop commands. Some games are not compatible with this option.
+- `Control console's output` - Enable to have the service manager control the console's output. This is useful if the game does not have console logging. It allows you to view the console output using the log viewer.
+Some games are not compatible with this option.
+- `Stop Console Commands` - Enter one or more console commands to execute when the service is stopped.
+  - On Windows, `General Settings` > `Interact with desktop` is required.
+  - On Linux, `Control console's input` is required
+  - **Some games are not compatible with this option**
+- `Wait for Exit` - The number of seconds to wait for the process to exit after the stop commands have been executed. If it takes longer the process will be killed.

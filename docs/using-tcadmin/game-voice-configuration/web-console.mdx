@@ -1,0 +1,20 @@
+---
+sidebar_label: Web Console
+sidebar_position: 10
+---
+
+# Web Console
+
+The Web Console options allow you to simulate the game server's console in the browser using log files, rcon or direct console input/output.
+
+- `Enable web console` - Enable this feature. Also enable it for specific user types in the Feature Permissions tab.
+- `Web Console Output Source` - Specify how TCAdmin will get the console output so it can be displayed in the browser.
+   - `Log file` : If the game server writes the console to a log file specify the relative path.
+   - `Console output` : Use the saved console output. `Text Console` > `Control console's` output is required. **Some games are not compatible with this option.**
+- `Log File` - If log file is selected as the output source, specify the relative path to the console log.
+- `Web Console Input Source` - Specify how TCAdmin will get execute console commands.
+   - `RCon protocol` : Use the game's rcon protocol to send commands to the console.
+   - `Console commands` : Write the commands directly to the console. On Windows, `General Settings` > `Interact with Desktop` is required. On Linux, `Text Console` > `Control console's input` is required. **Some games are not compatible with this option**.
+- Print rcon response - If the rcon response is not saved or printed on the console enable this option so it is added to the output.
+
+![webconsole](/img/using-tca/webconsole.png)

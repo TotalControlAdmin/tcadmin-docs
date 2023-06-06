@@ -1,0 +1,27 @@
+---
+sidebar_label: Game Switcher Scripting Variables
+sidebar_position: 5
+---
+
+# Game Switcher Scripting Variables
+
+These variables are available in the before game switch and after game switch events.
+
+- `SwitchGameFrom` - If the game server is being switched to a new game, this value is the current game id.
+
+- `SwitchGameTo` - If the game server is being switched to a new game, this value is the new game id.
+
+## Examples
+
+```bash title="Windows batch script"
+@echo off
+echo Switching from game id %SwitchGameFrom% to %SwitchGameTo%
+```
+
+```bash title="Linux shell script"
+echo Switching from game id $SwitchGameFrom to $SwitchGameTo
+```
+
+```py title="IronPython script"
+ Script.WriteToConsole("Switching from game id " + str(SwitchGameFrom) + " to " + str(SwitchGameTo))
+```

@@ -1,0 +1,55 @@
+---
+sidebar_label: Service Manager Scripting Variables
+sidebar_position: 7
+---
+
+# Service Manager Scripting Variables
+
+The following variables are available in the `Before Started`, `After Started`, `Before Stopped` and `After Stopped` events.
+
+```
+ThisService_CustomVariableName
+ThisService_Affinity
+ThisService_CommandLineArguments
+ThisService_CustomPort1
+ThisService_CustomPort2
+ThisService_CustomPort3
+ThisService_CustomPort4
+ThisService_CustomPort5
+ThisService_Description
+ThisService_Executable
+ThisService_FriendlyName
+ThisService_GamePort
+ThisService_ServiceId
+ThisService_InteractWithDesktop
+ThisService_IpAddress
+ThisService_ManagedInput
+ThisService_ManagedOutput
+ThisService_Owner
+ThisService_Priority
+ThisService_QueryPort
+ThisService_RConPort
+ThisService_RootDirectory
+ThisService_Slots
+ThisService_StartOnCPU0
+ThisService_Startup
+ThisService_StopCommands
+ThisService_StopCommandWait
+ThisService_StopDelay
+ThisService_WorkingDirectory
+ThisService_RunAsUserName
+```
+
+The following variables are available in the `After Started`, `Before Stopped` and `After Stopped` events.
+
+- `ThisService_Pid` - Id of the process that was started/stopped.
+
+- `ThisServiceController` - In IronPython and C# scripts, there is a variable named ThisServiceController. This can be used to read and update values in the game server's `TCAdmin2\Monitor\Services\ServiceId\Service.cfg`.
+
+:::note example
+
+```bash
+commandline = ThisServiceController.ServiceConfig["Service.CommandLineArguments"]
+```
+:::
+
