@@ -44,6 +44,29 @@ const config = {
 
   themeConfig: {
     image: "img/tcadmin-logo.png",
+    typesense: {
+      // Replace this with the name of your index/collection.
+      // It should match the "index_name" entry in the scraper's "config.json" file.
+      typesenseCollectionName: 'docusaurus-2',
+
+      typesenseServerConfig: {
+        nodes: [
+          {
+            host: 'typesense.tcadmin.k8s.ovh.alexr03.dev',
+            port: 443,
+            protocol: 'https',
+          },
+        ],
+        apiKey: 'NCoGzBpXNasQeKFCfwUZqunege4afmCvcKGwgRBi',
+      },
+
+      // Optional: Typesense search parameters: https://typesense.org/docs/0.24.0/api/search.html#search-parameters
+      typesenseSearchParameters: {},
+
+      // Optional
+      contextualSearch: true,
+    },
+
     navbar: {
       title: "",
       logo: {
@@ -61,7 +84,6 @@ const config = {
           href: "https://discord.gg/ptN2pGf",
           label: "Discord",
           position: "right",
-
         },
         {
           href: "https://community.tcadmin.com",
@@ -82,47 +104,7 @@ const config = {
     },
     footer: {
       style: "dark",
-      links: [
-        // {
-        //   title: "Docs",
-        //   items: [
-        //     {
-        //       label: "Docs",
-        //       to: "/docs/intro",
-        //     },
-        //   ],
-        // },
-        // {
-        //   title: "Community",
-        //   items: [
-        //     {
-        //       label: "Stack Overflow",
-        //       href: "https://stackoverflow.com/questions/tagged/docusaurus",
-        //     },
-        //     {
-        //       label: "Discord",
-        //       href: "https://discordapp.com/invite/docusaurus",
-        //     },
-        //     {
-        //       label: "Twitter",
-        //       href: "https://twitter.com/docusaurus",
-        //     },
-        //   ],
-        // },
-        // {
-        //   title: "More",
-        //   items: [
-        //     {
-        //       label: "Blog",
-        //       to: "/blog",
-        //     },
-        //     {
-        //       label: "GitHub",
-        //       href: "https://github.com/facebook/docusaurus",
-        //     },
-        //   ],
-        // },
-      ],
+      links: [],
       copyright: `Copyright © ${new Date().getFullYear()} TCAdmin Built with Docusaurus.`,
     },
     prism: {
@@ -133,6 +115,17 @@ const config = {
       respectPrefersColorScheme: true,
     },
   },
+  plugins: [
+    [
+      'docusaurus-theme-search-typesense',
+      {
+        typesenseSearchParameters: {
+          queryBy: 'title,keywords,content',
+          numTypos: 2,
+        },
+      },
+    ],
+  ],
 };
 
 module.exports = config;
