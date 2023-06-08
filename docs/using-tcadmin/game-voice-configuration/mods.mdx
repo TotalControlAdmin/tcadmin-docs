@@ -1,0 +1,61 @@
+---
+sidebar_label: Mods
+sidebar_position: 20
+---
+
+# Mods
+
+The mod installer allows the user to install one or more mods. Similar to the main game, the mod can have its own configuration files and custom scripts.
+
+If the mod is installed, its configuration files will be added to the service's Config Files page automatically.
+
+- `Name` - Enter the mod's name.
+- `Comments` - Enter comments for the mod.
+- `Incremental Version` - You should increase this value every time the mod is updated with new files. If the mod is already installed the user will see the option to update. The file will be extracted to the specified path. If the mod does not have a script for the update event it will execute uninstall then install scripts.
+- `Homepage Url` - Enter the mod's homepage url.
+- `Help Url` - Enter the mod's help url.
+- `Windows File or URL` - The file that will be extracted for Windows game servers. If left blank, the mod is not supported on Windows. If the mod doesn't require a file set the value to none. The file should be placed in `C:\TCAFiles\Games\GameFolder\TCA.Mods\.` To specify a different save name for the URL separate the save name with a space like this: `http://downloadserer/file` savename.
+- `Linux File or URL` - The file that will be extracted for Linux game servers. If left blank, the mod is not supported on Linux. If the mod doesn't require a file set the value to none. The file should be placed in `/home/tcadmin/tcafiles/games/GameFolder/TCA.Mods/`. To specify a different save name for the URL separate the save name with a space like this: `http://downloadserer/file` savename.
+- `Extract Path` - The relative path where the file will be extracted. If left blank it will be extracted to the game server's root directory. If file's directory structure is not correct or it includes files that you don't need you can extract the file to a temp folder and use a custom script to move the files around to the correct folders.
+- `Commandline` - Specify the commandline used by this mod. Default and custom variables can be used. Leave blank if the mod does not require a change in the commandline.
+- `Required Mods` - Select the mods that are required by this mod. Only select the mod directly required by this mod. For example the `AMX ModX cstrike` addon requires `AMX Mod X`, not `Metamod`.
+- `Incompatible Mods` - Select the mods that are not compatible with this mod.
+- `Required Updates` - Select the updates that are required by this mod.
+- Install Type:
+  - `Default values/configuration editor` - The mod will be configured using the default values or configuration editor depending on user selection.
+  - `Default values` - The mod will be configured only using the default values (hostname, rcon password, private password).
+  - `Configuration editor` - The mod will be configured only using the configuration editor.
+  - `Silent` - The mod will be installed silently without asking for variable values. The default or stored values will be used.
+- `Can be uninstalled` - Specify if the mod can be uninstalled. The files will not be deleted automatically. You must create a script for the `After mod uninstall` event that deletes the installed files.
+- `User access` - Specify if the mod can `installed/uninstalled` by the user.
+- `Reseller access` - Specify if the mod can `installed/uninstalled` by the reseller.
+- `Subadmin access` - Specify if the mod can `installed/uninstalled` by the subadmin.
+
+## Configure a Mod
+
+Each mod installation is different depending on the game. We can only give you an overview of what you might need to do when configuring a mod in TCAdmin.
+
+:::tip
+Prior to configuring TCAdmin, it is imperative to thoroughly review the Mods Documentation to understand the correct installation procedure. Without proper knowledge of manual installation, it is impossible to configure TCAdmin accurately.
+:::
+
+:::note
+The following instructions outline the traditional method of configuring mods and their files on your server.
+
+For a more advanced configuration, you can make use of a **CDN**.
+:::
+
+- Place the mod's zip file in `C:\TCAFiles\Games\GameFolder\TCA.Mods` or `/home/tcadmin/tcafiles/GameFolder/TCA.Mods`
+  - You might have to make changes to it so it is extracted with the correct directory structure or if you are good at scripting you can configure it to extract to a temp folder and use a script to move the files to the correct location. See the Enemy Territory ETPub mod for an example.
+- Add the mod in `System` (on the left-hand navigation) > under the `Game & Voice Hosting` category > `Game & other Voice Servers` > `your_Game_config` > `Mods`.
+- If the mod requires you to add lines to specific files select the `Add/Replace Lines` tab and configure them.
+- If you allow the mod to be uninstalled you must revert the changes made during installation.
+
+:::info example
+if you configured TCAdmin to add a line when the mod is installed, configure TCAdmin to remove the line when it is uninstalled. If you want to delete the files extracted during installation you need to create a script for the uninstall event that deletes them.
+:::
+
+- If the mod requires a commandline configure it in the Commandline field. You may use the same variables that are available in the default commandline.
+- If the mod requires another mod select it from the list. You can also select incompatible mods `(mod that has to be uninstalled before installing this one)` and required updates `(the mod will only be available for the selected updates)`.
+- If you do not require any input from the user while installing, select silent install for `Install Type`. If you require the user to enter values for `hostname`, `passwords` or `custom variables `select one of the other options.
+- If the mod has config files add them by clicking on the Configuration Files icon. Remember to save first.

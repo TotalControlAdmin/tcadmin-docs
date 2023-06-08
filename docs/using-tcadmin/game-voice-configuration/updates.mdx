@@ -1,0 +1,22 @@
+---
+sidebar_label: Updates
+sidebar_position: 22
+---
+
+# Updates
+
+:::note
+The following instructions outline the traditional method of configuring updates and their files on your server.
+
+For a more advanced configuration, you can make use of a **CDN**.
+:::
+
+- `Name` - Enter the update's name.
+- `Comments` - Enter comments for this update.
+- `Windows File` - The file that will be extracted for Windows game servers. If left blank, the update is not supported on Windows. The file should be placed in `GameFiles\GameForlder\TCA.Updates\`.
+- `Linux File` - The file that will be extracted for Linux game servers. If left blank, the update is not supported on Linux. The file should be placed in `GameFiles/GameForlder/TCA.Updates/`.
+- `Extract Path` - The relative path where the file will be extracted.
+- `Installed by default` - Specify if the update is included in the default game installation. Only one update can have this option checked.
+- `User access` - Specify if the update can installed by the user.
+- `Reseller access` - Specify if the update can installed by the reseller.
+- `Subadmin access` - Specify if the update can installed by the subadmin.

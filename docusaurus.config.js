@@ -30,6 +30,7 @@ const config = {
         docs: {
           routeBasePath: '/',
           sidebarPath: require.resolve("./sidebars.js"),
+          showLastUpdateTime: true,
           editUrl:
             "https://github.com/TotalControlAdmin/tcadmin-docs/blob/master/",
         },
