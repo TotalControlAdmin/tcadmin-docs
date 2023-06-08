@@ -1,0 +1,23 @@
+---
+sidebar_label: Map Packs
+sidebar_position: 21
+---
+
+# Map Packs
+
+The map pack installer allows the user to install one or more map files. You can either list all the files in the TCA.Maps folder or create single [compressed](/misc/compression) file with maps.
+
+- `Name` - Specify the name shown to the user.
+- `Comments` - Comments for this map pack.
+- `Type` - Specify the type of map pack that you want to create.
+  - `Compressed map files` : A single [compressed](/misc/compression) file that contains more than one map.
+  - `Map file list` : Allows the user to select from a list of files in the TCA.Maps folder.
+- `File` - If `Compressed map files` is selected, specify name of the compressed file that contains the maps. The file should be placed in `GameFiles\GameFolder\TCA.Maps\`
+- `Extract Path` - If `Compressed map files` is selected, specify the path relative to the game server's root directory where the file will be extracted.
+- `File Extensions` - If `Map file list` is selected, specify the extensions of the map files. The files should be placed in `GameFiles\GameFolder\TCA.Maps\` You can specify more than one extension by separating with ';'. For example: `*.pk3;*.bsp`
+- `Copy Path` - If `Map file list` is selected, specify the path relative to the game server's root directory where the files will be copied.
+- `Extract files` - If "Map file list" is selected, specify if the files with supported compression formats will be extracted. This is useful if a single map requires more than one file.
+
+:::info example
+A single Counter-Strike map has a `.bsp` file, a `.res` file and `.mdl` files.
+:::

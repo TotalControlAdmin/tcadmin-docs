@@ -1,0 +1,230 @@
+---
+sidebar_position: 9
+sidebar_label: Fast Downloads
+---
+
+# Fast Downloads
+
+## Overview
+
+The fast downloads (FastDL) feature allows you to copy or upload custom game content to a website so they can be downloaded directly by players.
+
+:::tip Important
+Before attempting to configure fast downloads in TCAdmin you should take the time to learn how to configure fast downloads for the game server manually without a control panel. That's the only way you will be able to troubleshoot if you have any problems with the game server's fast download configuration.
+:::
+
+## Features
+
+- `Fast downloads automatic sync` - TCAdmin will automatically synchronize the changes with the fast downloads website when the user `uploads`, `deletes` or `modified` files using the file manager or FTP.
+- `Manual sync` - In case automatic sync fails or if you have it disabled the user can synchronize the files manually.
+- `Include certain files` - You can configure TCAdmin to only copy/upload files with a certain name or extension.
+- `Exclude certain files` - You can configure TCAdmin to skip synchronization of files with a certain name or extension. For example you might not want to copy/upload the game's default maps.
+- `Fast downloads disk space quota` - You can limit the disk space used by a service's fast downloads files.
+
+## Requirements
+
+You can configure fast downloads in **3** different ways:
+
+1. `Locally` - The fast downloads website and game server are located on the same server.
+2. `Remotely with another server` - The fast downloads website is located on a different server that has TCAdmin installed.
+3. `Remotely with a file server` - The fast downloads website is located on a file server or hosting account.
+
+:::caution
+For security reasons it is recommended that the website used for fast downloads does not have any server side scripting enabled (`ASP`, `ASP.NET`, `PHP`, etc)
+:::
+
+## Downloads hosted locally
+
+Web server installed and configured with a website for fast downloads. (Apache, IIS, etc) We do not provide instructions on configuring the web server.
+
+## Downloads hosted on another TCAdmin server
+
+You must have at least one TCAdmin server configured with **downloads hosted locally**
+
+## Downloads hosted on a file server or hosting account
+
+FTP account with read/write/delete permissions used to upload files to the website's root folder.
+
+## File Server Configuration
+
+You can configure a file server to host your fast downloads. Go to `Server Management` (on the left-hand navigation) > `File Servers` > `Select the file server` or `create a new one`. In the file server settings tab enter the following
+
+- FTP server's IP
+- port
+- username
+- password.
+
+If the FTP server's file system is case sensitive enable File `system is case sensitive`.
+
+### Select the Fast Downloads tab and configure the following options:
+
+- Fast Downloads Save Path - Enter the path to the root of the fast downloads website.
+- Fast Downloads Folder Template - Enter the template used to determine the folder where the fast download files will be saved for each game or voice service. You may use the default value.
+
+:::note example
+
+This will create a folder with the service's IP and port `(1.2.3.4_27960)` : `$[Service.IpAddress]_$[Service.GamePort]\`
+
+:::
+
+- Fast Downloads URL - The base URL pointing to the fast download save path.
+
+![FastDownloadsFileSettings](/img/using-tca/FastDownloadsFileSettings.png)
+
+## Server Configuration
+
+### Downloads hosted locally
+
+You can configure fast downloads on a website located on the same server as the game or voice server. Go to `Server Management` (on the left-hand navigation) > `Servers` > `Select the server` > `Game & Voice Settings tab`. Configure the following options.
+
+- `Enable fast downloads` - Checked
+- `Fast Downloads Server` - Local Storage
+- `Fast Downloads Save Path` - Enter the path to the root of the fast downloads website that you created. `(for example C:\Inetpub\wwwroot)`
+- `Fast Downloads Folder Template` - Enter the template used to determine the folder where the fast download files will be saved for each game or voice service. You may use the default value. For example this will create a folder with the service's IP and port `(1.2.3.4_27960)` : `$[Service.IpAddress]_$[Service.GamePort]\`
+- `Fast Downloads URL` - The base URL pointing to the fast download save path.
+
+![fastdl-local](/img/using-tca/fastdl-local.png)
+
+### Downloads hosted on a different TCAdmin server
+
+You can configure fast downloads on a website located on a different TCAdmin server. First you must configure one of your servers with **downloads hosted locally**. Then go to the other server's Game & Voice Settings tab. Configure the following options.
+
+- `Enable fast downloads` - Checked
+- `Fast Downloads Server` - Select the other tcadmin server from the list.
+
+![fastdl-master](/img/using-tca/fastdl-master.png)
+
+### Downloads hosted on a file server or hosting account
+
+You can configure fast downloads on a website hosted on a separate server or hosting account. First you must **configure a file server for fast downloads**. Then go to `Server Management` (on the left-hand navigation) > `Servers` > `Select the server` > `Game & Voice Settings tab` tab. Configure the following options.
+
+- `Enable fast downloads` - Checked
+- `Fast Downloads Server` - Select the other tcadmin server from the list.
+
+![fastdl-myfileserver](/img/using-tca/fastdl-myfileserver.png)
+
+## Game Configuration
+
+:::tip
+Each game has different requirements for fast downloads. Read the game's dedicated server documentation to find out how to enable fast downloads. This section only explains how to enable the fast download feature in TCAdmin.
+:::
+
+To enable fast downloads for a specific game go to `System` (on the left-hand navigation) > `Game & Voice Hosting category` > `Games & Other Voice Servers` > `Select the game` > `Fast Downloads tab`. If you don't see the Fast Downloads tab select the Windows version of the game.
+
+- `Enable fast downloads` - Checked
+- `Relative Root Directory` - The relative path to the root directory used for fast downloads. If you don't know what value to enter leave blank. You might have to test different values so the files are placed in the correct directory structure required by the game.
+- `Fast Download URL` - The expression used to generate the download URL. Use the `$[FastDownloadBaseUrl]` variable. For example: `$[FastDownloadBaseUrl]/cstrike`
+- `Files to Sync` - Enter the files that will be available for fast download. Wildcards are supported. If a relative path is specified it must be relative to the fast downloads root directory. You can specify more than one file or extension by separating with `';'`. Use `-r` with relative paths to also match files in subfolders. For example `cstrike/maps/* -r;*.txt;`
+- `Exclude Files` - Enter the files that will not be available for fast download. For example you can enter name of maps that are included by default.
+- `Sync when service is created` - Enable this option if you want to syncronize the fast downloads when the service is created. This might only be needed if your default game files include custom maps.
+- `Sync automatically` - Sync the fast downloads automatically when files are uploaded, renamed or deleted using the file manager or FTP.
+- `Disk Space` - The maximum disk space allowed for fast downloads in MB. Set to 0 for unlimited disk space.
+
+![FastDownloadGameSettings](/img/using-tca/FastDownloadGameSettings.png)
+
+### Enable manual sync
+
+To enable manual sync go to `System` (on the left-hand navigation) > `Game & Voice Hosting category` > `Games & Other Voice Servers` > `Select the game` > `Feature Permissions` tab. If you don't see the Feature Permissions tab select the Windows version of the game. **Enable the checkboxes next to Fast Downloads Sync.**
+
+### Configuration file
+
+You have to enable fast downloads and specify the url in the game server's configuration file. To do this automatically use the `$[FastDownloadUrl]` and `$[FastDownloadEnabled]` variables. If fast downloads are disabled in the server on in the game's settings the value of `$[FastDownloadUrl]` will be blank and `$[FastDownloadEnabled]` will be `0`. The way to enable fast downloads depends on the game. Read the game's documentation to figure out the correct values.
+
+![FastDownloadGameConfigSettings](/img/using-tca/FastDownloadGameConfigSettings.png)
+
+## Tips
+
+:::tip security
+Make sure you don't sync config files. They will be downloadable from the fast download website and someone might steal rcon and other passwords.
+
+Don't sync .php and other scripts. For better security your fast download website should not allow execution of .php and other scripts.
+:::
+
+:::tip Exclude compressed files
+A client can upload a large zip or rar and extract it on the server. If he doesn't delete it the fast download will think it is custom content and upload it. Also if you have compression enabled it will try to compress it and use lots of CPU in the process. Just add the common compression formats in your exclude list: `*.zip;*.rar;*.7z;*.tar;*.tar.gz;*.tgz;*.tar.bz2;*.tbz2;*.tar;*.lzma;*.tlz`
+:::
+
+:::tip How to create a list of exclude files the easy way
+Normally you would only want to upload files that are not included by default. To do this you need a list of all the files included by default and set it in the "Exclude Files" field. You can do this easily by executing a few commands from a command prompt or shell session.
+:::
+
+### Windows
+
+Download the following file: [FastDownloadExclude.zip](/downloads/FastDownloadExclude.zip) Extract and execute from a command prompt like this:
+
+```bash
+FastDownloadExclude.bat (path to game's fast download root) > exclude.txt
+notepad exclude.txt
+```
+
+This below creates an exclude file named `exclude.txt` for `C:\TCAFiles\Games\css\css`. Copy the file's contents and paste it in the fast download exclude field.
+
+:::note example
+
+```bash
+FastDownloadExclude.bat C:\TCAFiles\Games\css\css > exclude.txt
+notepad exclude.txt
+```
+
+:::
+
+### Linux
+
+```bash
+cd /home/tcadmin/tcafiles/games/GAMEFOLDER/FAST_DOWNLOAD_ROOT
+find . -name \*.* -print| sed 's/^..//'|sed ':a;N;$!ba;s/\n/;/g'|sed 's/^..//' > ../exclude.txt
+```
+
+This below creates an exclude file named `/home/tcadmin/tcafiles/games/exclude.txt` for Garry's Mod. Download the file, copy the contents and paste it in the fast download exclude field.
+
+:::note example
+
+```bash
+cd /home/tcadmin/tcafiles/games/garrysmod-linux
+find . -name \*.* -print| sed 's/^..//'|sed ':a;N;$!ba;s/\n/;/g'|sed 's/^..//' > ../exclude.txt
+```
+
+:::
+
+### Lost connection to mysql error
+
+When you save a large value to the database your mysql server might show this error. Add the following line to your MySQL server's my.ini or my.cnf under `[mysqld]` and restart the MySQL service.
+
+```
+max_allowed_packet=10M
+```
+
+### Can't paste large text into exclude files field
+
+:::tip
+Don't use Chrome. Use a different browser.
+:::
+
+### Compressing custom content
+
+:::tip
+Compressing custom content will use a lot of CPU. If you configure the monitor to only use `CPU0` it's going to cause lag in the control panel every time a file is compressed. To prevent this you can set the affinity to `2` CPUs. It will use `1` to compress and the other is left for the website. If you set affinity to `4` CPUs or more it uses `2` of those CPUs to compress the file. Either of these `2` options will reduce or completely remove the lag.
+:::
+
+### Reset fast downloads information
+
+Each game server has a file in the root folder named FastDownload.db which holds the information about the files that are stored in the fast download server. You can delete this file to make TCAdmin sync all the files again.
+
+Use this scripts to delete all fast download databases of all game servers on that server:
+
+```bash title="Windows - create a .bat file"
+@echo off
+for /f "usebackq" %%m in (`dir /b C:\TCAFiles\Users`) do (
+DEL /F /S /Q /A "C:\TCAFiles\Users\%%m\FastDownload.db"
+)
+pause
+```
+
+```bash title="Linux"
+rm /home/tcagame/*/*/FastDownload.db
+```
+
+```bash title="Alternative script (thanks to Clanwarz)"
+find /home -type f -name FastDownload.db -delete
+```
+*Thanks to serenityservers.net for the scripts.*
