@@ -1,0 +1,60 @@
+---
+sidebar_position: 17
+sidebar_label: Game Tools
+---
+
+# Game Tools
+
+All of these features are available from within TCAdmin by going to `System` (on the left-hand navigation) > `Settings` > `Game & Voice Hosting` > `Game Tools`.
+
+## Batch Update
+
+This tool applies a game update to all the services on the specified servers.
+
+- `Game` - Select the game that has the update that you want to apply.
+- `Update to Install` - Select the update that you want to install.
+- `Servers` - Select the servers where the update will be installed. Use ctrl + click to select more than one server.
+- `Current Update` - Select the updates that the service must currently have installed. If the service does not have one of the selected updates it will be skipped. Use ctrl + click to select more than one server.
+- `Create One Task Per Server` - Enable this option if you want to create separate scheduled tasks for each server. If all your servers download files from the same file server it is recommended to leave this option unchecked. It can use up all the file server's bandwidth if you have lots of servers.
+
+## Create Steam Update File
+
+This tool runs the steam update on your base game files and creates a zip or tar with the new/updated files. After the file is created it adds the update to the game's settings. Use the [Batch Update tool](#) to apply it on all services or allow your clients to install it themselves. hldsupdatetool and steamcmd are supported.
+
+:::note
+If the base game files are already updated TCAdmin will create an empty or incomplete zip file.
+:::
+
+- `Game` - Select the game. Only games that have Steam enabled are shown in the list. If the game is configured to use steamcmd it will ask for the Steam user, password and Steam Guard code.
+- `Server` - Select the server where the steam update will be executed. The base game files will be updated.
+- `Steam User` - The account used to log in to Steam.
+- `Steam Password` - The password used to log in to Steam.
+- `Steam Guard Code` - The steam guard code (if required). If you have Steam Guard enabled, click on [ Request Code ] and check your e-mail for your access code. You only need to do this once per server.
+
+## Steam Game Downloader
+
+This tool is similar to the Create Steam Update File tool. It downloads or updates a game from Steam but it will not create an update file.
+
+- `Game` - Select the game. Only games that have Steam enabled are shown in the list. If the game is configured to use steamcmd it will ask for the Steam user, password and Steam Guard code.
+- `Server` - Select the server where the steam update will be executed. The base game files will be updated.
+- `Steam User` - The account used to log in to Steam.
+- `Steam Password` - The password used to log in to Steam.
+- `Steam Guard Code` - The steam guard code (if required). If you have Steam Guard enabled, click on [ Request Code ] and check your e-mail for your access code. You only need to do this once per server.
+
+## Stop/Start/Restart Services
+
+This tool stops/stars/restarts the specified services. You can specify the games and servers to include.
+
+- `Service Action` - Select the action to take (Start/Stop/Restart)
+- `Only if Empty` - Enable this option if you want to apply the action only if the game server is empty.
+- `Servers` - Select the servers where the action will be executed.
+- `Games` - Select the games to apply the action to.
+- `Create One Task Per Server` - Enable if you want to create separate tasks for each selected server. Separate tasks can run at the same time on different servers. If you don't check this option each server is processed one after the other.
+
+
+## Verify/Repair Game Accounts
+
+This tool creates missing accounts that run the services and repairs file system permissions. This can be useful if you have to reload the operating system and you need to reset the permissions on all services. This tool is executed on all services in the selected server. To run the repair tool for an individual service run the command from the service's Actions tab.
+
+- `Server` - Select the server that will be repaired.
+- `Update Run As User` - Enable this option if you want to update user that runs the service according to the game's current run as settings.

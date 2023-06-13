@@ -1,0 +1,58 @@
+---
+sidebar_position: 13
+sidebar_label: Troubleshooting Game & Voice Services
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Troubleshooting Game & Voice Services
+
+<Tabs>
+  <TabItem value="windows" label="Windows">
+
+### Running the Service with `Interact with Desktop` Enabled
+
+:::info
+
+Some old games require `Interact with Desktop` enabled. The feature was removed in `Windows 10 Version 1803` and `Windows Server 2019` but services can still start in `Session 0`.
+You won't be able to interact with the services from the Windows Desktop unless you are running an <u>**older version of Windows**</u>.
+
+We recommend not enabling this option unless it is required for the application to work.
+:::
+
+### Running the Service Manually
+
+You can stop the service in TCAdmin and start it manually from remote desktop so you can see any errors:
+
+- Go to Game/Voice Services > Select the service > Click on Service Settings.
+- Click on the Preview link next to Commandline.
+- Copy the command shown.
+- Log in to remote desktop.
+- Open a command prompt.
+- Paste the commands one by one.
+- Check for errors while the game server is starting up.
+
+![windows-cmd-preview](/img/using-tca/windows-cmd-preview.png)
+
+:::tip
+After running the game server manually and fixing any errors you might have to run the Repair tool in the game server's Actions tab. This will fix permissions on files created by Administrator so the game server can be started by TCAGame.
+:::
+
+  </TabItem>
+    <TabItem value="linux" label="Linux">
+
+### Running the Service Manually
+
+You can stop the service in TCAdmin and start it manually from ssh so you can see any errors:
+
+- Go to `Game/Voice Services` > `Select the service` > `Click on Service Settings`.
+- Click on the Preview link next to Commandline.
+- Copy the commands shown.
+- Paste the commands in your ssh session.
+- Check for errors while the game server is starting up.
+
+![linux-cmd-preview](/img/using-tca/linux-cmd-preview.png)
+
+  </TabItem>
+</Tabs>

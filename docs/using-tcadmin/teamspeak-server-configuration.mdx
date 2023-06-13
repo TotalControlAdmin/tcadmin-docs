@@ -1,0 +1,54 @@
+---
+sidebar_position: 10
+sidebar_label: Teamspeak Server Configuration
+---
+
+# Teamspeak Server Configuration
+
+## Teamspeak 3
+
+These instructions explain how to create a Teamspeak master server automatically and configure it to create Teamspeak services `virtual servers`. If you don't have a Teamspeak license you can't create additional Teamspeak services and you can only have one Teamspeak master server per server.
+
+### Buy a Teamspeak License
+
+If you don't have a Teamspeak license you will not be able to create additional Teamspeak services. The Teamspeak master server includes one free 32 slot service. You will get a `virtualserver limit reached` error when creating additional Teamspeak services. [You can buy additional licenses here](https://teamspeak.com/en/features/licensing/)
+
+### Install & Configure the Teamspeak 3 Master server
+
+- Go to Game & Voice Management > Create a Service
+- Select the Create a Voice Service tab and select `Other voice server`.
+- Select the server where the Teamspeak master will be created.
+- Select `Teamspeak 3 Master Server` type.
+- Enter the rcon password. This will be your serveradmin password.
+- Click on Create.
+- After the Teamspeak master has been created, if you have a Teamspeak license place the file in the service's root folder and restart the service.
+- Click on "More" and execute the "Install" action. This will configure the teamspeak master under settings > teamspeak servers.
+- If you have a teamspeak license you should be able to create teamspeak services in the "Create a Service" page but this time select "Teamspeak service" instead of "Other voice server".
+
+### Prepare the Teamspeak Server for Hosting
+
+**If you created the teamspeak server automatically with the instructions from this article this has already been done for you**. By default the Teamspeak installation allows your client to edit their slots. [Follow these instructions to prevent this](https://forum.teamspeak.com/threads/102734-How-to-restrict-Changing-server-slot-ammount)
+
+### Teamspeak Browser
+
+Use the Teamspeak browser to manage virtual servers even if they are not assigned to a user.
+
+#### Assign Existing Virtual Server to a User
+
+To assign a virtual server select it from the list. On the right select the user from the list and click on Apply.
+
+#### Move Player to Different Channel
+
+To move a player to a different channel drag its icon to that channel.
+
+### Teamspeak Server Owner
+
+A Teamspeak server can be assigned to a user or reseller. If a user owns the Teamspeak server he is able to create unlimited virtual servers as long as the Teamspeak license allows it. When a Teamspeak server is assigned to a user it is not used by the billing API or by reseller packages.
+
+### TSDNS
+
+- Configure your TSDNS domain(s) as explained here: [SERVER ADDRESS RESOLUTION AND TSDNS CHANGES WITH CLIENT 3.1.X](https://support.teamspeak.com/hc/en-us/articles/360002711457-Server-address-resolution-and-TSDNS-changes-with-Client-3-1-x)
+- Create a TSDNS service
+- Select the TSDNS service. Click on Config Files. Edit domain.txt and add the domains that you configured.
+- Go to `settings` > `teamspeak servers` > `select the TS server` > `assign the TSDNS service`.
+- Then your client can configure his TSDNS subdomain in his TS service home page.

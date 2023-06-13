@@ -1,0 +1,46 @@
+---
+sidebar_position: 11
+sidebar_label: Create Game Voice & Teamspeak Services
+---
+
+# Create Game, Voice & Teamspeak Services
+
+## Requirements
+
+### Game/Voice Services
+
+The game and voice server files should be placed in the `Game Files Path` specified in the server settings `(C:\TCAFiles\Games and /home/tcadmin/tcafiles/games by default)`. Optionally the server can be configured to download the files from another server.
+
+If the game's server files can be obtained from SteamCMD, you can use the [Steam Game Downloader](#) feature to install the files.
+
+Each game has a specific subfolder where the files should be placed. To find out the name of the subfolder go to `System` > `General Settings` > `Supported Games` > `Select a Game` > `Files and Directories` > `Files Folder Name`. For your convenience, each Steam game has a batch/shell script that you can execute to download the game files. If you imported a Steam game and you don't see this file restart the monitor and it will be created.
+
+:::info example
+If the value of `Files Folder Name` is bf2 the files should be placed in `C:\TCAFiles\Games\bf2` or `/home/tcadmin/tcafiles/games/bf2`
+The files can be left uncompressed in the subfolder or compressed in one of the supported formats. If your server downloads from another server the use of compressed files is recommended. The compressed files should only contain the contents of the subfolder, not the subfolder itself. Do not include the special TCAdmin folders in the compressed file `(TCA.Mods, TCA.Updates, TCA.Maps)`.
+:::
+
+:::info example
+You can place the files for Counterstrike in a folder `C:\TCAFiles\Games\cs` or compressed in a zip file `C:\TCAFiles\Games\cs.zip.` If both exist, the compressed file will be used.
+:::
+
+### Teamspeak Virtual Servers
+
+Before creating Teamspeak virtual server you must configure at least one Teamspeak server.
+
+## Create a Game/Voice/Teamspeak Service
+
+To create a service follow these steps:
+
+- Go to Game & Voice Management > Create a Game or Voice Service.
+- In the Service Owner tab you can select user that will own the service or create a new one.
+- If you want to create a game service click on the `Create a Game Service` tab. Select the server, game and enter the required information.
+- If you want to create a voice or Teamspeak service click on the `Create a Voice Service` tab. Select if you want to create a Teamspeak service or other voice server. Select the server/Teamspeak server depending on the previous selection and enter the required information.
+
+## Scheduled Creation Time
+
+In the Advanced tab you can specify if the service(s) will be created now or at a specific date and time.
+
+## Automatic Deletion
+
+In the Advanced tab you can specify if the service(s) and user will be deleted at a specific date and time.
