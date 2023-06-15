@@ -1,0 +1,72 @@
+---
+sidebar_position: 15
+sidebar_label: Google Drive
+---
+
+# Google Drive
+
+The TCAdmin file manager allows users to backup their files to Google Drive. These backups are stored within the user's Google account. The administrator's Google account is only required to activate the service on the domain.
+
+When backing up and restoring files using the TCAdmin file manager, the system applies the game's file system permissions. This means that if a user has permission to read a file, they can back it up to Google Drive. Similarly, if a user has permission to create a file, they can restore it from the backup.
+
+Furthermore, the TCAdmin file manager provides configuration options to customize access to this feature for specific games. Administrators can choose which games have access to the backup functionality. Additionally, they can set upload and download limits, allowing them to control the amount of data being transferred.
+
+In summary, the TCAdmin file manager enables users to conveniently backup their files to Google Drive, with the backups stored in their own Google account. The system leverages the game's file system permissions for backing up and restoring files. Administrators have control over access to this feature for different games and can set upload and download limits as needed.
+
+![GoogleDrive1](/img/using-tca/800px-GoogleDrive1.png)
+![GoogleDrive1](/img/using-tca/800px-GoogleDrive2.png)
+
+## Requirements
+
+- Your control panel must be accessible using a domain or subdomain. Direct IP access is not supported by Google.
+- If you don't have a domain you can do a reverse DNS lookup on your control panel's IP and use that hostname (if it has one). [https://www.whatismyip.com/reverse-dns-lookup/](https://www.whatismyip.com/reverse-dns-lookup/)
+
+## Limitations
+
+- TCAdmin can only restore files created by your control panel. It can't read other files in the client's Google Drive.
+- If you delete the Google project and create a new one TCAdmin will not be able to read backups created with the previous project.
+
+## Get your API key, client id and client secret
+
+- Go to [Google Developers](https://developers.google.com/drive/api/v3/quickstart/js) You only need to follow step 1. You do not need to install Python 2.4.
+  - Click on `Enable the Drive API`. This will give you the client id and client secret.
+  - Click on `Create API key`. This will give you the API key.
+- Log in to your control panel. Go to `System` > `Settings` > `Google Drive`.
+  - Enter the client id, client secret and API key.
+  - Enable it.
+  - Click on games and select the games that have access to this feature.
+
+## Configure the consent screen
+
+- Log in to with your Google account at [https://console.cloud.google.com/](https://console.cloud.google.com/)
+- On the menu with the 3 bars on the upper left corner select `API & Services` > `Oath consent screen`
+- Select EDIT APP next to Quickstart and select user type= external
+- Change the application name to something more suitable for your company/domain
+
+:::caution
+DO NOT upload an application logo. If you do this it will require extra verification steps.
+:::
+
+- Click on Add scope and add **Google Drive API ../auth/drive.file**. Do not add any other scopes.
+- Under Authorized domains enter your primary domain (not a sub domain)
+- Under Application Homepage link enter your control panel url.
+- Under Application Privacy Policy link enter the link to your privacy policy. If you don't have one enter the control panel url.
+- Click on Save.
+
+## Whitelist your domain
+
+- Log in to with your Google account at [https://console.cloud.google.com/](https://console.cloud.google.com/)
+- On the menu with the 3 bars on the upper left corner select `API & Services` > `Credentials`
+- Click on OAuth client
+- Under Authorized JavaScript origins add your control panel's domain and save. You can also add [http://localhost:8880](http://localhost:8880) for development **(ip will not work).**
+
+:::note
+This may take up to 10 minutes to take effect.
+:::
+
+- After this has been applied your clients will be able to log in to Google Drive from the file manager and backup/restore files.
+
+## Usage
+- In the file manager click on the Google Drive toolbar button. It will ask you to log in with a Google account.
+- After logging in you can create a backup by right clicking on a file or folder and select Backup to Google Drive.
+- To restore a backup click on the Google Drive toolbar button. Select the files or folders and click on restore. The files are restored to their original location.

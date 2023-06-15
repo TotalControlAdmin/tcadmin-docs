@@ -1,0 +1,228 @@
+---
+sidebar_position: 22
+sidebar_label: SteamCmd
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# SteamCmd
+
+## Configure TCAdmin to use SteamCmd
+
+### Configure the game
+
+- Go to `System` (on the left-hand navigation) > `Settings` > `Games` > `Select the game` > `Select the Steam Settings` tab.
+- Select "Enabled (steamcmd)"
+- Enter the steam app id of the game's **dedicated server**. Specify a steam account if needed. You can find a list of application ids here: [Steam_Application_IDs](http://developer.valvesoftware.com/wiki/Steam_Application_IDs)
+- Select the Feature Permissions tab
+- Enable Steam Update for all user types.
+- Save
+
+### Configure the Steam Account used by TCAdmin
+
+- Go to `System` (on the left-hand navigation) > `Settings` > `Default Steam Settings`
+- Enter your Steam account user and password. It is recommended that you set the default user to `anonymous` with a blank password. If a game requires a different account specify it in the game's settings.
+- Save
+
+### Download the Game Files
+
+You can download the game's files by going to `System` (on the left-hand navigation) > `Settings` > `Game Tools`. Select the `Steam Game Downloader tool`. Select the game and the server where the files will be downloaded, then execute the task. The first time steamcmd is used TCAdmin will attempt to install it.
+
+:::tip
+For troubleshooting follow the instructions below.
+:::
+
+### Updating a service
+
+After following the previous instructions you should be able to select a game server and click on Steam Update to update the game files.
+
+## Steam Guard Activation
+
+If you have Steam Guard enabled on your account, the first time you use the SteamCmd features in TCAdmin you will receive an email with the Steam Guard code. Follow these instructions to use that code.
+
+<Tabs>
+  <TabItem value="windows" label="Windows">
+
+- Go to `System` (on the left-hand navigation) > `Settings` > `Game Tools`. Select the `Steam Game Downloader tool`.
+- Select a game that uses steamcmd.
+- Select the server.
+- Enter the steam guard code and execute. If you don't have a steam guard code execute once to get the code then a second time to use the code.
+- If you don't get a login error it worked correctly.
+- If `Execute as service's user` is **checked** in the game's Steam settings
+
+  - Log in to your control panel and select a game server.
+  - Click on Steam update. That will create the folder `C:\TCAFiles\Users\SteamCmd`
+  - Click on Service Settings.
+  - Click on Preview next to the Commandline field.
+  - Copy the runas command and execute it from remote desktop.
+  - It will asks for the password. Copy and paste the one shown in the preview.
+  - This will open a command prompt as the game server's user (tcagame by default).
+  - Execute these commands. It will ask for the account's password and steam guard code.
+
+  ```
+  cd C:\TCAFiles\Users\SteamCmd
+  steamcmd.exe +login YOUR-STEAM-ACCOUNT
+  ```
+
+</TabItem>
+<TabItem value="linux" label="Linux">
+
+:::note
+If you receive the code in the Steam app configure it to send it with emails. After configuring TCAdmin you can change codes back to the Steam app.
+:::
+
+- Activate steam as root
+  - Execute these commands as root. It will ask for the account's password and steam guard code.
+
+```bash
+cd /home/tcadmin/Monitor/Tools/SteamCmd
+./steamcmd.sh +login YOUR-STEAM-ACCOUNT
+```
+
+- Activate steam as tcagame
+  - Execute these commands as root. It will ask for the account's password and steam guard code.
+
+```bash
+su tcagame
+cd /home/tcagame/SteamCmd
+./steamcmd.sh +login YOUR-STEAM-ACCOUNT
+```
+
+</TabItem>
+</Tabs>
+
+## Configure Steam Update Notifications
+
+- Go to `System` (on the left-hand navigation) > `Settings` > `Default Steam Settings`. Enter your Steam API key. You can get a free API key from [https://steamcommunity.com/dev/apikey](https://steamcommunity.com/dev/apikey)
+- Go to Settings > Games > Select the Game > Steam Settings. Enter the value for Store Id (for Steam API). Get this id from the game's URL.
+
+:::info example
+if the URL to the game is [http://store.steampowered.com/app/4000/](http://store.steampowered.com/app/4000/) set this value to 4000.
+:::
+
+- If all goes well you should see an update notification when you select the game server.
+- Enabling this option also allows you to configure the Steam Update scheduled task to check if an update is available before running the update. This prevents unnecessary restarts.
+- If you are using MVC templates go to `System` (on the left-hand navigation) > `Setting`s > `Plugin Repository` > and install the module named `Steam Badges`.
+
+:::note
+When you enable this option for the first time all game servers will say there is an update available because the game server's current version is not saved. Run the steam update and the message will go away.
+:::
+
+### Steam badges
+
+<Tabs>
+<TabItem value="mvc" label="MVC Templates">
+
+  ![SteamBadges](/img/using-tca/SteamBadges.png)
+
+</TabItem>
+<TabItem value="asp" label="ASP.NET Templates">
+
+  ![SteamUpdateAvailable](/img/using-tca/SteamUpdateAvailable.png)
+
+</TabItem>
+</Tabs>
+
+### Steam scheduled task configuration
+
+![SteamUpdateScheduledScriptOptions](/img/using-tca/SteamUpdateScheduledScriptOptions.png)
+
+## Common errors
+
+<Tabs>
+<TabItem value="windows" label="Windows">
+
+**Steam needs to be online to update. Please confirm your network connection and try again.**
+
+Log in to remote desktop. Go to `Program Files\TCAdmin2\Monitor\Tools\SteamCmd`. Right click on steamcmd.exe and select `Run as Administrator`. After the update is complete close the console window and try again from TCAdmin.
+
+:::tip
+If this doesn't work open Internet Explorer, go to Internet Options. Select the connections tab. Click on Lan Settings. Check "automatically detect settings" and save. Then run steamcmd.exe again.
+:::
+
+</TabItem>
+<TabItem value="linux" label="Linux">
+
+  **Steam downloader does not download any files with steamcmd**
+  Run these commands from ssh.
+
+  ```bash
+  cd /home/tcadmin/Monitor/Tools/SteamCmd
+  ./steamcmd.sh
+  ```
+  If you see an error similar to `libstdc++.so.6: version GLIBCXX_3.4.9 not found` download [Libstdcplusplus.zip](/downloads/Libstdcplusplus.zip) and save to `/home/tcadmin/Monitor/Tools/SteamCmd/linux32` . Unzip itand execute the commands again.
+
+  If you get any other errors search for them in Google to find a solution.
+
+:::tip
+
+If all else fails delete the folders `/root/Steam` and `/home/tcadmin/Monitor/Tools/SteamCmd` and try again from TCAdmin.
+
+:::
+
+### steamcmd: No such file or directory
+
+You are running 64bit Ubuntu or Debian. Execute this command to install missing 32bit libraries:
+
+```bash
+ apt-get install ia32-libs
+```
+
+
+</TabItem>
+</Tabs>
+
+### A Steam Engine Instance already exists
+Steamcmd on Linux does not allow multiple instances like it does on Windows. Wait until the other update has completed and try again.
+
+### Failed to create directory `/steam/SteamApps`
+
+Rename `/Steam/SteamApps` to `/steam/SteamApps`
+
+### Referenced character was not allowed in XML. `Normalization is True, checkCharacters = True Line 21, position 40.`
+
+Go to `System` (on the left-hand navigation) > `Settings` > `Default Steam Account`. Set the account to `anonymous` with a `blank password`.
+
+:::tip
+If the game requires a specific account you can assign it in the game's steam settings tab.
+:::
+
+## Custom SteamCmd Scripts
+
+<Tabs>
+<TabItem value="windows" label="Windows">
+
+Create a script for the custom icon event with the following configuration. Change the steamcmd command line as needed.
+
+- `Icon URL` - `~/App_Themes/Default/Images/ControlPanel/MenuIcons/GameHosting/Steam.png`
+- `Script Engine` - Batch/shell script
+- `Script`
+
+```bash
+@echo off
+"%TCAdminFolder%\Monitor\Tools\SteamCmd\steamcmd.exe" +login anonymous +force_install_dir %ThisService_RootDirectory% +app_update "90 -beta beta" validate +quit
+```
+
+</TabItem>
+<TabItem value="linux" label="Linux">
+
+  Create a script for the custom icon event with the following configuration. Change the steamcmd command line as needed.
+
+  - `Icon URL` - `~/App_Themes/Default/Images/ControlPanel/MenuIcons/GameHosting/Steam.png`
+  - `Script Engine` - Batch/shell script
+  - Script
+  ```bash
+  #!/bin/bash
+  cd ${TCAdminFolder}/Monitor/Tools/SteamCmd/
+  ./steamcmd.sh +login anonymous +force_install_dir ${ThisService_RootDirectory} +app_update "90 -beta beta" validate +quit
+  chown --recursive tcagame ${ThisService_RootDirectory}
+  ```
+
+
+</TabItem>
+</Tabs>
+
+## Examples
+
+[C# Rust branch switcher](https://community.tcadmin.com/topic/11338-rust-server-branch-switcher-single-button-c-script/)
