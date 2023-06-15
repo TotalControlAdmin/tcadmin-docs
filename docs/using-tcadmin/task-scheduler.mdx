@@ -1,0 +1,41 @@
+---
+sidebar_position: 20
+sidebar_label: Task Scheduler
+---
+
+# Task Scheduler
+
+The Task Scheduler is a component that enables the scheduling of program or script launches at predetermined times. Whenever a service is created, reinstalled, or deleted, an associated task is automatically generated.
+
+These tasks can be individualized to run once or may have already been executed. To manually initiate a task, simply select it and click on the Start button. If a previously failed task is started, it will resume from the point where the error occurred.
+
+![ScheduledTasks](/img/using-tca/ScheduledTasks.png)
+
+## Recurring Tasks
+
+These tasks are user-defined and designed to run either once or multiple times. When a recurring task is created, it automatically generates a scheduled task that executes at the specified time. Upon executing the scheduled task, a new scheduled task is created based on the recurrence pattern defined for the original task.
+
+![RecurringTasks](/img/using-tca/RecurringTasks.png)
+
+### Schedule
+
+- `One Time` - The task will only run once at the specified time. If the task has already executed you can schedule it again simply by updating the start time.
+- `Daily` - The task will run once a day at the specified time. It can also be configured to run every other day, every 3 days, etc by using the `recur every x days` field.
+- `Weekly` - The task will run every week on the specified days and time. It can also be configured to run every other week, every 3 weeks, etc by using the `recur every x weeks` field.
+- `Monthly` - The task will run on the selected months on the specified days and time.
+
+### Actions
+
+Each recurring task can have one or more actions that execute on the specified server. If one action fails the task execution will be cancelled and set to error status.
+
+### Action Chaining
+
+Some actions can work with the results from previous actions.
+
+:::info example
+you can configure a task that does the following:
+
+- Backup the database
+- Compress the database backup file
+- Upload the compressed file to an FTP server
+  :::

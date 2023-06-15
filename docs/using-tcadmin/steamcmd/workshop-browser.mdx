@@ -1,0 +1,2209 @@
+---
+sidebar_position: 23
+sidebar_label: Workshop Browser
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Collapsible from 'react-collapsible';
+
+# Workshop Browser
+
+The Steam Workshop browser allows your users to download and install mods and maps from Steam with a single click. Each game handles Workshop mods differently. You must configure scripts that move the mod files to the correct location after it has been downloaded.
+
+![Workshop_Browser](/img/using-tca/Workshop_Browser.png)
+
+## Configure the Workshop Browser
+
+- Go to `System` (on left-hand navigation) > `Settings` > `Default Steam Settings`. Enter your Steam API key.
+- Go to `System` (on left-hand navigation) > `Settings` > `Games` > `select the game` > `Steam Settings`. Set the following values:
+  - `Store Id` - Set the game's id in the Steam store. For example: [https://store.steampowered.com/app/4000/Garrys_Mod/](https://store.steampowered.com/app/4000/Garrys_Mod/)
+  - `Enable Workshop Browser` - Enables the Workshop browser.
+  - `Stop before installing Workshop content` - Specify if you want to stop the service before installing content.
+  - `Skip Workshop download` - If enabled the content is not downloaded automatically. Use this option if the game can download content automatically.
+  - `Workshop file id format` - Format used on the file id. For example if the file id needs @ at the beginning use `@![FileId]`
+  - `Workshop file id separator` - Specify the characters used to separate file ids. Use `![NewLine]` to separate with a new line character.
+  - Go to `System` (on left-hand navigation) > `Settings` > `Games` > `select the game` > `Feature Permissions` and enable W`orkshop browser for users`, `resellers` and `sub admins`. **(If you want to test this feature as admin don't enable these options)**
+
+## Script Events
+
+### After Workshop Content Installed - Occurs after the content has been downloaded.
+
+- Available objects: - [ThisServer](/customizations/scripts/script-objects/this-server), [ThisGame](/customizations/scripts/script-objects/this-game), [ThisUser](/customizations/scripts/script-objects/this-user), [ThisService](/customizations/scripts/script-objects/this-service)
+- Available Variables:
+  - `FileId` - The id of the Workshop content that was installed.
+  - `FileIds` - A list of currently installed file ids formatted and separated according to the game's configuration. It includes the file id that is being installed.
+  - `FileIdsArray` - An uint32 array of currently installed file ids. It includes the file id that is being installed.
+  - `InstallPath` - The folder where the content is downloaded. For example: `ServiceRoot/steamapps/Workshop/content/STOREID/FILEID`
+  - `FileUrl` - Url to download the file. If the content has more than 1 file this value is blank.
+  - `FileName` - The filename according to the Steam API. The value is relative to the install path. If the content has more than 1 file this value is blank. For example: `mymaps/aim_ak47_training_csgo.bsp`
+  - `FileNameNoPath` - The filename without any paths. If the content has more than 1 file this value is blank. For example: `aim_ak47_training_csgo.bsp
+  - `FileNameSavePath` - The full path where the single file is downloaded. For example `ServiceRoot/steamapps/Workshop/content/STOREID/FILEID/mymaps/aim_ak47_training_csgo.bsp`
+  - `TagsArray` - A string array that contains the content's tags.
+  - `Tags` - A list of the content's tags separated by comma.
+  - `FileTitle` - The content's name.
+
+### After Workshop Content Uninstalled - Occurs after the content has been uninstalled.
+
+- Available objects: - [ThisServer](/customizations/scripts/script-objects/this-server), [ThisGame](/customizations/scripts/script-objects/this-game), [ThisUser](/customizations/scripts/script-objects/this-user), [ThisService](/customizations/scripts/script-objects/this-service)
+- Available Variables:
+  - `FileId` - The id of the Workshop content that was uninstalled.
+  - `FileIds` - A list of currently installed file ids formatted and separated according to the game's configuration. It does not include the file id that is being uninstalled.
+  - `FileIdsArray` - An uint32 array of currently installed file ids. It does not include the file id that is being uninstalled.
+  - `InstallPath` - The folder where the content is located. For example: `ServiceRoot/steamapps/Workshop/content/STOREID/FILEID`
+  - `FileUrl` - Url to download the file. If the content has more than 1 file this value is blank.
+  - `FileName` - The filename according to the Steam API. The value is relative to the install path. If the content has more than 1 file this value is blank. For example: `mymaps/aim_ak47_training_csgo.bsp`
+  - `FileNameNoPath` - The filename without any paths. If the content has more than 1 file this value is blank. For example: `aim_ak47_training_csgo.bsp`
+  - `FileNameSavePath` - The full path where the single file is downloaded. For example `ServiceRoot/steamapps/Workshop/content/STOREID/FILEID/mymaps/aim_ak47_training_csgo.bsp`
+  - `TagsArray` - A string array that contains the content's tags.
+  - `Tags` - A list of the content's tags separated by comma.
+  - FileTitle - The content's name.
+
+### After Workshop Content Updated `(available in 2.0.131.3 and greater)` - Occurs after the content has been updated
+
+:::info
+If the game's workshop update script is not configured the uninstall/install scripts will be executed.
+:::
+
+- Available objects: - [ThisServer](/customizations/scripts/script-objects/this-server), [ThisGame](/customizations/scripts/script-objects/this-game), [ThisUser](/customizations/scripts/script-objects/this-user), [ThisService](/customizations/scripts/script-objects/this-service)
+- Available Variables:
+  - FileId - The id of the Workshop content that was installed.
+  - FileIds - A list of currently installed file ids formatted and separated according to the game's configuration. It includes the file id that is being installed.
+  - FileIdsArray - An uint32 array of currently installed file ids. It includes the file id that is being installed.
+  - InstallPath - The folder where the content is downloaded. For example: `ServiceRoot/steamapps/Workshop/content/STOREID/FILEID`
+  - FileUrl - Url to download the file. If the content has more than 1 file this value is blank.
+  - FileName - The filename according to the Steam API. The value is relative to the install path. If the content has more than 1 file this value is blank. For example: `mymaps/aim_ak47_training_csgo.bsp`
+  - FileNameNoPath - The filename without any paths. If the content has more than 1 file this value is blank. For example: aim_ak47_training_csgo.bsp
+  - FileNameSavePath - The full path where the single file is downloaded. For example `ServiceRoot/steamapps/Workshop/content/STOREID/FILEID/mymaps/aim_ak47_training_csgo.bsp`
+  - TagsArray - A string array that contains the content's tags.
+  - Tags - A list of the content's tags separated by comma.
+  - FileTitle - The content's name.
+
+### Before Workshop Automatic Update `(available in 2.0.144 and greater)`
+This event is executed when the service has a scheduled task for Workshop Update. Use it to send an update notification to the connected players. 
+
+- Available objects: - [ThisServer](/customizations/scripts/script-objects/this-server), [ThisGame](/customizations/scripts/script-objects/this-game), [ThisUser](/customizations/scripts/script-objects/this-user), [ThisService](/customizations/scripts/script-objects/this-service)
+
+:::tip
+See the Ark scripts below for an example.
+:::
+
+## Sample Scripts
+
+:::info
+The Workshop browser downloads the content to `ServiceRoot/steamapps/Workshop/content/STOREID/FILEID`. It is up to the administrator to configure a script that moves the files to the correct location and update the config file. Contact TCAdmin support if you need help creating a script.
+:::
+
+### Ark Survival Evolved
+
+:::caution
+The parallel code in the after installed script below causes Mono to crash. **On Linux use the script in the Linux tab instead**
+:::
+
+<Tabs>
+  <TabItem value="windows" label="Windows">
+
+  <Tabs className="unique-tabs">
+  <TabItem value="After Workshop Install">
+
+:::note update notes
+- Updated 2020/08/24. Fix for file ids > 2147483647 after this was fixed in the game
+- Updated 2020/07/07. Fix for file ids > 2147483647
+:::
+
+#### Windows Script
+
+- **Operating System:** Windows
+- **Description:** Extract `.z`, copy to `ShooterGame/Content/Mods` and update `GameUserSettings.ini`
+- **Script Engine:** IronPython
+- **Event:** After Workshop Content Installed
+- **Ignore execution errors:** Unchecked
+- **Notes** - This script supports extraction of multiple files simultaneously. `The default is 2`. You can increase it by editing this line near the bottom of the script.
+
+:::tip Recommended parallelism value
+**options.MaxDegreeOfParallelism = 2**
+:::
+:::warning Change if you know what you are doing
+For VPS the recommended value is `2`. For dedicated servers the recommended value is `4`. The higher the value the faster the script will execute but it will require more CPU and disk. Set it too high and it might take even longer.
+:::
+
+<details><summary>VIEW CODE BLOCK</summary>
+<p>
+
+```py showLineNumbers
+import clr
+ 
+ 
+from System.IO import Directory, File, Path, SearchOption
+from System import Environment, PlatformID, String, Exception
+from System.Text.RegularExpressions import Regex, RegexOptions, Match
+ 
+            
+ 
+#Support for parallel extraction
+clr.AddReference('System.Core')
+from System.Collections.Generic import List
+from System import Action
+from System.Threading.Tasks import Parallel, ParallelOptions
+ 
+extractedcount=0
+totalfilecount=0
+lastfileprogress=0
+########################################
+# https://github.com/TheCherry/ark-server-manager #
+########################################
+import struct
+import zlib
+import sys
+ 
+def str_to_l(st):
+    return struct.unpack('q', st)[0]
+ 
+def z_unpack(src, dst):
+    global extractedcount, totalfilecount, lastfileprogress
+    with open(src, 'rb') as f_src:
+        with open(dst, 'wb') as f_dst:
+            f_src.read(8)
+            size1 = str_to_l(f_src.read(8))
+            f_src.read(8)
+            size2 = str_to_l(f_src.read(8))
+            if(size1 == -1641380927):
+                size1 = 131072L
+            runs = (size2 + size1 - 1L) / size1
+            array = []
+            for i in range(runs):
+                array.append(f_src.read(8))
+                f_src.read(8)
+            for i in range(runs):
+                to_read = array[i]
+                compressed = f_src.read(str_to_l(to_read))
+                decompressed = zlib.decompress(compressed)
+                f_dst.write(decompressed)
+    Script.WriteToConsole("Extracted " + dst.Replace(ThisService.RootDirectory, ""))
+    File.Delete(src)
+    File.Delete(src + ".uncompressed_size")
+    extractedcount=extractedcount+1
+    progress=round((float(extractedcount)/totalfilecount)*100,0)
+    if progress > lastfileprogress + 4:
+      lastfileprogress=progress
+      ThisTaskStep.UpdateProgress(progress)
+      
+#######################################################################
+# https://github.com/barrycarey/Ark_Mod_Downloader/blob/master/Ark_Mod_Downloader.py #
+#######################################################################
+import os
+import struct
+from collections import OrderedDict
+map_names = []
+map_count=0
+temp_mod_path = os.path.join(ThisService.RootDirectory, "ShooterGame/Content/Mods")
+meta_data = OrderedDict([])
+ 
+def parse_base_info(modid):
+        Script.WriteToConsole("[+] Collecting Mod Details From mod.info")
+ 
+        mod_info = os.path.join(temp_mod_path, modid, "mod.info")
+ 
+        if not os.path.isfile(mod_info):
+            raise Exception("[x] Failed to locate mod.info. Cannot Continue. Please try again.")
+            return False
+ 
+        with open(mod_info, "rb") as f:
+            read_ue4_string(f)
+            map_count = struct.unpack('i', f.read(4))[0]
+ 
+            for i in range(map_count):
+                cur_map = read_ue4_string(f)
+                if cur_map:
+                    map_names.append(cur_map)
+ 
+        return True
+ 
+def parse_meta_data(modid):
+        """
+        Parse the modmeta.info files and extract the key value pairs need to for the .mod file.
+        How To Parse modmeta.info:
+            1. Read 4 bytes to tell how many key value pairs are in the file
+            2. Read next 4 bytes tell us how many bytes to read ahead to get the key
+            3. Read ahead by the number of bytes retrieved from step 2
+            4. Read next 4 bytes to tell how many bytes to read ahead to get value
+            5. Read ahead by the number of bytes retrieved from step 4
+            6. Start at step 2 again
+        :return: Dict
+        """
+ 
+        print("[+] Collecting Mod Meta Data From modmeta.info")
+        print("[+] Located The Following Meta Data:")
+ 
+        mod_meta = os.path.join(temp_mod_path, modid, "modmeta.info")
+        if not os.path.isfile(mod_meta):
+            raise Exception("[x] Failed To Locate modmeta.info. Cannot continue without it. Please try again.")
+            return False
+ 
+        with open(mod_meta, "rb") as f:
+ 
+            total_pairs = struct.unpack('i', f.read(4))[0]
+ 
+            for i in range(total_pairs):
+ 
+                key, value = "", ""
+ 
+                key_bytes = struct.unpack('i', f.read(4))[0]
+                key_flag = False
+                if key_bytes < 0:
+                    key_flag = True
+                    key_bytes -= 1
+ 
+                if not key_flag and key_bytes > 0:
+ 
+                    raw = f.read(key_bytes)
+                    key = raw[:-1].decode()
+ 
+                value_bytes = struct.unpack('i', f.read(4))[0]
+                value_flag = False
+                if value_bytes < 0:
+                    value_flag = True
+                    value_bytes -= 1
+ 
+                if not value_flag and value_bytes > 0:
+                    raw = f.read(value_bytes)
+                    value = raw[:-1].decode()
+ 
+                # TODO This is a potential issue if there is a key but no value
+                if key and value:
+                    Script.WriteToConsole("[!] " + key + ":" + value)
+                    meta_data[key] = value
+ 
+        return True
+ 
+def create_mod_file(modid):
+        """
+        Create the .mod file.
+        This code is an adaptation of the code from Ark Server Launcher.  All credit goes to Face Wound on Steam
+        :return:
+        """
+        if not parse_base_info(modid) or not parse_meta_data(modid):
+            return False
+ 
+        print("[+] Writing .mod File")
+        with open(os.path.join(temp_mod_path, modid + ".mod"), "w+b") as f:
+ 
+            modid = int(modid)
+            if modid > 2147483647:
+              diff = modid-2147483647
+              modid = -2147483647 + diff - 2                                           
+            f.write(struct.pack('ixxxx', modid))  # Needs 4 pad bits
+            write_ue4_string("ModName", f)
+            write_ue4_string("", f)
+ 
+            map_count = len(map_names)
+            f.write(struct.pack("i", map_count))
+ 
+            for m in map_names:
+                write_ue4_string(m, f)
+ 
+            # Not sure of the reason for this
+            num2 = 4280483635
+            f.write(struct.pack('I', num2))
+            num3 = 2
+            f.write(struct.pack('i', num3))
+ 
+            if "ModType" in meta_data:
+                mod_type = b'1'
+            else:
+                mod_type = b'0'
+ 
+            # TODO The packing on this char might need to be changed
+            f.write(struct.pack('p', mod_type))
+            meta_length = len(meta_data)
+            f.write(struct.pack('i', meta_length))
+ 
+            for k, v in meta_data.items():
+                write_ue4_string(k, f)
+                write_ue4_string(v, f)
+ 
+        return True
+ 
+def read_ue4_string(file):
+        count = struct.unpack('i', file.read(4))[0]
+        flag = False
+        if count < 0:
+            flag = True
+            count -= 1
+ 
+        if flag or count <= 0:
+            return ""
+ 
+        return file.read(count)[:-1].decode()
+ 
+def write_ue4_string(string_to_write, file):
+        string_length = len(string_to_write) + 1
+        file.write(struct.pack('i', string_length))
+        barray = bytearray(string_to_write, "utf-8")
+        file.write(barray)
+        file.write(struct.pack('p', b'0'))
+ 
+###########################################
+###########################################
+###########################################
+ 
+# Only extract files the correct folder depending on operating system
+oseditor="WindowsNoEditor" if Environment.OSVersion.Platform == PlatformID.Win32NT else "LinuxNoEditor"
+noeditor=Path.Combine(InstallPath, oseditor )
+ 
+# Use other OS folder if it doesn't exist.
+if not Directory.Exists(noeditor) :
+  oseditor = "LinuxNoEditor" if Environment.OSVersion.Platform == PlatformID.Win32NT else "WindowsNoEditor"
+  noeditor = Path.Combine(InstallPath, oseditor)  
+ 
+# Extract and delete all .z files
+actions = List[Action]()
+for zfile in Directory.GetFiles(noeditor, "*.z", SearchOption.AllDirectories):
+ file=Path.Combine(Path.GetDirectoryName(zfile), Path.GetFileNameWithoutExtension(zfile))
+ action=Action(lambda a=zfile, b=file: z_unpack(a, b))
+ actions.Add(action)
+ 
+options=ParallelOptions()
+#Extract 2 files at a time.
+options.MaxDegreeOfParallelism = 2
+totalfilecount=actions.Count
+ThisTaskStep.WriteLog(String.Format("Extracting {0} files...", totalfilecount))
+ThisTaskStep.UpdateProgress(0)
+Parallel.Invoke(options, actions.ToArray())
+ 
+# Move folder to correct location. Delete if it already exists.
+# Define modid before FileId is altered so we write the correct id to inifile
+modid = FileId
+if FileId > 2147483647:
+  diff = FileId-2147483647
+  FileId = -2147483647 + diff - 2
+ 
+modfolder=Path.Combine(ThisService.RootDirectory, String.Format("ShooterGame/Content/Mods/{0}", modid))
+if Directory.Exists(modfolder) :
+  Directory.Delete(modfolder, True)
+Directory.Move(Path.Combine(InstallPath, oseditor), modfolder)
+ 
+# Update ini file
+serveros = "WindowsServer" if Environment.OSVersion.Platform == PlatformID.Win32NT else "LinuxServer"
+inifile = Path.Combine(ThisService.RootDirectory, String.Format("ShooterGame/Saved/Config/{0}/GameUserSettings.ini", serveros))
+pattern="ActiveMods[ \t]*=[ \t]*(?<ActiveMods>[0-9, \t]*)"
+filecontents = File.ReadAllText(inifile)
+match = Regex.Match(filecontents, pattern, RegexOptions.IgnoreCase)
+if match.Success :
+  activemods = match.Groups["ActiveMods"].Value
+  if String.IsNullOrEmpty(activemods) or activemods.IndexOf(modid.ToString()) == -1 :
+    if activemods.Length > 0 :
+      activemods = activemods + ","
+      activemods = activemods + modid.ToString()
+      filecontents=filecontents.Replace(match.Groups["ActiveMods"].Value, activemods)
+    else :
+      activemods = modid.ToString()
+      filecontents = filecontents.Substring(0, match.Groups["ActiveMods"].Index) + activemods + filecontents.Substring(match.Groups["ActiveMods"].Index)
+    File.WriteAllText(inifile, filecontents)
+ 
+#Create .mod
+parse_base_info(modid.ToString())
+parse_meta_data(modid.ToString())
+create_mod_file(modid.ToString())
+ 
+# Delete folder
+if Directory.Exists(InstallPath) :
+  Directory.Delete(InstallPath, True)
+```
+
+</p>
+</details>
+
+
+
+  </TabItem>
+</Tabs>
+
+
+
+</TabItem>
+<TabItem value="linux" label="Linux">
+  <Tabs className="unique-tabs">
+  <TabItem value="After Workshop Install">
+
+:::note update notes
+- Updated 2020/08/24. Fix for file ids > 2147483647 after game was fixed
+- Updated 2020/7/7. Fix for file ids > 2147483647
+- Updated 2020/6/9. Some Linux mods are placed in /downloads/ instead of /content/
+:::
+
+#### Linux Script
+
+- **Operating System:** Linux
+- **Description:** Extract `.z`, copy to `ShooterGame/Content/Mods` and update `GameUserSettings.ini`
+- **Script Engine:** IronPython
+- **Event:** After Workshop Content Installed
+- **Ignore execution errors:** Unchecked
+
+<details><summary>SHOW CODE BLOCK</summary>
+<p>
+
+```py showLineNumbers
+import clr
+   
+from System.IO import Directory, File, Path, SearchOption
+from System import Environment, PlatformID, String, Exception
+from System.Text.RegularExpressions import Regex, RegexOptions, Match
+   
+extractedcount=0
+totalfilecount=0
+lastfileprogress=0
+   
+########################################
+# https://github.com/TheCherry/ark-server-manager #
+########################################
+import struct
+import zlib
+import sys
+   
+def str_to_l(st):
+    return struct.unpack('q', st)[0]
+   
+def z_unpack(src, dst):
+    global extractedcount, totalfilecount, lastfileprogress
+    with open(src, 'rb') as f_src:
+        with open(dst, 'wb') as f_dst:
+            f_src.read(8)
+            size1 = str_to_l(f_src.read(8))
+            f_src.read(8)
+            size2 = str_to_l(f_src.read(8))
+            if(size1 == -1641380927):
+                size1 = 131072L
+            runs = (size2 + size1 - 1L) / size1
+            array = []
+            for i in range(runs):
+                array.append(f_src.read(8))
+                f_src.read(8)
+            for i in range(runs):
+                to_read = array[i]
+                compressed = f_src.read(str_to_l(to_read))
+                decompressed = zlib.decompress(compressed)
+                f_dst.write(decompressed)
+    Script.WriteToConsole("Extracted " + dst.Replace(ThisService.RootDirectory, ""))
+    File.Delete(src)
+    File.Delete(src + ".uncompressed_size")
+    extractedcount=extractedcount+1
+    progress=round((float(extractedcount)/totalfilecount)*100,0)
+    if progress > lastfileprogress + 4:
+      lastfileprogress=progress
+      ThisTaskStep.UpdateProgress(progress)                
+   
+#######################################################################
+# https://github.com/barrycarey/Ark_Mod_Downloader/blob/master/Ark_Mod_Downloader.py #
+#######################################################################
+import os
+import struct
+from collections import OrderedDict
+map_names = []
+map_count=0
+temp_mod_path = os.path.join(ThisService.RootDirectory, "ShooterGame/Content/Mods")
+meta_data = OrderedDict([])
+   
+def parse_base_info(modid):
+   
+        Script.WriteToConsole("[+] Collecting Mod Details From mod.info")
+   
+        mod_info = os.path.join(temp_mod_path, modid, "mod.info")
+   
+        if not os.path.isfile(mod_info):
+            Script.WriteToConsole("[x] Failed to locate mod.info. Cannot Continue.  Aborting")
+            return False
+   
+        with open(mod_info, "rb") as f:
+            read_ue4_string(f)
+            map_count = struct.unpack('i', f.read(4))[0]
+   
+            for i in range(map_count):
+                cur_map = read_ue4_string(f)
+                if cur_map:
+                    map_names.append(cur_map)
+   
+        return True
+   
+def parse_meta_data(modid):
+        """
+       Parse the modmeta.info files and extract the key value pairs need to for the .mod file.
+       How To Parse modmeta.info:
+           1. Read 4 bytes to tell how many key value pairs are in the file
+           2. Read next 4 bytes tell us how many bytes to read ahead to get the key
+           3. Read ahead by the number of bytes retrieved from step 2
+           4. Read next 4 bytes to tell how many bytes to read ahead to get value
+           5. Read ahead by the number of bytes retrieved from step 4
+           6. Start at step 2 again
+       :return: Dict
+       """
+   
+        print("[+] Collecting Mod Meta Data From modmeta.info")
+        print("[+] Located The Following Meta Data:")
+   
+        mod_meta = os.path.join(temp_mod_path, modid, "modmeta.info")
+        if not os.path.isfile(mod_meta):
+            Script.WriteToConsole("[x] Failed To Locate modmeta.info. Cannot continue without it.  Aborting")
+            return False
+   
+        with open(mod_meta, "rb") as f:
+   
+            total_pairs = struct.unpack('i', f.read(4))[0]
+   
+            for i in range(total_pairs):
+   
+                key, value = "", ""
+   
+                key_bytes = struct.unpack('i', f.read(4))[0]
+                key_flag = False
+                if key_bytes < 0:
+                    key_flag = True
+                    key_bytes -= 1
+   
+                if not key_flag and key_bytes > 0:
+   
+                    raw = f.read(key_bytes)
+                    key = raw[:-1].decode()
+   
+                value_bytes = struct.unpack('i', f.read(4))[0]
+                value_flag = False
+                if value_bytes < 0:
+                    value_flag = True
+                    value_bytes -= 1
+   
+                if not value_flag and value_bytes > 0:
+                    raw = f.read(value_bytes)
+                    value = raw[:-1].decode()
+   
+                # TODO This is a potential issue if there is a key but no value
+                if key and value:
+                    Script.WriteToConsole("[!] " + key + ":" + value)
+                    meta_data[key] = value
+   
+        return True
+   
+def create_mod_file(modid):
+        """
+       Create the .mod file.
+       This code is an adaptation of the code from Ark Server Launcher.  All credit goes to Face Wound on Steam
+       :return:
+       """
+        if not parse_base_info(modid) or not parse_meta_data(modid):
+            return False
+   
+        print("[+] Writing .mod File")
+        with open(os.path.join(temp_mod_path, modid + ".mod"), "w+b") as f:
+   
+            modid = int(modid)
+            if modid > 2147483647:
+              diff = modid-2147483647
+              modid = -2147483647 + diff - 2
+            f.write(struct.pack('ixxxx', modid))  # Needs 4 pad bits
+            write_ue4_string("ModName", f)
+            write_ue4_string("", f)
+   
+            map_count = len(map_names)
+            f.write(struct.pack("i", map_count))
+   
+            for m in map_names:
+                write_ue4_string(m, f)
+   
+            # Not sure of the reason for this
+            num2 = 4280483635
+            f.write(struct.pack('I', num2))
+            num3 = 2
+            f.write(struct.pack('i', num3))
+   
+            if "ModType" in meta_data:
+                mod_type = b'1'
+            else:
+                mod_type = b'0'
+   
+            # TODO The packing on this char might need to be changed
+            f.write(struct.pack('p', mod_type))
+            meta_length = len(meta_data)
+            f.write(struct.pack('i', meta_length))
+   
+            for k, v in meta_data.items():
+                write_ue4_string(k, f)
+                write_ue4_string(v, f)
+   
+        return True
+   
+def read_ue4_string(file):
+        count = struct.unpack('i', file.read(4))[0]
+        flag = False
+        if count < 0:
+            flag = True
+            count -= 1
+   
+        if flag or count <= 0:
+            return ""
+   
+        return file.read(count)[:-1].decode()
+   
+def write_ue4_string(string_to_write, file):
+        string_length = len(string_to_write) + 1
+        file.write(struct.pack('i', string_length))
+        barray = bytearray(string_to_write, "utf-8")
+        file.write(barray)
+        file.write(struct.pack('p', b'0'))
+   
+###########################################
+###########################################
+###########################################
+# If the content folder doesn't exist use downloads
+if not Directory.Exists(InstallPath) :
+  InstallPath=InstallPath.Replace("/content/", "/downloads/")
+   
+# Always use Windows files. Linux files cause the game server to crash at startup.
+oseditor="WindowsNoEditor"
+noeditor=Path.Combine(InstallPath, oseditor )
+   
+# Extract and delete all .z files
+zfiles=Directory.GetFiles(noeditor, "*.z", SearchOption.AllDirectories);
+totalfilecount=zfiles.Count
+for zfile in zfiles:
+  file=Path.Combine(Path.GetDirectoryName(zfile), Path.GetFileNameWithoutExtension(zfile))
+  z_unpack(zfile, file)
+  Script.WriteToConsole("Extracted " + file)
+  File.Delete(zfile)
+  File.Delete(zfile + ".uncompressed_size")
+   
+# Move folder to correct location. Delete if it already exists.
+# Define modid before FileId is altered so we write the correct id to inifile
+modid = FileId
+if FileId > 2147483647:
+  diff = FileId-2147483647
+  FileId = -2147483647 + diff - 2
+   
+modfolder=Path.Combine(ThisService.RootDirectory, String.Format("ShooterGame/Content/Mods/{0}", modid))
+if Directory.Exists(modfolder) :
+  Directory.Delete(modfolder, True)
+Directory.Move(Path.Combine(InstallPath, oseditor), modfolder)
+   
+# Update ini file
+serveros = "WindowsServer" if Environment.OSVersion.Platform == PlatformID.Win32NT else "LinuxServer"
+inifile = Path.Combine(ThisService.RootDirectory, String.Format("ShooterGame/Saved/Config/{0}/GameUserSettings.ini", serveros))
+pattern="ActiveMods[ \t]*=[ \t]*(?<ActiveMods>[0-9, \t]*)"
+filecontents = File.ReadAllText(inifile)
+match = Regex.Match(filecontents, pattern, RegexOptions.IgnoreCase)
+if match.Success :
+  activemods = match.Groups["ActiveMods"].Value
+  if String.IsNullOrEmpty(activemods) or activemods.IndexOf(modid.ToString()) == -1 :
+    if activemods.Length > 0 :
+      activemods = activemods + ","
+      activemods = activemods + modid.ToString()
+      filecontents=filecontents.Replace(match.Groups["ActiveMods"].Value, activemods)
+    else :
+      activemods = modid.ToString()
+      filecontents = filecontents.Substring(0, match.Groups["ActiveMods"].Index) + activemods + filecontents.Substring(match.Groups["ActiveMods"].Index)
+    File.WriteAllText(inifile, filecontents)
+   
+#Create .mod
+parse_base_info(modid.ToString())
+parse_meta_data(modid.ToString())
+create_mod_file(modid.ToString())
+   
+# Delete folder
+if Directory.Exists(InstallPath) :
+  Directory.Delete(InstallPath, True)
+```
+</p>
+</details>
+
+
+  </TabItem>
+  <TabItem value="After Workshop Update">
+
+This script is the same as the install script except it does not update the .ini so it keeps the mod order.
+
+<details><summary>SHOW CODE BLOCK</summary>
+<p>
+
+
+
+```py showLineNumbers
+import clr
+   
+from System.IO import Directory, File, Path, SearchOption
+from System import Environment, PlatformID, String, Exception
+from System.Text.RegularExpressions import Regex, RegexOptions, Match
+   
+extractedcount=0
+totalfilecount=0
+lastfileprogress=0
+   
+########################################
+# https://github.com/TheCherry/ark-server-manager #
+########################################
+import struct
+import zlib
+import sys
+   
+def str_to_l(st):
+    return struct.unpack('q', st)[0]
+   
+def z_unpack(src, dst):
+    global extractedcount, totalfilecount, lastfileprogress
+    with open(src, 'rb') as f_src:
+        with open(dst, 'wb') as f_dst:
+            f_src.read(8)
+            size1 = str_to_l(f_src.read(8))
+            f_src.read(8)
+            size2 = str_to_l(f_src.read(8))
+            if(size1 == -1641380927):
+                size1 = 131072L
+            runs = (size2 + size1 - 1L) / size1
+            array = []
+            for i in range(runs):
+                array.append(f_src.read(8))
+                f_src.read(8)
+            for i in range(runs):
+                to_read = array[i]
+                compressed = f_src.read(str_to_l(to_read))
+                decompressed = zlib.decompress(compressed)
+                f_dst.write(decompressed)
+    Script.WriteToConsole("Extracted " + dst.Replace(ThisService.RootDirectory, ""))
+    File.Delete(src)
+    File.Delete(src + ".uncompressed_size")
+    extractedcount=extractedcount+1
+    progress=round((float(extractedcount)/totalfilecount)*100,0)
+    if progress > lastfileprogress + 4:
+      lastfileprogress=progress
+      ThisTaskStep.UpdateProgress(progress)                
+   
+#######################################################################
+# https://github.com/barrycarey/Ark_Mod_Downloader/blob/master/Ark_Mod_Downloader.py #
+#######################################################################
+import os
+import struct
+from collections import OrderedDict
+map_names = []
+map_count=0
+temp_mod_path = os.path.join(ThisService.RootDirectory, "ShooterGame/Content/Mods")
+meta_data = OrderedDict([])
+   
+def parse_base_info(modid):
+   
+        Script.WriteToConsole("[+] Collecting Mod Details From mod.info")
+   
+        mod_info = os.path.join(temp_mod_path, modid, "mod.info")
+   
+        if not os.path.isfile(mod_info):
+            Script.WriteToConsole("[x] Failed to locate mod.info. Cannot Continue.  Aborting")
+            return False
+   
+        with open(mod_info, "rb") as f:
+            read_ue4_string(f)
+            map_count = struct.unpack('i', f.read(4))[0]
+   
+            for i in range(map_count):
+                cur_map = read_ue4_string(f)
+                if cur_map:
+                    map_names.append(cur_map)
+   
+        return True
+   
+def parse_meta_data(modid):
+        """
+       Parse the modmeta.info files and extract the key value pairs need to for the .mod file.
+       How To Parse modmeta.info:
+           1. Read 4 bytes to tell how many key value pairs are in the file
+           2. Read next 4 bytes tell us how many bytes to read ahead to get the key
+           3. Read ahead by the number of bytes retrieved from step 2
+           4. Read next 4 bytes to tell how many bytes to read ahead to get value
+           5. Read ahead by the number of bytes retrieved from step 4
+           6. Start at step 2 again
+       :return: Dict
+       """
+   
+        print("[+] Collecting Mod Meta Data From modmeta.info")
+        print("[+] Located The Following Meta Data:")
+   
+        mod_meta = os.path.join(temp_mod_path, modid, "modmeta.info")
+        if not os.path.isfile(mod_meta):
+            Script.WriteToConsole("[x] Failed To Locate modmeta.info. Cannot continue without it.  Aborting")
+            return False
+   
+        with open(mod_meta, "rb") as f:
+   
+            total_pairs = struct.unpack('i', f.read(4))[0]
+   
+            for i in range(total_pairs):
+   
+                key, value = "", ""
+   
+                key_bytes = struct.unpack('i', f.read(4))[0]
+                key_flag = False
+                if key_bytes < 0:
+                    key_flag = True
+                    key_bytes -= 1
+   
+                if not key_flag and key_bytes > 0:
+   
+                    raw = f.read(key_bytes)
+                    key = raw[:-1].decode()
+   
+                value_bytes = struct.unpack('i', f.read(4))[0]
+                value_flag = False
+                if value_bytes < 0:
+                    value_flag = True
+                    value_bytes -= 1
+   
+                if not value_flag and value_bytes > 0:
+                    raw = f.read(value_bytes)
+                    value = raw[:-1].decode()
+   
+                # TODO This is a potential issue if there is a key but no value
+                if key and value:
+                    Script.WriteToConsole("[!] " + key + ":" + value)
+                    meta_data[key] = value
+   
+        return True
+   
+def create_mod_file(modid):
+        """
+       Create the .mod file.
+       This code is an adaptation of the code from Ark Server Launcher.  All credit goes to Face Wound on Steam
+       :return:
+       """
+        if not parse_base_info(modid) or not parse_meta_data(modid):
+            return False
+   
+        print("[+] Writing .mod File")
+        with open(os.path.join(temp_mod_path, modid + ".mod"), "w+b") as f:
+   
+            modid = int(modid)
+            if modid > 2147483647:
+              diff = modid-2147483647
+              modid = -2147483647 + diff - 2
+            f.write(struct.pack('ixxxx', modid))  # Needs 4 pad bits
+            write_ue4_string("ModName", f)
+            write_ue4_string("", f)
+   
+            map_count = len(map_names)
+            f.write(struct.pack("i", map_count))
+   
+            for m in map_names:
+                write_ue4_string(m, f)
+   
+            # Not sure of the reason for this
+            num2 = 4280483635
+            f.write(struct.pack('I', num2))
+            num3 = 2
+            f.write(struct.pack('i', num3))
+   
+            if "ModType" in meta_data:
+                mod_type = b'1'
+            else:
+                mod_type = b'0'
+   
+            # TODO The packing on this char might need to be changed
+            f.write(struct.pack('p', mod_type))
+            meta_length = len(meta_data)
+            f.write(struct.pack('i', meta_length))
+   
+            for k, v in meta_data.items():
+                write_ue4_string(k, f)
+                write_ue4_string(v, f)
+   
+        return True
+   
+def read_ue4_string(file):
+        count = struct.unpack('i', file.read(4))[0]
+        flag = False
+        if count < 0:
+            flag = True
+            count -= 1
+   
+        if flag or count <= 0:
+            return ""
+   
+        return file.read(count)[:-1].decode()
+   
+def write_ue4_string(string_to_write, file):
+        string_length = len(string_to_write) + 1
+        file.write(struct.pack('i', string_length))
+        barray = bytearray(string_to_write, "utf-8")
+        file.write(barray)
+        file.write(struct.pack('p', b'0'))
+   
+###########################################
+###########################################
+###########################################
+# If the content folder doesn't exist use downloads
+if not Directory.Exists(InstallPath) :
+  InstallPath=InstallPath.Replace("/content/", "/downloads/")
+   
+# Always use Windows files. Linux files cause the game server to crash at startup.
+oseditor="WindowsNoEditor"
+noeditor=Path.Combine(InstallPath, oseditor )
+   
+# Extract and delete all .z files
+zfiles=Directory.GetFiles(noeditor, "*.z", SearchOption.AllDirectories);
+totalfilecount=zfiles.Count
+for zfile in zfiles:
+  file=Path.Combine(Path.GetDirectoryName(zfile), Path.GetFileNameWithoutExtension(zfile))
+  z_unpack(zfile, file)
+  Script.WriteToConsole("Extracted " + file)
+  File.Delete(zfile)
+  File.Delete(zfile + ".uncompressed_size")
+   
+# Move folder to correct location. Delete if it already exists.
+# Define modid before FileId is altered so we write the correct id to inifile
+modid = FileId
+if FileId > 2147483647:
+  diff = FileId-2147483647
+  FileId = -2147483647 + diff - 2
+   
+modfolder=Path.Combine(ThisService.RootDirectory, String.Format("ShooterGame/Content/Mods/{0}", modid))
+if Directory.Exists(modfolder) :
+  Directory.Delete(modfolder, True)
+Directory.Move(Path.Combine(InstallPath, oseditor), modfolder)
+   
+#Create .mod
+parse_base_info(modid.ToString())
+parse_meta_data(modid.ToString())
+create_mod_file(modid.ToString())
+   
+# Delete folder
+if Directory.Exists(InstallPath) :
+  Directory.Delete(InstallPath, True)
+```
+</p>
+</details>
+
+
+
+</TabItem>
+</Tabs>
+
+</TabItem>
+</Tabs>
+
+#### After Workshop Uninstall
+
+- **Operating System:** Any
+- **Description:** Delete mod from ShooterGame/Content/Mods and update GameUserSettings.ini
+- **Script Engine:** IronPython
+- **Event:** After Workshop Content Uninstalled
+- **Ignore execution errors:** Unchecked
+
+<details><summary>SHOW CODE BLOCK</summary>
+<p>
+
+```py showLineNumbers
+import clr
+ 
+from System.IO import Path, Directory, File
+from System import Environment, PlatformID, String
+from System.Text.RegularExpressions import Regex, RegexOptions, Match
+ 
+modid = FileId
+if FileId > 2147483647:
+  diff = FileId-2147483647
+  FileId = -2147483647 + diff - 2
+ 
+# Delete folder
+modfolder=Path.Combine(ThisService.RootDirectory, String.Format("ShooterGame/Content/Mods/{0}", modid))
+if Directory.Exists(modfolder) :
+  Directory.Delete(modfolder, True)
+ 
+#Delete .mod
+modfile=Path.Combine(ThisService.RootDirectory, String.Format("ShooterGame/Content/Mods/{0}.mod", modid))
+if File.Exists(modfile) :
+  File.Delete(modfile)
+ 
+# Update ini file
+serverfolder = "WindowsServer" if Environment.OSVersion.Platform == PlatformID.Win32NT else "LinuxServer"
+inifile = Path.Combine(ThisService.RootDirectory, String.Format("ShooterGame/Saved/Config/{0}/GameUserSettings.ini", serverfolder))
+pattern="ActiveMods[ \t]*=[ \t]*(?<ActiveMods>[0-9, \t]*)"
+filecontents = File.ReadAllText(inifile)
+match = Regex.Match(filecontents, pattern, RegexOptions.IgnoreCase)
+if match.Success :
+  activemods = match.Groups["ActiveMods"].Value
+  if activemods.IndexOf(modid.ToString()) != -1 :
+    activemods = activemods.Replace("," + modid.ToString(), String.Empty).Replace(modid.ToString() + ",", String.Empty).Replace(modid.ToString(), String.Empty)
+    filecontents=filecontents.Replace(match.Groups["ActiveMods"].Value, activemods)
+    File.WriteAllText(inifile, filecontents)
+```
+
+</p>
+</details>
+
+#### After Workshop Update
+
+:::caution
+The parallel code in the **after updated** script below causes Mono to crash. For Linux please use the script above in the Linux tab
+:::
+
+This script is the same as the install script except it does not update the .ini so it keeps the mod order.
+
+<details><summary>SHOW CODE BLOCK</summary>
+<p>
+
+#### yes, even hidden code blocks!
+
+```py showLineNumbers
+import clr
+ 
+ 
+from System.IO import Directory, File, Path, SearchOption
+from System import Environment, PlatformID, String, Exception
+from System.Text.RegularExpressions import Regex, RegexOptions, Match
+ 
+            
+ 
+#Support for parallel extraction
+clr.AddReference('System.Core')
+from System.Collections.Generic import List
+from System import Action
+from System.Threading.Tasks import Parallel, ParallelOptions
+ 
+extractedcount=0
+totalfilecount=0
+lastfileprogress=0
+########################################
+# https://github.com/TheCherry/ark-server-manager #
+########################################
+import struct
+import zlib
+import sys
+ 
+def str_to_l(st):
+    return struct.unpack('q', st)[0]
+ 
+def z_unpack(src, dst):
+    global extractedcount, totalfilecount, lastfileprogress
+    with open(src, 'rb') as f_src:
+        with open(dst, 'wb') as f_dst:
+            f_src.read(8)
+            size1 = str_to_l(f_src.read(8))
+            f_src.read(8)
+            size2 = str_to_l(f_src.read(8))
+            if(size1 == -1641380927):
+                size1 = 131072L
+            runs = (size2 + size1 - 1L) / size1
+            array = []
+            for i in range(runs):
+                array.append(f_src.read(8))
+                f_src.read(8)
+            for i in range(runs):
+                to_read = array[i]
+                compressed = f_src.read(str_to_l(to_read))
+                decompressed = zlib.decompress(compressed)
+                f_dst.write(decompressed)
+    Script.WriteToConsole("Extracted " + dst.Replace(ThisService.RootDirectory, ""))
+    File.Delete(src)
+    File.Delete(src + ".uncompressed_size")
+    extractedcount=extractedcount+1
+    progress=round((float(extractedcount)/totalfilecount)*100,0)
+    if progress > lastfileprogress + 4:
+      lastfileprogress=progress
+      ThisTaskStep.UpdateProgress(progress)
+      
+#######################################################################
+# https://github.com/barrycarey/Ark_Mod_Downloader/blob/master/Ark_Mod_Downloader.py #
+#######################################################################
+import os
+import struct
+from collections import OrderedDict
+map_names = []
+map_count=0
+temp_mod_path = os.path.join(ThisService.RootDirectory, "ShooterGame/Content/Mods")
+meta_data = OrderedDict([])
+ 
+def parse_base_info(modid):
+        Script.WriteToConsole("[+] Collecting Mod Details From mod.info")
+ 
+        mod_info = os.path.join(temp_mod_path, modid, "mod.info")
+ 
+        if not os.path.isfile(mod_info):
+            raise Exception("[x] Failed to locate mod.info. Cannot Continue. Please try again.")
+            return False
+ 
+        with open(mod_info, "rb") as f:
+            read_ue4_string(f)
+            map_count = struct.unpack('i', f.read(4))[0]
+ 
+            for i in range(map_count):
+                cur_map = read_ue4_string(f)
+                if cur_map:
+                    map_names.append(cur_map)
+ 
+        return True
+ 
+def parse_meta_data(modid):
+        """
+        Parse the modmeta.info files and extract the key value pairs need to for the .mod file.
+        How To Parse modmeta.info:
+            1. Read 4 bytes to tell how many key value pairs are in the file
+            2. Read next 4 bytes tell us how many bytes to read ahead to get the key
+            3. Read ahead by the number of bytes retrieved from step 2
+            4. Read next 4 bytes to tell how many bytes to read ahead to get value
+            5. Read ahead by the number of bytes retrieved from step 4
+            6. Start at step 2 again
+        :return: Dict
+        """
+ 
+        print("[+] Collecting Mod Meta Data From modmeta.info")
+        print("[+] Located The Following Meta Data:")
+ 
+        mod_meta = os.path.join(temp_mod_path, modid, "modmeta.info")
+        if not os.path.isfile(mod_meta):
+            raise Exception("[x] Failed To Locate modmeta.info. Cannot continue without it. Please try again.")
+            return False
+ 
+        with open(mod_meta, "rb") as f:
+ 
+            total_pairs = struct.unpack('i', f.read(4))[0]
+ 
+            for i in range(total_pairs):
+ 
+                key, value = "", ""
+ 
+                key_bytes = struct.unpack('i', f.read(4))[0]
+                key_flag = False
+                if key_bytes < 0:
+                    key_flag = True
+                    key_bytes -= 1
+ 
+                if not key_flag and key_bytes > 0:
+ 
+                    raw = f.read(key_bytes)
+                    key = raw[:-1].decode()
+ 
+                value_bytes = struct.unpack('i', f.read(4))[0]
+                value_flag = False
+                if value_bytes < 0:
+                    value_flag = True
+                    value_bytes -= 1
+ 
+                if not value_flag and value_bytes > 0:
+                    raw = f.read(value_bytes)
+                    value = raw[:-1].decode()
+ 
+                # TODO This is a potential issue if there is a key but no value
+                if key and value:
+                    Script.WriteToConsole("[!] " + key + ":" + value)
+                    meta_data[key] = value
+ 
+        return True
+ 
+def create_mod_file(modid):
+        """
+        Create the .mod file.
+        This code is an adaptation of the code from Ark Server Launcher.  All credit goes to Face Wound on Steam
+        :return:
+        """
+        if not parse_base_info(modid) or not parse_meta_data(modid):
+            return False
+ 
+        print("[+] Writing .mod File")
+        with open(os.path.join(temp_mod_path, modid + ".mod"), "w+b") as f:
+ 
+            modid = int(modid)
+            if modid > 2147483647:
+              diff = modid-2147483647
+              modid = -2147483647 + diff - 2                                           
+            f.write(struct.pack('ixxxx', modid))  # Needs 4 pad bits
+            write_ue4_string("ModName", f)
+            write_ue4_string("", f)
+ 
+            map_count = len(map_names)
+            f.write(struct.pack("i", map_count))
+ 
+            for m in map_names:
+                write_ue4_string(m, f)
+ 
+            # Not sure of the reason for this
+            num2 = 4280483635
+            f.write(struct.pack('I', num2))
+            num3 = 2
+            f.write(struct.pack('i', num3))
+ 
+            if "ModType" in meta_data:
+                mod_type = b'1'
+            else:
+                mod_type = b'0'
+ 
+            # TODO The packing on this char might need to be changed
+            f.write(struct.pack('p', mod_type))
+            meta_length = len(meta_data)
+            f.write(struct.pack('i', meta_length))
+ 
+            for k, v in meta_data.items():
+                write_ue4_string(k, f)
+                write_ue4_string(v, f)
+ 
+        return True
+ 
+def read_ue4_string(file):
+        count = struct.unpack('i', file.read(4))[0]
+        flag = False
+        if count < 0:
+            flag = True
+            count -= 1
+ 
+        if flag or count <= 0:
+            return ""
+ 
+        return file.read(count)[:-1].decode()
+ 
+def write_ue4_string(string_to_write, file):
+        string_length = len(string_to_write) + 1
+        file.write(struct.pack('i', string_length))
+        barray = bytearray(string_to_write, "utf-8")
+        file.write(barray)
+        file.write(struct.pack('p', b'0'))
+ 
+###########################################
+###########################################
+###########################################
+ 
+# Only extract files the correct folder depending on operating system
+oseditor="WindowsNoEditor" if Environment.OSVersion.Platform == PlatformID.Win32NT else "LinuxNoEditor"
+noeditor=Path.Combine(InstallPath, oseditor )
+ 
+# Use other OS folder if it doesn't exist.
+if not Directory.Exists(noeditor) :
+  oseditor = "LinuxNoEditor" if Environment.OSVersion.Platform == PlatformID.Win32NT else "WindowsNoEditor"
+  noeditor = Path.Combine(InstallPath, oseditor)  
+ 
+# Extract and delete all .z files
+actions = List[Action]()
+for zfile in Directory.GetFiles(noeditor, "*.z", SearchOption.AllDirectories):
+ file=Path.Combine(Path.GetDirectoryName(zfile), Path.GetFileNameWithoutExtension(zfile))
+ action=Action(lambda a=zfile, b=file: z_unpack(a, b))
+ actions.Add(action)
+ 
+options=ParallelOptions()
+#Extract 2 files at a time.
+options.MaxDegreeOfParallelism = 2
+totalfilecount=actions.Count
+ThisTaskStep.WriteLog(String.Format("Extracting {0} files...", totalfilecount))
+ThisTaskStep.UpdateProgress(0)
+Parallel.Invoke(options, actions.ToArray())
+ 
+# Move folder to correct location. Delete if it already exists.
+# Define modid before FileId is altered so we write the correct id to inifile
+modid = FileId
+if FileId > 2147483647:
+  diff = FileId-2147483647
+  FileId = -2147483647 + diff - 2
+ 
+modfolder=Path.Combine(ThisService.RootDirectory, String.Format("ShooterGame/Content/Mods/{0}", modid))
+if Directory.Exists(modfolder) :
+  Directory.Delete(modfolder, True)
+Directory.Move(Path.Combine(InstallPath, oseditor), modfolder)
+ 
+#Create .mod
+parse_base_info(modid.ToString())
+parse_meta_data(modid.ToString())
+create_mod_file(modid.ToString())
+ 
+# Delete folder
+if Directory.Exists(InstallPath) :
+  Directory.Delete(InstallPath, True)
+```
+
+</p>
+</details>
+
+#### Before Workshop Automatic Update
+
+This script sends a message to players 5 minutes before doing an automatic update.
+
+- **Operating System:** Any
+- **Description:** Broadcast a message, wait 5 minutes, save world
+- **Script Engine:** IronPython
+- **Event:** Before Workshop Automatic Update
+- **Ignore execution errors:** Checked
+
+<details><summary>SHOW CODE BLOCK</summary>
+<p>
+
+
+```py showLineNumbers
+import clr
+clr.AddReference("TCAdmin.GameHosting.SDK")
+clr.AddReference("TCAdmin.Interfaces")
+ 
+from System.IO import File, Path
+from System.Text.RegularExpressions import Regex, RegexOptions
+from System import Environment, PlatformID, String
+from System.Threading import Thread
+from TCAdmin.GameHosting.SDK import rconClient
+from TCAdmin.GameHosting.SDK import RCONGameType
+from TCAdmin.Interfaces.Server import ServiceStatus
+ 
+if ThisService.Status.ServiceStatus != ServiceStatus.Running :
+  Script.WriteToConsole(String.Format("{0} is stopped. The script will not continue.", ThisService.ConnectionInfo))
+  Script.Exit()
+ 
+serveros = "WindowsServer" if Environment.OSVersion.Platform == PlatformID.Win32NT else "LinuxServer"
+inifile = Path.Combine(ThisService.RootDirectory, String.Format("ShooterGame/Saved/Config/{0}/GameUserSettings.ini", serveros))
+ 
+pattern="ServerAdminPassword[ \t]*=[ \t]*[\"]?(?<ServerAdminPassword>([^\"\r\n])*)[\"]?"
+filecontents = File.ReadAllText(inifile)
+match = Regex.Match(filecontents, pattern, RegexOptions.IgnoreCase)
+ 
+if match.Success :
+  rconpass = match.Groups["ServerAdminPassword"].Value
+  Script.WriteToConsole(String.Format("RCon password is: {0}", rconpass))
+   
+  rconclient=rconClient()
+  rconclient.GameType = RCONGameType.CounterStrikeSource
+  rconclient.Server = ThisService.IpAddress
+  rconclient.Port = ThisService.RConPort
+  Script.WriteToConsole("Sending update notification...")
+  rconclient.Send(None, None, rconpass, "broadcast \"Server will update mods in 5 minutes!\"")
+  Script.WriteToConsole(String.Format("RCon Response: {0}", rconclient.ReadResponse()))
+  Script.WriteToConsole("Waiting for 5 minutes...")
+  Thread.Sleep(300000)
+  Script.WriteToConsole("Saving world...")
+  rconclient.Send(None, None, rconpass, "saveworld")
+  Script.WriteToConsole(String.Format("RCon Response: {0}", rconclient.ReadResponse()))
+  Script.WriteToConsole("Done.")
+```
+
+</p>
+</details>
+
+### Arma 3
+
+:::info ESSENTIAL PREREQUISITE'S
+- Go to the game's settings. Add a variable named Mods and another named ServerMods.
+- Go to the game's command lines. Add the variables to the game's command line: `-mod=![Mods]` `-servermod=![ServerMods]`
+- Go to the game's steam settings. Set Workshop File Id Format to `![FileId]` and Workshop File Id Separator to ;
+:::
+
+#### After Workshop Content Installed
+
+- **Operating System:** Any
+- **Description:** Configure mod
+- **Script Engine:** IronPython
+- **Event:** After Workshop Content Installed
+- **Ignore execution errors:** Unchecked
+
+<details><summary>SHOW CODE BLOCK</summary>
+<p>
+
+
+
+```py showLineNumbers
+import clr
+from System import Array, String
+from System.IO import File, Path, Directory, SearchOption
+  
+servertag="Server"
+servermods=""
+mods=""
+ 
+if ThisService.Variables.HasValue("ServerMods") :
+  servermods=ThisService.Variables["ServerMods"]
+ 
+if ThisService.Variables.HasValue("Mods") :
+  mods=ThisService.Variables["Mods"]
+   
+if Array.IndexOf(TagsArray, servertag) == -1 :
+  ThisService.Variables["Mods"]=String.Format("@{0}", FileId) + ";" + mods    
+else :
+  ThisService.Variables["ServerMods"]=String.Format("@{0}", FileId) + ";" + servermods  
+ 
+# Move folder to correct location
+modfolder=Path.Combine(ThisService.RootDirectory, String.Format("@{0}", FileId))
+if Directory.Exists(modfolder) :
+  Directory.Delete(modfolder, True)
+Directory.Move(InstallPath, modfolder)
+ 
+# Move keys to root key folder
+modkeys=Path.Combine(modfolder, "keys")
+rootkeys=Path.Combine(ThisService.RootDirectory, "keys")
+Directory.CreateDirectory(rootkeys)
+if Directory.Exists(modkeys) :
+  for file in Directory.GetFiles(modkeys, "*", SearchOption.AllDirectories):
+    keyfile = Path.Combine(rootkeys, Path.GetFileName(file))
+    if File.Exists(keyfile) :
+      File.Delete(keyfile)
+    File.Move(file, keyfile)
+ 
+# Move key to root key folder
+modkeys=Path.Combine(modfolder, "key")
+if Directory.Exists(modkeys) :
+  for file in Directory.GetFiles(modkeys, "*", SearchOption.AllDirectories):
+    keyfile = Path.Combine(rootkeys, Path.GetFileName(file))
+    if File.Exists(keyfile) :
+      File.Delete(keyfile)
+    File.Move(file, keyfile)
+ 
+# Update command line
+ThisService.Save()
+ThisService.Configure()
+```
+
+</p>
+</details>
+
+#### After Workshop Content Uninstalled
+
+- **Operating System:** Any
+- **Description:** Configure mod
+- **Script Engine:** IronPython
+- **Event:** After Workshop Content Uninstalled
+- **Ignore execution errors:** Unchecked
+
+<details><summary>SHOW CODE BLOCK</summary>
+<p>
+
+```py showLineNumbers
+import clr
+from System import Array, String
+from System.IO import Path, Directory
+ 
+servermods=""
+mods=""
+ 
+if ThisService.Variables.HasValue("ServerMods") :
+  servermods=ThisService.Variables["ServerMods"]
+ 
+if ThisService.Variables.HasValue("Mods") :
+  mods=ThisService.Variables["Mods"]
+   
+ThisService.Variables["ServerMods"]=servermods.Replace(String.Format("@{0};", FileId), "")
+ThisService.Variables["Mods"]=mods.Replace(String.Format("@{0};", FileId), "")
+ 
+# Delete mod folder
+modfolder=Path.Combine(ThisService.RootDirectory, String.Format("@{0}", FileId))
+if Directory.Exists(modfolder) :
+  Directory.Delete(modfolder, True)
+ 
+# Update command line
+ThisService.Save()
+ThisService.Configure()
+```
+
+</p>
+</details>
+
+#### Clear workshop mod variables
+
+- **Operating System:** Any
+- **Description:** Clear workshop mod variables
+- **Script Engine:** IronPython
+- **Event:** After Reinstalled
+- **Ignore execution errors:** Unchecked
+
+```py
+ThisService.Variables["ServerMods"]=""
+ThisService.Variables["Mods"]=""
+ThisService.Save()
+```
+
+### America's Army Proving Grounds
+
+#### After Workshop Content Installed, After Workshop Content Uninstalled
+
+- **Operating System:** Any
+- **Description:** Updates [SteamUGCManager.SteamUGCManager] in AASteamUGCManager.ini
+- **Script Engine:** IronPython
+- **Events:** After Workshop Content Installed, After Workshop Content Uninstalled
+- **Ignore execution errors:** Unchecked
+
+<details><summary>SHOW CODE BLOCK</summary>
+<p>
+
+```py showLineNumbers
+import clr
+clr.AddReference("INIFileParser")
+ 
+from IniParser.Model.Configuration import IniParserConfiguration
+from IniParser.Parser import IniDataParser
+from IniParser import FileIniDataParser
+from System.IO import Path, File
+from System import String
+ 
+#Remove all keys from [SteamUGCManager.SteamUGCManager]
+inifile = Path.Combine(ThisService.RootDirectory, String.Format("AAGame/Config/ServerConfig/AASteamUGCManager.ini"))
+iniconfig = IniParserConfiguration()
+iniconfig.AllowDuplicateKeys = True
+dataparser = IniDataParser(iniconfig)
+ini = FileIniDataParser(dataparser)
+data = ini.ReadFile(inifile)
+data["SteamUGCManager.SteamUGCManager"].RemoveAllKeys()
+ini.WriteFile(inifile, data)
+ 
+#Add mods under [SteamUGCManager.SteamUGCManager]
+i=0
+items=""
+while i < len(FileIdsArray):
+   items = items + String.Format("ServerSubscribedItems=(IdString={0})\n",FileIdsArray[i])
+   i += 1
+ 
+contents=File.ReadAllText(inifile)
+contents=contents.Replace("[SteamUGCManager.SteamUGCManager]", "[SteamUGCManager.SteamUGCManager]\n" + items)
+File.WriteAllText(inifile, contents)
+```
+
+</p>
+</details>
+
+### Broke Protocol: Online City RPG
+
+#### After Workshop Content Installed
+
+- **Operating System:** Windows
+- **Description:** Moves mod files.
+- **Script Engine:** Batch
+- **Event:** After Workshop Content Installed
+- **Ignore execution errors:** Unchecked
+
+```bash
+move /y %InstallPath% %ThisService_RootDirectory%\AssetBundles\%FileId%
+```
+
+#### After Workshop Content Uninstalled
+
+**Operating System:** Windows
+**Description:** Delete mod files.
+**Script Engine:** Batch
+**Event:** After Workshop Content Uninstalled
+**Ignore execution errors:** Unchecked
+
+```bash
+rd /q /s %ThisService_RootDirectory%\AssetBundles\%FileId%
+```
+
+### Conan Exiles
+#### After Workshop Content Installed
+
+- **Operating System:** Any
+- **Description:** Moves mod files.
+- **Script Engine:** IronPython
+- **Event:** After Workshop Content Installed
+- **Ignore execution errors:** Unchecked
+
+These scripts have been updated to keep the order of `modlist.txt`
+
+<details><summary>SHOW CODE BLOCK</summary>
+<p>
+
+```py showLineNumbers
+import clr
+from System import String
+from System.IO import Directory, File, Path, SearchOption, DirectoryInfo
+ 
+import System
+clr.AddReference("System.Core")
+clr.ImportExtensions(System.Linq)
+ 
+modpath = Path.Combine(ThisService.RootDirectory, "ConanSandbox", "Mods")
+Directory.CreateDirectory(modpath)
+ 
+#Save a list of the mod's files so we can delete them when uninstalling the mod. 
+modpakfile = "";
+modfilelist=Path.Combine(ThisService.RootDirectory, "ConanSandbox", "Mods", String.Format("{0}.txt", FileId))
+for file in Directory.GetFiles(InstallPath, "*", SearchOption.AllDirectories):
+  modfile = Path.Combine(modpath, Path.GetFileName(file))
+  if(File.Exists(modfile)) :
+   File.Delete(modfile)
+  File.Move(file, modfile)
+  modfilename=Path.GetFileName(file)
+  File.AppendAllText(modfilelist, String.Format("{0}\r", modfilename))
+  if Path.GetExtension(modfilename) == ".pak" :
+    modpakfile = modfilename
+ 
+#Create modlist.txt
+modlisttxt=Path.Combine(modpath, "modlist.txt")
+if File.Exists(modlisttxt) :
+  lines = File.ReadAllLines(modlisttxt)
+  File.Delete(modlisttxt)
+  with File.AppendText(modlisttxt) as fs :
+    for line in lines :
+      fs.WriteLine(line)
+    
+with File.AppendText(modlisttxt) as fs :
+  fs.WriteLine(modpakfile)
+```
+
+</p>
+</details>
+
+#### After Workshop Content Uninstalled
+
+- **Operating System:** Any
+- **Description:** Delete mod files
+- **Script Engine:** IronPython
+- **Event:** After Workshop Content Uninstalled
+- **Ignore execution errors:** Unchecked
+
+<details><summary>SHOW CODE BLOCK</summary>
+<p>
+
+```py showLineNumbers
+import clr
+from System import String
+from System.IO import Directory, File, Path, SearchOption, DirectoryInfo
+ 
+import System
+clr.AddReference("System.Core")
+clr.ImportExtensions(System.Linq)
+ 
+modpath = Path.Combine(ThisService.RootDirectory, "ConanSandbox", "Mods")
+modfilelist=Path.Combine(ThisService.RootDirectory, "ConanSandbox", "Mods", String.Format("{0}.txt", FileId))
+ 
+modpakfile = "";
+if File.Exists(modfilelist) :
+  modfiles = File.ReadAllLines(modfilelist)
+  for modfile in modfiles :
+    if Path.GetExtension(modfile) == ".pak" :
+      modpakfile = modfile
+    modfile = Path.Combine(modpath, modfile)
+    if File.Exists(modfile) :
+      File.Delete(modfile)
+  File.Delete(modfilelist)
+  
+#Create modlist.txt
+modlisttxt=Path.Combine(modpath, "modlist.txt")
+if(File.Exists(modlisttxt)) :
+  lines = File.ReadAllLines(modlisttxt).Where(lambda l: not l.Contains(modpakfile)).ToArray()
+  File.Delete(modlisttxt)
+  with File.AppendText(modlisttxt) as fs :
+    for line in lines :
+      fs.WriteLine(line)
+```
+
+</p>
+</details>
+
+#### After Workshop Content Updated
+
+- **Operating System:** Any
+- **Description:** Moves mod files.
+- **Script Engine:** IronPython
+- **Event:** After Workshop Content Updated
+- **Ignore execution errors:** Unchecked
+
+This is basically the install script but with the part that updates `modlist.txt` removed so we don't lose the mod order.
+
+<details><summary>SHOW CODE BLOCK</summary>
+<p>
+
+```py showLineNumbers
+import clr
+from System import String
+from System.IO import Directory, File, Path, SearchOption, DirectoryInfo
+ 
+import System
+clr.AddReference("System.Core")
+clr.ImportExtensions(System.Linq)
+ 
+modpath = Path.Combine(ThisService.RootDirectory, "ConanSandbox", "Mods")
+Directory.CreateDirectory(modpath)
+ 
+#Save a list of the mod's files so we can delete them when uninstalling the mod. 
+modpakfile = "";
+modfilelist=Path.Combine(ThisService.RootDirectory, "ConanSandbox", "Mods", String.Format("{0}.txt", FileId))
+for file in Directory.GetFiles(InstallPath, "*", SearchOption.AllDirectories):
+  modfile = Path.Combine(modpath, Path.GetFileName(file))
+  if(File.Exists(modfile)) :
+   File.Delete(modfile)
+  File.Move(file, modfile)
+  modfilename=Path.GetFileName(file)
+  File.AppendAllText(modfilelist, String.Format("{0}\r", modfilename))
+  if Path.GetExtension(modfilename) == ".pak" :
+    modpakfile = modfilename
+```
+
+</p>
+</details>
+
+### DayZ
+
+:::note
+- Create a variable named `Mods`
+- Add this to the command line: `-mod=![Mods]`
+:::
+
+#### After Workshop Content Installed
+
+- **Operating System:** Any
+- **Description:** After Workshop Content Installed
+- **Script Engine:** IronPython
+- **Event:** AfterWorkshopInstall
+- **Ignore execution errors:** Unchecked
+
+<details><summary>SHOW CODE BLOCK</summary>
+<p>
+
+```py showLineNumbers
+import clr
+from System import Array, String
+from System.IO import File, Path, Directory, SearchOption
+from System.Threading import Thread
+import re
+ 
+# Setup variables
+servertag="Server"
+mods=""
+y=[]
+ModName=""
+ 
+# Get commandline list of mods
+if ThisService.Variables.HasValue("Mods") :
+  mods=ThisService.Variables["Mods"]
+else:
+  raise Exception("Missing Mod information. Installation Failed!")
+ 
+# Check for FileTitle
+if len(FileTitle) != 0:
+# Check FileTitle for special character
+  for i in range(len(FileTitle)):
+    if bool(re.search('[a-zA-Z0-9 \]\[_\'+-]', FileTitle[i])) : 
+      y.append(FileTitle[i])
+    else:
+      y.append("")
+         
+    ModName= "".join(str(x) for x in y)
+    ModName= ModName.Replace("  "," ").Replace(" ","_")
+    ModName= ModName.strip()
+else:  
+   ModName = FileId
+   
+if (mods.find(';') != -1) :
+   ThisService.Variables["Mods"]=String.Format("@{0}", ModName) + ";" + mods   
+else :  
+  if len(mods) > 0 :
+     ThisService.Variables["Mods"]=String.Format("@{0}", ModName) + ";" + mods   
+  else :
+     ThisService.Variables["Mods"]=String.Format("@{0}", ModName) + mods   
+       
+modfolder=Path.Combine(ThisService.RootDirectory, String.Format("@{0}", ModName))
+   
+# If mod exists delete the folder
+if Directory.Exists(modfolder) : 
+   Directory.Delete(modfolder, True)
+ 
+# Move mod to root using renamed file name as folder name 
+Directory.Move(InstallPath, modfolder)
+ 
+# Setup keys path to to copy .bikey file root \keys folder
+modkeys=Path.Combine(modfolder, "keys")
+rootkeys=Path.Combine(ThisService.RootDirectory, "keys")
+ 
+# Check for \keys folder in root
+if not Directory.Exists(rootkeys) :
+  Directory.CreateDirectory(rootkeys)
+ 
+# Check for mod \keys folder
+# Get list of all files on mods \keys folder
+# Copy file(s) from mods \keys folder to root \keys folder
+if Directory.Exists(modkeys) :
+  for file in Directory.GetFiles(modkeys, "*", SearchOption.AllDirectories):
+    keyfile = Path.Combine(rootkeys, Path.GetFileName(file))
+    if not File.Exists(keyfile) :
+      File.Copy(file, keyfile)
+ 
+# Update command line
+ThisService.Save()
+ThisService.Configure()
+```
+
+</p>
+</details>
+
+#### After Workshop Content Uninstalled
+
+- **Operating System:** Any
+- **Description:** After Workshop Content Uninstalled
+- **Script Engine:** IronPython
+- **Event:** AfterWorkshopUninstall
+- **Ignore execution errors:** Unchecked
+
+<details><summary>SHOW CODE BLOCK</summary>
+<p>
+
+```py showLineNumbers
+import clr
+from System import Array, String
+from System.IO import Directory, File, Path, SearchOption, DirectoryInfo
+import re
+ 
+# Setup variables
+mods=""
+mlist=""
+lastmod=""
+ModName=""
+y=[]
+ 
+# Check for Variable
+# Get commandline mods list
+if ThisService.Variables.HasValue("Mods") :
+  mods=ThisService.Variables["Mods"]
+else:
+  raise Exception("Missing Mod information. Uninstall Failed!")
+ 
+# Check if the mod being uninstalled is the last mod or is the only mod in the commandline
+# Convert commandline modlist string to List
+mlist = mods.split('@')
+ 
+def is_last(alist,choice):
+  if choice == alist[-1]:
+    return True
+  else:
+    return False
+   
+if len(FileTitle) != 0:
+  for i in range(len(FileTitle)):
+    if bool(re.search('[a-zA-Z0-9 \]\[_\'+-]', FileTitle[i])) : 
+      y.append(FileTitle[i])
+    else:
+      y.append("")
+         
+    ModName= "".join(str(x) for x in y)
+    ModName= ModName.Replace("  "," ").Replace(" ","_")
+    ModName= ModName.strip()
+else:
+  ModName = FileId
+ 
+# If mod to be uninstalled is the last mod set flag to true
+if is_last(mlist,ModName) == True :
+   lastmod = "y"
+else:
+   lastmod = "n"
+                    
+# Remove mod name from commandline variable
+# If the mod is the last mod in the list or the only mod in the list remove FileTitle and not FileTitle;, 
+#     attempting to remove FileTitle; will fail and the mod will not be removed from the commandline
+# If mod removal result; in only one mod being left make sure there is not trailing semi-colon
+if (mods.find(';') != -1) :
+  if lastmod == "n" :
+# Multiple mods not last mod
+     ThisService.Variables["Mods"]=mods.Replace(String.Format("@{0};", ModName), "")
+  else :
+# Last Mod in list
+     ThisService.Variables["Mods"]=mods.Replace(String.Format(";@{0}", ModName), "")
+else :  
+# Only Mod
+  ThisService.Variables["Mods"]=mods.Replace(String.Format("@{0}", ModName), "")
+   
+# Setup folders for removal
+modfolder=Path.Combine(ThisService.RootDirectory, String.Format("@{0}", ModName))
+modkeys=Path.Combine(modfolder, "keys")
+rootkeys=Path.Combine(ThisService.RootDirectory, "keys")
+ 
+# Delete mod key files
+if Directory.Exists(modkeys) :
+  for file in Directory.GetFiles(modkeys, "*", SearchOption.AllDirectories):
+    keyfile = Path.Combine(rootkeys, Path.GetFileName(file))
+    File.Delete(keyfile)
+ 
+# Delete mod folder
+if Directory.Exists(modfolder) :
+  Directory.Delete(modfolder, True)
+ 
+# Becuase some devs develope more tyhan one mod and use the same .bikey file
+# Parse the mod folders and make sire the .bikey files are in the \keys folder
+# If not copy the /bikey file
+dirinfo = DirectoryInfo(ThisService.RootDirectory)
+for i in  dirinfo.GetDirectories("@*") :
+  modfolder=Path.Combine(ThisService.RootDirectory, i.Name)
+  modkeys=Path.Combine(modfolder, "keys")
+  if Directory.Exists(modkeys) :
+    for file in Directory.GetFiles(modkeys, "*", SearchOption.AllDirectories):
+      keyfile = Path.Combine(rootkeys, Path.GetFileName(file))
+      if not File.Exists(keyfile) :
+        File.Copy(file, keyfile)
+ 
+# Update command line
+ThisService.Save()
+ThisService.Configure()
+```
+
+</p>
+</details>
+
+#### After Workshop Content Updated
+
+- **Operating System:** Any
+- **Description:** After Workshop Content Updated
+- **Script Engine:** IronPython
+- **Event:** AfterWorkshopUpdate
+- **Ignore execution errors:** Unchecked
+
+<details><summary>SHOW CODE BLOCK</summary>
+<p>
+
+
+```py showLineNumbers
+import clr
+from System import Array, String
+from System.IO import File, Path, Directory, SearchOption
+from System.Threading import Thread
+import re
+  
+# Setup variables
+servertag="Server"
+mods=""
+y=[]
+ModName=""
+  
+# Get commandline list of mods
+if ThisService.Variables.HasValue("Mods") :
+  mods=ThisService.Variables["Mods"]
+else:
+  raise Exception("Missing Mod information. Installation Failed!")
+  
+# Check for FileTitle
+if len(FileTitle) != 0:
+# Check FileTitle for special character
+  for i in range(len(FileTitle)):
+    if bool(re.search('[a-zA-Z0-9 \]\[_\'+-]', FileTitle[i])) : 
+      y.append(FileTitle[i])
+    else:
+      y.append("")
+          
+    ModName= "".join(str(x) for x in y)
+    ModName= ModName.Replace("  "," ").Replace(" ","_")
+    ModName= ModName.strip()
+else:  
+   ModName = FileId
+    
+        
+modfolder=Path.Combine(ThisService.RootDirectory, String.Format("@{0}", ModName))
+    
+# If mod exists delete the folder
+if Directory.Exists(modfolder) : 
+   Directory.Delete(modfolder, True)
+  
+# Move mod to root using renamed file name as folder name 
+Directory.Move(InstallPath, modfolder)
+  
+# Setup keys path to to copy .bikey file root \keys folder
+modkeys=Path.Combine(modfolder, "keys")
+rootkeys=Path.Combine(ThisService.RootDirectory, "keys")
+  
+# Check for \keys folder in root
+if not Directory.Exists(rootkeys) :
+  Directory.CreateDirectory(rootkeys)
+  
+# Check for mod \keys folder
+# Get list of all files on mods \keys folder
+# Copy file(s) from mods \keys folder to root \keys folder
+if Directory.Exists(modkeys) :
+  for file in Directory.GetFiles(modkeys, "*", SearchOption.AllDirectories):
+    keyfile = Path.Combine(rootkeys, Path.GetFileName(file))
+    if not File.Exists(keyfile) :
+      File.Copy(file, keyfile)
+  
+# Update command line
+ThisService.Save()
+ThisService.Configure()
+```
+
+</p>
+</details>
+
+
+### Garry's Mod
+
+:::note update notes
+- Updated 2021/05/23. Fixed errors when file already exists. Gave execute permissions to bin/gmad_linux.
+:::
+
+#### After Workshop Content Installed
+
+- **Operating System:** Any
+- **Description:** After Workshop Content Installed
+- **Script Engine:** IronPython
+- **Event:** AfterWorkshopInstall
+- **Ignore execution errors:** Unchecked
+
+<details><summary>SHOW CODE BLOCK</summary>
+<p>
+
+```py showLineNumbers
+import clr
+clr.AddReference("TCAdmin.SDK")
+from System import Environment, PlatformID, String
+from System.IO import Directory, File, Path, SearchOption
+from System.Net import WebClient
+from System.Diagnostics import Process
+from TCAdmin.SDK.Misc import CompressionTools, Linux
+ 
+addon=Path.Combine(ThisService.RootDirectory, "garrysmod", "addons", FileId.ToString())
+ 
+urldownload=True;
+#File downloaded from Steam not from URL. Update variable values.
+if String.IsNullOrEmpty(FileUrl) :
+  for file in Directory.GetFiles(InstallPath) :
+    urldownload=False
+    FileName=Path.GetFileName(file)
+    FileNameNoPath=FileName
+    FileNameSavePath=file
+ 
+#Rename .gm to .gma
+if FileNameSavePath.EndsWith(".gm") :
+  if File.Exists(FileNameSavePath + "a") : 
+    File.Delete(FileNameSavePath + "a")
+  File.Move(FileNameSavePath, FileNameSavePath + "a")
+  FileNameSavePath=FileNameSavePath + "a"
+  FileName=FileName + "a"
+  FileNameNoPath=FileNameNoPath + "a"
+ 
+#If not .gma just move to addons
+if not FileNameSavePath.EndsWith(".gma") :
+  Directory.CreateDirectory(addon)
+  if File.Exists(Path.Combine(addon, FileNameNoPath)) : 
+    File.Delete(Path.Combine(addon, FileNameNoPath))
+  File.Move(FileNameSavePath, Path.Combine(addon, FileNameNoPath))
+  Script.Exit();
+ 
+#Important: Only 7zip 9.20 is able to extract the file.
+if Environment.OSVersion.Platform == PlatformID.Win32NT :
+  _7zaurl="https://www.7-zip.org/a/7za920.zip"
+  _7zazip=Path.Combine(TCAdminFolder, "Monitor", "Tools", "7za.zip")
+  _7zapath=Path.Combine(TCAdminFolder, "Monitor", "Tools", "7za")
+  _7zaexe = Path.Combine(_7zapath, "7za.exe")
+  gmad = Path.Combine(ThisService.RootDirectory, "bin", "gmad.exe")
+else :
+  _7zaurl="http://cdnsource.tcadmin.net/games/__files/p7zip_9.20_x86_linux_bin.tar.bz2"
+  _7zazip=Path.Combine(TCAdminFolder, "Monitor", "Tools", "7za.tar.bz2")
+  _7zapath=Path.Combine(TCAdminFolder, "Monitor", "Tools", "7za")
+  _7zaexe = Path.Combine(_7zapath, "p7zip_9.20", "bin", "7za")
+  gmad = Path.Combine(ThisService.RootDirectory, "bin", "gmad_linux")
+  Linux.MakeExecutable(gmad)
+  
+#Download 7zip if needed.
+if not File.Exists(_7zaexe) :
+  Script.WriteToConsole("Downloading 7zip...")
+  wc = WebClient()
+  wc.DownloadFile(_7zaurl, _7zazip);
+  c=CompressionTools()
+  c.Decompress(_7zazip, _7zapath)
+  File.Delete(_7zazip)
+ 
+#Only files downloaded from URL need to be extracted
+if urldownload :
+  p = Process()
+  p.StartInfo.FileName=_7zaexe
+  p.StartInfo.Arguments=String.Format('e -y -o"{0}" "{1}"', addon, FileNameSavePath)
+  p.StartInfo.WorkingDirectory=ThisService.WorkingDirectory
+  p.Start()
+  p.WaitForExit()
+  extractedfile=Path.Combine(addon, FileNameNoPath).Replace(".gma", String.Empty)
+  realgma=Path.Combine(ThisService.RootDirectory, "garrysmod", "addons", String.Format("{0}.gma", FileId))
+  if File.Exists(realgma) : 
+    File.Delete(realgma)
+  File.Move(extractedfile, realgma)
+else :
+  realgma=Path.Combine(Path.Combine(ThisService.RootDirectory, "garrysmod", "addons"), FileId.ToString() + ".gma")
+  if File.Exists(realgma) : 
+    File.Delete(realgma)
+  File.Move(FileNameSavePath, realgma)
+   
+p = Process()
+p.StartInfo.FileName=gmad
+p.StartInfo.Arguments=String.Format('extract -file "{0}"', realgma)
+p.StartInfo.WorkingDirectory=addon
+p.Start()
+p.WaitForExit()
+ 
+File.Delete(realgma)
+```
+
+</p>
+</details>
+
+#### After Workshop Content Uninstalled
+
+- **Operating System:** Any
+- **Description:** After Workshop Content Uninstalled
+- **Script Engine:** IronPython
+- **Event:** AfterWorkshopUninstall
+- **Ignore execution errors:** Unchecked
+
+```py showLineNumbers
+import clr
+from System.IO import Directory, Path
+ 
+addon = Path.Combine(ThisService.RootDirectory, "garrysmod", "addons", FileId.ToString())
+if Directory.Exists(addon) : 
+  Directory.Delete(addon, True);
+```
+
+### Space Engineers
+
+#### After Workshop Content Installed
+
+- **Operating System:** Any
+- **Description:** Adds mod info.
+- **Script Engine:** IronPython
+- **Event:** After Workshop Content Installed
+- **Ignore execution errors:** Unchecked
+
+```py showLineNumbers
+import clr
+clr.AddReference("System.Xml")
+ 
+from System import Exception
+from System import String
+from System.IO import Path
+from System.Xml import XmlDocument
+ 
+configpath=Path.Combine(ThisService.RootDirectory, "Sandbox.sbc")
+xmldoc = XmlDocument()
+xmldoc.Load(configpath)
+ 
+mods=xmldoc.SelectSingleNode("MyObjectBuilder_Checkpoint/Mods")
+if mods is None:
+  raise Exception("Could not find Mods section")
+   
+#Add only if mod does not exist
+modinfo=mods.SelectSingleNode(String.Format("ModItem[PublishedFileId='{0}']", FileId))
+if modinfo is None:
+   modinfo = xmldoc.CreateElement("ModItem")
+   modname = xmldoc.CreateElement("Name")
+   modfileid = xmldoc.CreateElement("PublishedFileId")
+   modname.InnerText=String.Format("{0}.sbm", FileId)
+   modfileid.InnerText=FileId.ToString()
+   modinfo.AppendChild(modname)
+   modinfo.AppendChild(modfileid)
+   mods.AppendChild(modinfo)
+   xmldoc.Save(configpath)
+```
+#### After Workshop Content Uninstalled
+
+- **Operating System:** Any
+- **Description:** Adds mod info.
+- **Script Engine:** IronPython
+- **Event:** After Workshop Content Uninstalled
+- **Ignore execution errors:** Unchecked
+
+```py showLineNumbers
+import clr
+clr.AddReference("System.Xml")
+ 
+from System import Exception
+from System import String
+from System.IO import Path
+from System.Xml import XmlDocument
+ 
+configpath=Path.Combine(ThisService.RootDirectory, "Sandbox.sbc")
+xmldoc = XmlDocument()
+xmldoc.Load(configpath)
+ 
+mods=xmldoc.SelectSingleNode("MyObjectBuilder_Checkpoint/Mods")
+if mods is None:
+  raise Exception("Could not find Mods section")
+ 
+#Remove mod and save file only if the mod exists in the file
+modinfo=mods.SelectSingleNode(String.Format("ModItem[PublishedFileId='{0}']", FileId))
+if not modinfo is None:
+  mods.RemoveChild(modinfo)
+  xmldoc.Save(configpath)
+```
+## Known Issues
+
+- `The remote server returned an error: (429) Too Many Requests.` - This is a temporary error from the Steam api. Wait a few seconds and start the task again.
