@@ -1,0 +1,459 @@
+---
+sidebar_position: 2
+sidebar_label: Setting up Nginx with TCAdmin
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Setting up Nginx with TCAdmin
+
+:::caution important
+
+The steps provided for configuring nginx in this guide are tailored for Ubuntu 22.04, which is the suggested and preferred operating system. Should you be utilizing a different operating system, consider this guide as a point of reference.
+
+:::
+
+## Prerequisites
+
+Prior to starting with this tutorial, ensure that you possess a standard user account with sudo privileges set up on your server, without using root access. [Initial server setup guide for Ubuntu 22.04.](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-22-04)
+
+Additionally, it's recommended to have already registered a domain name before reaching the final stages of this guide. [Register a new domain](https://developers.cloudflare.com/registrar/get-started/register-domain/) If you already have a domain with DNS configured you can skip this step.
+
+Once you have a valid account, initiate the process by logging in as your non-root user.
+
+## Installing Nginx
+
+```bash
+sudo apt update
+sudo apt install nginx
+```
+
+## Checking your Web Server
+
+```bash
+systemctl status nginx
+```
+Yoiu should see:
+```
+● nginx.service - A high performance web server and a reverse proxy server
+   Loaded: loaded (/lib/systemd/system/nginx.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2022-03-01 16:08:19 UTC; 3 days ago
+     Docs: man:nginx(8)
+ Main PID: 2369 (nginx)
+    Tasks: 2 (limit: 1153)
+   Memory: 3.5M
+   CGroup: /system.slice/nginx.service
+           ├─2369 nginx: master process /usr/sbin/nginx -g daemon on; master_process on;
+           └─2380 nginx: worker processb
+```
+
+More commands and info [**here**](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-22-04)
+
+## Configure TCAdmin to Execute the Fastcgi Server
+
+If you are running Debian or Ubunto with Mono 4 install the mono-fastcgi-server4 package:
+
+```bash
+apt-get install mono-fastcgi-server4
+```
+## Use HyperFastCgi (optional)
+
+You can install HyperFastCgi which should give better performance and memory usage. TCAdmin will automatically detect HyperFastCgi and use it instead of the mono fastcgi. [https://github.com/xplicit/HyperFastCgi](https://github.com/xplicit/HyperFastCgi)
+
+## Update tcadmin-config
+
+Edit the file **`tcadmin-config`**.
+
+```
+sudo nano /home/tcadmin/Monitor/tcadmin-config
+```
+Find and and change:
+
+```
+ENABLE_FASTCGI_SERVER="False"
+```
+
+to:
+
+```
+ENABLE_FASTCGI_SERVER="True"
+```
+
+Then restart the monitor service:
+
+```bash
+/home/tcadmin/Monitor/monitor-service restart
+```
+
+## Configure Nginx
+
+Edit the file **`nginx.conf`**
+
+```
+sudo nano /etc/nginx/nginx.conf
+```
+Find and change:
+
+```
+user nginx;
+```
+
+to:
+
+```
+user tcadmin;
+```
+
+Then execute this command:
+
+```
+sudo systemctl restart nginx
+```
+
+## Configure the control panel website
+
+run the following command:
+
+```sh
+sudo nano /etc/nginx/sites-available/default
+```
+:::tip
+If there is existing server blocks in the default file you can fully remove it ensuring the file is empty.
+:::
+
+### Adding the custom TCAdmin server blocks
+
+:::info Important
+
+uncomment the `server_name.` **`(remove the #)`** for the below conf file and enter your own domain name. (**Line: 15**)
+:::
+
+add/replace the below server blocks to the `default folder`
+
+<Tabs>
+  <TabItem value='MVC' label='MVC (Recommended)'>
+
+
+```conf showLineNumbers
+upstream tcadmin-fcgi {
+        ip_hash;
+        server unix:/home/tcadmin/Temp/fastcgi-socket-1;
+        keepalive 32;
+}
+
+upstream tcadmin-fcgi-mvc {
+        ip_hash;
+        server unix:/home/tcadmin/Temp/fastcgi-socket-mvc-1;
+        keepalive 32;
+}
+
+server {
+        #the following line is required if you want to configure with Let's Encrypt
+        #server_name tcadmin.yourdomain.com;
+        fastcgi_temp_path /home/tcadmin/Temp 1 2;
+        client_body_temp_path /home/tcadmin/Temp 1 2;
+        listen   8880;
+        #access_log   /home/tcadmin/Logs/nginx.log;
+        root /home/tcadmin/ControlPanel.MVC;
+        index index.html index.htm default.aspx Default.aspx;
+
+        #Support for Let's encrypt tools
+        location /.well-known {
+               try_files $uri $uri/ =404;
+        }
+
+        #Everything else served by fastcgi server
+        location / {
+               root /home/tcadmin/ControlPanel.MVC;
+               fastcgi_ignore_client_abort on;
+               fastcgi_pass tcadmin-fcgi-mvc;
+               include fastcgi_params;
+               fastcgi_split_path_info ^(.+\.as[pmh]x)(.*)$;
+               fastcgi_param PATH_INFO $fastcgi_path_info;
+               fastcgi_param  SCRIPT_FILENAME    $document_root$fastcgi_script_name;
+               fastcgi_keep_conn on;
+               fastcgi_buffering off;
+               fastcgi_read_timeout 600s;
+               gzip            on;
+               client_max_body_size 100m;
+       }
+
+        #Everything else served by fastcgi server
+        location /Aspx {
+               root /home/tcadmin/ControlPanel;
+               fastcgi_ignore_client_abort on;
+               fastcgi_index Default.aspx;
+               fastcgi_pass tcadmin-fcgi;
+               include fastcgi_params;
+               fastcgi_split_path_info ^(.+\.as[pmh]x)(.*)$;
+               fastcgi_param PATH_INFO $fastcgi_path_info;
+               fastcgi_param  SCRIPT_FILENAME    $document_root$fastcgi_script_name;
+               fastcgi_keep_conn on;
+               fastcgi_buffering off;
+               fastcgi_read_timeout 600s;
+               gzip            off;
+               client_max_body_size 100m;
+       }
+}
+```
+
+
+  </TabItem>
+
+  <TabItem value='asp' label='ASP.NET'>
+
+:::caution important
+This file is for TCAdmin 2.0.127 and earlier or if you have MVC templates disabled.
+:::
+
+```conf showLineNumbers
+upstream tcadmin-fcgi {
+        ip_hash;
+        server unix:/home/tcadmin/Temp/fastcgi-socket-1;
+        keepalive 32;
+}
+
+server {
+        #the following line is required if you want to configure with Let's Encrypt
+        #server_name tcadmin.yourdomain.com;
+        fastcgi_temp_path /home/tcadmin/Temp 1 2;
+        client_body_temp_path /home/tcadmin/Temp 1 2;
+        listen   8880;
+        #access_log   /home/tcadmin/Logs/nginx.log;
+        root /home/tcadmin/ControlPanel;
+        index index.html index.htm default.aspx Default.aspx;
+
+        #Support for Let's encrypt tools
+        location /.well-known {
+               try_files $uri $uri/ =404;
+        }
+        
+        #Static files are served by nginx
+        location ~ \.(css|js|txt|xml|jpg|png|gif|ico)$ {
+               gzip            on;
+               gzip_min_length 1000;
+               gzip_proxied    expired no-cache no-store private auth;
+               gzip_types      text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+        }
+
+        #Everything else served by fastcgi server
+        location / {
+               fastcgi_ignore_client_abort on;
+               fastcgi_index Default.aspx;
+               fastcgi_pass tcadmin-fcgi;
+               include fastcgi_params;
+               fastcgi_split_path_info ^(.+\.as[pmh]x)(.*)$;
+               fastcgi_param PATH_INFO $fastcgi_path_info;
+               fastcgi_param  SCRIPT_FILENAME    $document_root$fastcgi_script_name;
+               fastcgi_keep_conn on;
+               fastcgi_buffering off;
+               fastcgi_read_timeout 600s;
+               gzip            off;
+               client_max_body_size 100m;
+       }
+}
+```
+
+
+  </TabItem>
+</Tabs>
+
+### After creating the file restart the nginx server:
+
+first run:
+
+```
+sudo nginx -t
+```
+output:
+```
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+```
+if you do not get the above successful message you will need to double check your `default` file is correct
+
+if all is correct you can run:
+
+```
+sudo systemctl restart nginx
+```
+
+## Configure the website to allow secure connections
+
+### Get a certificate from Let's Encrypt
+
+### Installing Certbot
+
+Certbot suggests utilizing their snap package for installation. Snap packages are compatible with most Linux distributions, but prior to using them, you must have snapd installed to handle these packages. Notably, Ubuntu 22.04 inherently supports snaps, ensuring that you can proceed by verifying the up-to-dateness of your snapd core package.
+
+
+```
+sudo snap install core; sudo snap refresh core
+```
+
+:::tip
+If you get the error: **`snap: command not found`** run the commands below:
+
+```
+sudo apt-get update
+```
+```
+sudo apt-get install snapd
+```
+```
+sudo snap install core; sudo snap refresh core
+```
+:::
+
+:::note skip if you have never had the old certbot files installed
+
+In the event that your server previously hosted an older version of Certbot, it's advisable to remove it before proceeding:
+
+```
+sudo apt remove certbot
+```
+
+:::
+Subsequently, you can proceed with the installation of the Certbot package:
+
+```
+sudo snap install --classic certbot
+```
+
+To conclude, you should create a symbolic link from the Certbot command in the snap installation directory to your path. This will enable you to execute Certbot by simply entering the command "certbot." While not essential for all packages, this step is often unnecessary with snaps due to their default non-intrusive nature, preventing unintended conflicts with other system packages:
+
+```
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+```
+
+With Certbot now successfully installed, we can initiate it to obtain our desired certificate.
+
+### Obtaining an SSL Certificate
+
+run the below commands and follow the prompts
+
+- enter an email address and agree to the terms of service
+
+```
+sudo certbot --nginx -d tcadmin.yourdomain.com
+```
+
+output:
+```
+Output
+IMPORTANT NOTES:
+Successfully received certificate.
+Certificate is saved at: /etc/letsencrypt/live/tcadmin.yourdomain.com/fullchain.pem
+Key is saved at: /etc/letsencrypt/live/tcadmin.yourdomain.com/privkey.pem
+This certificate expires on 2022-06-01.
+These files will be updated when the certificate renews.
+Certbot has set up a scheduled task to automatically renew this certificate in the background.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+If you like Certbot, please consider supporting our work by:
+* Donating to ISRG / Let's Encrypt: https://letsencrypt.org/donate
+* Donating to EFF: https://eff.org/donate-le
+```
+
+### Verifying Certbot Auto-Renewal
+
+- Let’s Encrypt’s certificates are only valid for ninety days. This is to encourage users to automate their certificate renewal process.
+
+You can query the status of the timer with systemctl:
+
+```
+sudo systemctl status snap.certbot.renew.service
+```
+
+Output:
+
+```
+○ snap.certbot.renew.service - Service for snap application certbot.renew
+     Loaded: loaded (/etc/systemd/system/snap.certbot.renew.service; static)
+     Active: inactive (dead)
+TriggeredBy: ● snap.certbot.renew.timer
+```
+
+### Create a self signed certificate (optional)
+
+:::info
+If you have ran the setup for Lets Encrypt you do not need this step and it can be skipped
+:::
+
+The default certificate and private key used by TCAdmin are not compatible with nginx. You must create new ones. Execute the following commands. When it asks for a passphrase enter a word that you can remember. If you already have a certificate place the files in the Monitor folder, make tcadmin the owner and update the paths in the ssl_certificate and ssl_certificate_key parameters.
+
+```sh
+cd /home/tcadmin/Monitor
+openssl genrsa -des3 -out nginx.key 2048
+```
+Execute this command. Enter the passphrase that you used in the first step. You can leave all other values blank.
+
+```sh
+openssl req -new -key nginx.key -out nginx.csr
+```
+
+Execute this command. Enter the passphrase that you used in the first step.
+
+```
+mv nginx.key nginx.key.org
+openssl rsa -in nginx.key.org -out nginx.key
+```
+
+Execute this command to create the certificate file.
+
+```
+openssl x509 -req -days 7300 -in nginx.csr -signkey nginx.key -out nginx.crt
+```
+
+Add the following lines to `/etc/nginx/sites-available/default` under listen 8880;.
+
+```
+listen   8881 ssl;
+ssl_certificate /home/tcadmin/Monitor/nginx.crt;
+ssl_certificate_key /home/tcadmin/Monitor/nginx.key;
+```
+
+After updating the file restart the nginx server:
+
+```
+sudo systemctl restart nginx
+```
+
+## Change the default ports (optional)
+
+If you change the default ports in /etc/nginx/sites-available/default make sure you update the values of `WEB_PORT` and `SECURE_WEB_PORT` in `/home/tcadmin/Monitor/tcadmin-config` and restart the monitor service:
+
+```
+/home/tcadmin/Monitor/monitor-service restart
+```
+
+## Enable logging (optional)
+
+Logging is commented out in the above configuration. You can enable it by changing `#access_log` to access_log and reloading the nginx service. That will create a single log file that can get huge after a few days. You can configure log rotation with these instructions: [https://www.digitalocean.com/community/tutorials/how-to-configure-logging-and-log-rotation-in-nginx-on-an-ubuntu-vps](https://www.digitalocean.com/community/tutorials/how-to-configure-logging-and-log-rotation-in-nginx-on-an-ubuntu-vps)
+
+## Common Errors
+
+### Object reference error when logging in
+
+This should only happen the first time you log in after changing the web server.
+
+### Port already in use
+
+If Nginx says the port is already in use make sure you configured TCAdmin to start the fastcgi server instead of the built in web server and restarted the monitor. Also check if there is a process using port 8880 and kill it:
+
+```
+netstat -tlnp|grep 8880
+```
+
+### Website doesn't load
+
+Try starting nginx:
+
+```
+sudo systemctl restart nginx
+```
+
+### Website errors every few minutes
+
+Edit `/home/tcadmin/Monitor/TCAdminMonitor.exe.config`. Change the value of `TCAdmin.CheckWebHealth` to `False` and restart the monitor.

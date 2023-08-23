@@ -1,0 +1,47 @@
+---
+sidebar_position: 3
+sidebar_label: Setting up ASPNET IIS Classic
+---
+
+# Setting up ASPNET IIS Classic
+
+## Install IIS with support for ASP.NET 4.0/4.5
+
+1. If you are using a SQLite database, copy `TCAdmin2\Monitor\sqlite3.dll` to `C:\Windows\System32`.
+2. Add `TCAWeb` to the `IIS_IUSRS` group.
+3. Manually create the website in IIS Manager with its web root pointing to `Program Files\TCAdmin2\ControlPanel`. The website's application pool should be ".NET v4.0 Classic".
+4. In IIS Manager, select the website, click on "Bindings", then on "Connect as...". Enter the user and password of the Windows user that runs your website. Make sure the user that runs your website has full permissions on the `ControlPanel`, `Cache`, `Temp`, `Logs`, and `Database` folders, and read permissions on `Monitor\Shared`. If you want to use `TCAWeb`, attach `TCAdmin2\Monitor\TCAWeb.config` to a support ticket, and they will send you the decrypted password.
+5. If you use Let's Encrypt, bind the website to a specific IP and hostname. This prevents TCAdmin from changing the website's certificate.
+6. Give full permissions to `"IIS APPPOOL\.NET v4.5 Classic"` on `C:\Program Files\TCAdmin2\Cache`, `C:\Program Files\TCAdmin2\Temp`, and `C:\Program Files\TCAdmin2\Logs\Web`.
+
+## Execute these commands on your database to disable the built-in web server
+
+```sql
+DELETE FROM tc_server_enabled_components WHERE module_id = '07405876-e8c2-4b24-a774-4ef57f596384' AND component_id = 2 AND server_id = 1;
+```
+
+## If you ever need to enable the built-in web server again, execute this command
+
+```sql
+INSERT INTO tc_server_enabled_components (module_id, component_id, server_id) VALUES ('07405876-e8c2-4b24-a774-4ef57f596384', 2, 1);
+```
+
+## Disable Output Caching
+
+Some clients have reported users randomly being logged in as other users. This is caused by IIS cache. To fix this:
+
+1. Run IIS Manager.
+2. Select your website.
+3. Double click on "Output Caching".
+4. On the right side under "Actions", click on "Edit Feature Settings".
+5. Uncheck "Enable Cache" and "Enable kernel cache".
+6. Click OK.
+
+## Configuring your IIS website with more than 1 worker process
+
+1. Disable the built-in web server with the instructions above.
+2. Go to Start > Administrative Tools > Services. Start the ASP.NET state service and set the startup to "Automatic".
+3. Edit your `TCAdmin2\ControlPanel\Web.config`.
+4. Replace `<sessionState timeout="30"/>` with `<sessionState mode="StateServer" stateConnectionString="tcpip=localhost:42424" cookieless="false" timeout="30" />`.
+5. Open IIS Manager.
+6. Select the advanced properties of the `.NET Application` pool and increase the number of worker processes.

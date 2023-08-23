@@ -1,0 +1,62 @@
+---
+sidebar_position: 4
+sidebar_label: Live Stats
+---
+
+# Live Stats
+
+## Game Service Live Stats
+
+Every time the game monitors query a service, the statistics are saved to the table named `tc_game_service_live_stats`. This table can be used to create a list of services on your website along with their current status.
+
+The following information is currently available in the `tc_game_service_live_stats` table:
+
+- **Service Id**: The unique identifier for the service.
+- **Online (1/0)**: Indicates whether the service is online (1) or offline (0).
+- **Process ID**: The ID of the process associated with the service.
+- **Bandwidth (bytes)**: The amount of bandwidth used in bytes.
+- **CPU (%)**: The CPU usage percentage.
+- **Memory (bytes)**: The amount of memory used in bytes.
+- **Memory Limit (bytes)**: The memory limit assigned to Minecraft and Craftbukkit services.
+- **Game**: The name of the game associated with the service.
+- **Game type**: The type of game.
+- **Map**: The current map being played.
+- **Name**: The name of the service.
+- **HTML name**: The HTML-formatted name of the service.
+- **Max players**: The maximum number of players allowed.
+- **Number of current players**: The current number of players.
+- **Number of current spectators**: The current number of spectators.
+- **Player details in XML format**: Player details presented in XML format.
+- **Rules in XML format**: Game rules presented in XML format.
+- **Query time (UTC/GMT)**: The time the query was made, in UTC/GMT.
+
+This table can be a valuable resource for displaying real-time service status and game information on your website.
+
+## Examples
+
+### Get a list of services that are currently running:
+
+```sql showLineNumbers
+SELECT a.ip_address, a.game_port, b.*
+FROM tc_game_services a, tc_game_service_live_stats b
+WHERE online = 1 AND a.service_id = b.service_id;
+```
+
+### Get the total number of players connected on each server:
+
+```sql showLineNumbers
+SELECT a.display_name, sum(b.players) as players
+FROM tc_servers a, tc_game_service_live_stats b, tc_services c
+WHERE c.server_id=a.server_id AND b.service_id=c.service_id AND b.online=1 
+GROUP BY a.server_id;
+```
+
+### Get the total RAM assigned to Minecraft/Craftbukkit services per server. The results are ordered from lowest to highest.
+
+```sql showLineNumbers
+SELECT a.server_id ,a.display_name, ROUND(SUM(b.memory_limit)/1024/1024, 0) AS memory_limit_mb
+FROM tc_servers a, tc_game_service_live_stats b, tc_services c
+WHERE c.server_id=a.server_id AND b.service_id=c.service_id
+GROUP BY a.server_id
+ORDER BY SUM(b.memory_limit) ASC
+```

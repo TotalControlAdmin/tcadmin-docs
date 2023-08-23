@@ -1,0 +1,99 @@
+---
+sidebar_position: 1
+sidebar_label: Sample Module
+---
+
+# Sample Module
+
+This is an example of a module that can be installed onto your master which will work with TCAdmin.
+
+## Sample View Page
+
+### Sample View Page - HelloWorld.cshtml
+
+```html showLineNumbers
+@model Game.HelloWorldModel
+@{
+    Layout = this.GetTemplateFile("Shared/Main.cshtml", true);
+ 
+    <script>
+        $(document).ready(function () {
+            document.title = "@TCAdmin.SDK.Web.MVC.Template.GetSelectedTemplateTitle() " + "Hello World!"; // Sets the page title
+            $('.header-text').html("Hello World - A Sample Module") // Sets the page header
+        });
+    </script>
+}
+ 
+@section head{
+ 
+}
+ 
+@section sidebar{
+    @Html.Action("_PageIcons", "Service", new { id = Model.Service.ServiceId }) @*Adds the service buttons to the sidebar*@
+}
+<br />
+@Model.Message @*Displays the 'Hello World' message*@
+<br />
+<br />
+@Model.ServiceStartedOn @*Displays information about the service startup time & process id*@
+```
+
+## Sample Controller
+
+### Sample Controller - HelloWorldController.cs
+
+```cs showLineNumbers
+using System.Web.Mvc;
+using TCAdmin.SDK.Web.MVC.Controllers;
+ 
+namespace Game
+{
+    public class HelloWorldModel
+    {
+        public string Message { get; set; }
+        public string ServiceStartedOn { get; set; }
+        public TCAdmin.GameHosting.SDK.Objects.Service Service { get; set; }
+    }
+ 
+    public class HelloWorldController : BaseServiceController
+    {
+        [HttpGet]
+        [ParentAction("Service", "Home")]
+        public ActionResult Index(int id)
+        {
+            //Make sure the user has permission this feature
+            EnforceFeaturePermission("FileManager");
+ 
+            var model = new HelloWorldModel();
+            //Gets the current service
+            model.Service = TCAdmin.GameHosting.SDK.Objects.Service.GetSelectedService();
+            //Sets the message variable
+            model.Message = "Hello World!";
+            //Gets information about the service startup
+            model.ServiceStartedOn = string.Format($"{model.Service.ConnectionInfo} was started on {TCAdmin.SDK.Misc.Dates.UniversalTimeToCurrentTimeZone(model.Service.Status.StartTime)} with process id {model.Service.Status.ProcessId}");
+ 
+ 
+            return View("HelloWorld", model);
+        }
+    }
+}
+```
+
+## Installing The Custom Module
+
+### How to install the module after compiling it with TCAdmin:
+
+1. Copy `SampleModule.dll` to `TCAdmin2\ControlPanel.MVC\bin-extensions`
+2. Copy `HelloWorld.cshtml` to `ControlPanel.MVC\Views\[ThemeFolder]\Game\Service`
+3. Clear the contents of `TCAdmin2\Cache` and restart the monitor
+4. You can then navigate to the module in your browser e.g [http://127.0.0.1/Service/HelloWorld/1](http://127.0.0.1/Service/HelloWorld/1)
+
+## Module Preview
+
+### What this module looks like:
+
+![1200px-ModuleView1](/img/customizations/modules/1200px-ModuleView1.png)
+
+## Module Download
+
+[SampleModule.zip](/downloads/SampleModule.zip)

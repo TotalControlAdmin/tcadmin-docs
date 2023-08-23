@@ -1,0 +1,77 @@
+---
+sidebar_position: 26
+sidebar_label: Hosting the control panel website separately
+---
+
+# Hosting the control panel website separately
+
+## Requirements
+
+If you want to host the control panel website on a separate server without requiring an additional license you will need:
+
+- Remote desktop or SSH access to the web server
+- TCAdmin **2.0.152.1** or greater
+- TCAdmin configured with a MySQL database
+- Low latency from MySQL to the web server
+
+## Limitations
+
+- When you update TCAdmin the seperate control panel needs to be [updated manually](/getting-started/updating#manual-update)
+- Some modules might not be compatible
+- Built in DDoS protection for the control panel is not available
+
+## Configure the master to accept connections from the web server
+
+- The master should already be configured and have a working control panel.
+- Go to `Server Management (on the left-hand navigation)` > `Servers` > `Master` > `Server IPs`. Add the web server's IP but **disable game and voice servers on it**.
+
+## Installation of the website on Linux
+
+- Install Mono and TCAdmin as you would normally. You don't need to run the configuration utility to enter a license.
+- Download the [Hosting.zip](/downloads/Hosting.zip), extract and edit with notepad or your favorite text editor.
+
+:::tip
+We recommend [Visual Studio Code](https://code.visualstudio.com/) for all configuration edits that need to be made.
+:::
+
+- Update the value of `TCAdmin.ConfigUtility.Database.ConnectionString` with the information required to make the connection to the MySQL server.
+- Save your updated `Hosting.config` to your web server in the path `/home/tcadmin/Monitor/Hosting.config`
+- Restart the web server's monitor:
+
+```bash
+/home/tcadmin/Monitor/monitor-service restart
+```
+
+- After restarting the monitor you should be able to log in to the control panel and test the connection to the master in `Server Management (on the left-hand navigation)` > `Servers` > `Show Versions`.
+- After the control panel is working correctly you can [configure the control panel website to run with Nginx](#) for improved performance.
+
+## Installation of the website on Windows
+
+- Install TCAdmin as you would normally. You don't need to run the configuration utility to enter a license.
+- Download the [Hosting.zip](/downloads/Hosting.zip), extract and edit with notepad or your favorite text editor.
+
+:::tip
+We recommend [Visual Studio Code](https://code.visualstudio.com/) for all configuration edits that need to be made.
+:::
+
+- Update the value of `TCAdmin.ConfigUtility.Database.ConnectionString` with the information required to make the connection to the MySQL server.
+- Save your updated Hosting.config to your web server in the path `C:\Program Files\TCAdmin2\Monitor\Hosting.config`
+- On the web server go to `Start` > `Services` and restart the TCAdmin Monitor service.
+- After restarting the monitor you should be able to log in to the control panel and test the connection to the master in `Server Management (on the left-hand navigation)` > `Servers` > `Show Versions`.
+- After the control panel is working correctly you can [configure the control panel website to run with IIS](#) for improved performance.
+
+## Disable the master's control panel
+
+Execute this command on your database if you want to disable the master's built in web server.
+
+```sql
+DELETE FROM tc_server_enabled_components WHERE module_id = '07405876-e8c2-4b24-a774-4ef57f596384' AND component_id = 2 AND server_id = 1;
+```
+
+## Enable the master's control panel (optional)
+
+If you ever need to enable the built in web server again execute this command.
+
+```sql
+INSERT INTO tc_server_enabled_components (module_id, component_id, server_id) values ('07405876-e8c2-4b24-a774-4ef57f596384', 2, 1);
+```

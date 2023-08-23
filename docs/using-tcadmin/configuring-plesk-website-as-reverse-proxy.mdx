@@ -1,0 +1,37 @@
+---
+sidebar_position: 27
+sidebar_label: Configuring a Plesk website as a reverse proxy for the control panel
+---
+
+# Configuring a Plesk website as a reverse proxy for the control panel
+
+- Login to Plesk
+- Select your domain
+- Select Apache & nginx Settings
+- Uncheck `Proxy mode`
+- Click on Apply **(this is important before continuing)**
+- Set "Additional nginx directives" to the following. Replace `x.x.x.x:8881` with your control panel's IP and secure port.
+
+```js showLineNumbers
+location / {
+    proxy_pass https://x.x.x.x:8881;
+    proxy_redirect off;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Host $server_name;
+    proxy_set_header X-Forwarded-Proto https;
+    client_max_body_size 0;
+    proxy_http_version 1.1;
+    proxy_request_buffering off;
+    proxy_buffering off;
+}
+```
+
+If `Last login` shows the incorrect IP
+
+- Go to `servers` > `master` > `website settings`.
+- Set `Web Proxy IP` to the IP that is shown.
+- Set `Web Proxy IP Header` to `X-Real-IP`.
+- Save and select `Tools` > `Restart monitor`.
+- After the control panel has been restarted you need to log out and log in twice so it shows your real IP.

@@ -78,3 +78,35 @@
   border-radius: var(--ifm-global-radius);
   background-color: var(--ifm-tabs-color-active);
 }
+
+::-webkit-scrollbar {
+  background-color: #0f1114;
+  height: 6px;
+  width: 6px;
+}
+::-webkit-scrollbar-button {
+  display: none;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--ifm-tabs-color-active);
+  border: 4px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+::-webkit-scrollbar-track {
+  border: 4px solid transparent;
+  box-shadow: inset 0 0 14px 14px transparent;
+}
+
+/* Capitalize the h1 tags */
+h1 {
+  text-transform: Capitalize;
+}
+
+/* Capitalize the sidebar label */
+nav li a {
+  text-transform: Capitalize;
+}

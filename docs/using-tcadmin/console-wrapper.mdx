@@ -1,0 +1,28 @@
+---
+sidebar_position: 25
+sidebar_label: Console Wrapper
+---
+
+# Console Wrapper
+
+`TCAdminConsoleWrapper.exe` reads the output of a console application without redirecting. This is useful if the process crashes with 'Control console's output' enabled. Make sure 'Control console's output' is disabled in the game settings.
+
+## Usage:
+
+- Copy `TCAdminConsoleWrapper.exe` from `Program Files\TCAdmin2\Monitor\Tools` to the game server's folder. You may use an additional game script to do this.
+- Create this batch script for the after started event with `Execute as the service's user` checked.
+
+```bash
+start TCAdminConsoleWrapper.exe -pid=%ThisService_Pid% -output=console.log -followcursor -max
+```
+
+- In the game's web console configuration:
+  - Web Console Output Source: Log file
+  - Log File: console.log
+  
+- If the game allows writing commands in the console:
+  - Web Console Input Source: Console commands
+
+Save and click on update existing services.
+
+You can run `TCAdminConsoleWrapper.exe` without a command line to see all available parameters.
