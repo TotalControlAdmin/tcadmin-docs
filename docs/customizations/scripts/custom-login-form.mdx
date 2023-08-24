@@ -1,0 +1,24 @@
+---
+sidebar_position: 6
+sidebar_label: Custom Login Form
+---
+
+# Custom Login Form
+
+Use this sample form. Make sure you change "[http://www.tcadmin.com:8880/Login](http://www.tcadmin.com:8880/Login)" to your control panel's Login.aspx.
+
+```html
+<form method="POST" action="http://www.tcadmin.com:8880/Login">
+  <table border="0">
+    <tr>
+        <td>User:</td>
+        <td><input type="text" name="USERID" size="20"></td>
+    </tr>
+    <tr>
+        <td>Password:</td>
+        <td><input type="password" name="PASSWORD" size="20"></td>
+    </tr>
+  </table>
+  <input type="submit" value="Login"><input type="reset" value="Reset">
+</form>
+```

@@ -1,0 +1,128 @@
+---
+sidebar_position: 14
+sidebar_label: Update IP and port in WHMCS
+---
+
+# Update IP and port in WHMCS
+
+When you create a game server with the billing API WHMCS does not get updated with the game server's IP and port. This can be updated using the built in recurring task or custom scripts.
+
+## Update WHMCS by connecting to the API (Recommended)
+
+:::tip
+You can similarly duplicate this script to configure an **After Move Event** that updates the IP and port when you move servers to different nodes.
+:::
+
+Thanks to [Dennis](https://community.tcadmin.com/profile/12219-dennis/) for this script.
+
+In WHMCS create api credentials with the `Products` > `UpdateClientProduct role`.
+
+Update the `WHMCS_URL`, `WHMCS_API_IDENTIFIER`, `WHMCS_API_SECRET` and `WHMCS_API_ACCESS_KEY`
+
+:::tip
+If you cant find how to get your access key refer to the [**WHMCS documentation**](https://developers.whmcs.com/api/access-control/)
+:::
+
+**Operating System:** Any  
+**Description:** Update WHMCS (SQL)  
+**Script Engine:** IronPython  
+**Event:** After Created  
+**Script:**
+
+```python
+import urllib2
+import urllib
+
+WHMCS_URL = 'https://your-whmcs-site.com/includes/api.php' 
+WHMCS_API_IDENTIFIER = "xxxxxxx"
+WHMCS_API_SECRET = "yyyyyyy"
+WHMCS_API_ACCESS_KEY = "" 
+
+query = urllib.urlencode({'action' : 'UpdateClientProduct', 'username' : WHMCS_API_IDENTIFIER, 'password' : WHMCS_API_SECRET, 'accesskey' : WHMCS_API_ACCESS_KEY, 'serviceid' : ThisService.BillingId, 'domain' : ThisService.ConnectionInfo, 'responsetype' : 'json'})
+
+try:
+  response = urllib2.urlopen(WHMCS_URL, data=query)
+  content = response.read()
+  Script.WriteToConsole(content)
+except urllib2.HTTPError, e:
+  Script.WriteToConsole(str(e.code))
+```
+
+## Built in recurring task to update the WHMCS database every day
+
+- Go to `Settings` > `Recurring Tasks`
+- Create a new recurring task and configure it to execute daily.
+- In the Actions tab add a new action of type `Sync Service IP with Billing`.
+- Enter the information required to connect to your WHMCS database. If you use custom billing software you can specify a custom SQL update command.
+- hen the task runs the product's domain field in WHMCS should have the game server's IP and port.
+
+## Custom recurring task to update the WHMCS database every day using the WHMCS API
+
+- In WHMCS create API credentials with the Products > UpdateClientProduct role.
+- In TCAdmin go to `Settings` > `Global Game Scripts`. Add the script below. Update `WHMCS_URL`, `WHMCS_API_IDENTIFIER`, `WHMCS_API_SECRET` with the correct values.
+- Go to `Settings` > `Recurring Tasks`. Add a recurring task with action = Execute a script and select the script that you created.
+
+**Operating System:** Any  
+**Description:** Update WHMCS (API)  
+**Script Engine:** IronPython  
+**Event:** No Event  
+**Allow Scheduling:** Checked  
+**Script:** 
+
+```python
+import clr
+import urllib2
+import urllib
+ 
+clr.AddReference("TCAdmin.GameHosting.SDK")
+from TCAdmin.GameHosting.SDK.Objects import Service
+ 
+WHMCS_URL = "https://your-whmcs-site.com/includes/api.php"
+WHMCS_API_IDENTIFIER = "xxxxxxx"
+WHMCS_API_SECRET = "yyyyyyy"
+ 
+AllServices = Service.GetServices()
+ 
+for ThisService in AllServices:
+  Script.WriteToConsole("Updating " + ThisService.ConnectionInfo)
+  query = urllib.urlencode({'action' : 'UpdateClientProduct', 'username' : WHMCS_API_IDENTIFIER, 'password' : WHMCS_API_SECRET, 'serviceid' : ThisService.BillingId, 'domain' : ThisService.ConnectionInfo, 'responsetype' : 'json'})
+  try:
+    urllib2.urlopen(WHMCS_URL, data=query)
+  except urllib2.HTTPError, e:
+    Script.WriteToConsole("Error updating " + ThisService.ConnectionInfo + ": " + str(e.code) + " " + e.reason)
+```
+
+:::note
+To troubleshoot the script you can set the event to custom action. Execute it by selecting any game server and clicking on click on more.
+:::
+
+## Update WHMCS by connecting to the database
+
+Update the mysql_ variables with your WHMCS database connection.
+
+**Operating System:** Any  
+**Description:** Update WHMCS (SQL)  
+**Script Engine:** IronPython  
+**Event:** After Created  
+**Script:** 
+
+```python
+import clr;
+import System;
+
+clr.AddReference("TCAdmin.DatabaseProviders.MySql");
+clr.AddReference("TCAdmin.SDK");
+from TCAdmin.DatabaseProviders.MySql import MySqlManager;
+from System import String;
+
+mysql_server="WHMCSIP";
+mysql_user="WHMCSUSER";
+mysql_password="WHMCSPASSWORD";
+mysql_database="WHMCSDATABASE";
+
+with MySqlManager() as mysql:
+ mysql.UseMasterWebService = False;
+ mysql.DisableReplication = True;
+ mysql.Connect(String.Format("Data Source={0};User Id={1};Password={2};Database={3};Pooling=False;", mysql_server, mysql_user, mysql_password, mysql_database));
+ mysql.ExecuteNonQuery(String.Format("UPDATE tblhosting SET domain='{0}' WHERE id='{1}'", ThisService.ConnectionInfo, ThisService.BillingId));
+```

@@ -1,0 +1,20 @@
+---
+sidebar_position: 8
+sidebar_label: Kill all processes running from the game server's root folder
+---
+
+# Kill all processes running from the game server's root folder
+
+This Windows batch script kills all running processes located in the game server's root directory and sub directories.
+
+```
+set exelocation=%ThisService_RootDirectory:\=\\%
+wmic path win32_process where "ExecutablePath like '%%%exelocation%%%'" call terminate
+```
+
+This Windows batch script kills a specific process located in the game server's root directory.
+
+```
+set executable=%ThisService_RootDirectory%CustomExe.exe
+wmic path win32_process where "ExecutablePath like '%executable:\=\\%'" call terminate
+``

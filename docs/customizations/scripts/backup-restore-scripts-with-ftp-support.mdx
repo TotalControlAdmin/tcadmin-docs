@@ -1,0 +1,389 @@
+---
+sidebar_position: 5
+sidebar_label: Backup & Restore Scripts with FTP Support
+---
+
+# Backup & Restore Scripts with FTP Support
+
+:::info
+These scripts are a modified version of [Backup & Restore_Scripts](/customizations/scripts/backup-restore-scripts). Instead of keeping a local copy of the zip it will get uploaded to FTP. Locally in the backups folder you will see a zip with 0 bytes. This is used to remember which files have been uploaded.
+:::
+
+## Secure your Backups folder
+
+:::danger Urgent Warning: Critical Configuration Step - Neglect at Your Peril!
+Failure to execute this pivotal step in the configuration process will render your server alarmingly susceptible to exploitations and security breaches.
+:::
+
+- Go to Settings > Games > Select the game > File System Permissions.
+- Expand User Files and select Add permissions by subdirectory.
+- Configure these values:
+  - Subdirectory Path: Backups
+  - Permissions: "no permissions"
+  - Click on Add.
+  - Add the same permission for "Sub Admin Files" and "Reseller Files".
+  - Click on Save.
+
+## Create the variable
+
+- Configure a variable used by the restore script. Go to Settings > Games > Select the game > Variables (it can also be a global variable). Create this variable:
+  - **Name:** BackupFile
+  - **Script parameter:** Checked
+  - **Admin access:** Checked
+  - **Sub admin access:** Checked
+  - **Reseller access:** Checked
+  - **User access:** Checked
+  - **Server owner access:** Checked
+  - **Value is required:** Checked
+  - **Required Message:** The backup file is required.
+  - **Item Type:** Combobox
+  - **Label:** Backup:
+  - **Description:** Select the backup to restore.
+  - **Source:** File System
+  - **Filter Type:** Files
+  - **Filter:** Backups/*.zip
+  - **Item Value:** Full path
+  - **Item Display:** Name (no extension)
+
+## Create the scripts
+
+- Go back to the game's main settings. Click on the Custom Scripts icon. Add the following scripts. They can also be configured as global scripts.
+
+**Operating System:** Any  
+**Name:** Backup Your Settings  
+**Description:** Create a backup of your game server's settings.  
+**Script Engine:** IronPython  
+**Event:** Custom Icon  
+**Sub admin access:** Checked  
+**Reseller access:** Checked  
+**User access:** Checked  
+**Server owner access:** Checked  
+**Stop service before executing:** Check if you want to stop the game server before creating the backup.  
+Script: Configure BACKUP_LOCATION, MAX_BACKUPS, BACKUP_EXTENSIONS, FOLDER_TO_BACKUP, BACKUP_FTP_IP, BACKUP_FTP_PORT, BACKUP_FTP_USER, BACKUP_FTP_PASSWORD, BACKUP_FTP_PATH as needed.
+
+:::tip
+If you change the backup location remember to update your file system permissions.
+:::
+
+```python
+import clr;
+clr.AddReference("TCAdmin.SDK");
+
+import System;
+from System import Array, String, DateTime, Exception, Environment, PlatformID
+from System.IO import Path, DirectoryInfo, SearchOption
+from System.Collections.Generic import List
+from System.Globalization import CultureInfo
+from TCAdmin.SDK.Misc import CompressionTools, Linux, Windows
+
+clr.AddReference("System.Core")
+clr.ImportExtensions(System.Linq)
+
+# FTP support
+from System.Net import WebRequest, WebRequestMethods, NetworkCredential
+from System.IO import StreamReader, File
+from System.Text import Encoding
+
+# FTP Connection
+FTP_IP = "BACKUP_FTP_IP"
+FTP_PORT = BACKUP_FTP_PORT
+FTP_USER = "BACKUP_FTP_USERNAME"
+FTP_PASSWORD = "BACKUP_FTP_PASSWORD"
+# FTP Path should be something like /Backups/{0}
+FTP_BACKUP_PATH = String.Format("/BACKUP_FTP_PATH/{0}", ThisService.ServiceId)
+# Enable support for FTPS
+ENABLE_FTP_SSL = False
+
+# Specify where backups are saved.
+# Default location is a folder named Backups in the game server's root.
+BACKUP_LOCATION = Path.Combine(ThisService.RootDirectory, "Backups")
+
+# Specify the maximum number of backups to keep.
+MAX_BACKUPS = 5
+
+# Extension of files that will be included in the backup.
+# Only specify config file extensions to keep file size small. Avoid log extensions.
+# For security do not backup executables (.exe, .dll or .so, etc). Use ".*" to backup all extensions in the specified folder.
+BACKUP_EXTENSIONS = Array[str]([".cfg", ".lua", ".properties", ".txt"])
+
+# Extensions that are excluded from the backup. (only used if you specify ".*" in BACKUP_EXTENSIONS)
+BACKUP_EXCLUDE_EXTENSIONS = Array[str]([".xxx"])
+
+backupfilename = String.Format("{0}.zip", DateTime.Now.ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture))
+backupfiles = List[str]()
+
+####################################################################################################################################### 
+# COPY THIS BLOCK IF YOU WANT TO BACKUP MORE THAN 1 PATH ##############################################################################
+#######################################################################################################################################
+# Specify the folder to backup. Sub folders will be included in the backup.
+# All files with the extensions specified in BACKUP_EXTENSIONS will be added to the backup.
+# Set value to ThisService.RootDirectory if you want to backup all specified extensions in the game server's root folder and sub folders.
+# This example will backup the path RootDirectory\garrysmod\cfg
+FOLDER_TO_BACKUP = Path.Combine(ThisService.RootDirectory, "garrysmod", "cfg")
+backupdir = DirectoryInfo(FOLDER_TO_BACKUP)
+allfiles = backupdir.GetFiles("*", SearchOption.AllDirectories)
+for file in allfiles:
+  if not file.FullName.StartsWith(BACKUP_LOCATION) :
+    if Array.IndexOf(BACKUP_EXTENSIONS, file.Extension) != -1 or (Array.IndexOf(BACKUP_EXTENSIONS, ".*") != -1 and Array.IndexOf(BACKUP_EXCLUDE_EXTENSIONS, file.Extension) == -1 ) :
+      backupfiles.Add(file.FullName.Replace(ThisService.RootDirectory, String.Empty).TrimStart(Path.DirectorySeparatorChar))
+#######################################################################################################################################
+#######################################################################################################################################
+if backupfiles.Count == 0 :
+  raise Exception("Didn\'t find any files to backup.")
+
+Script.WriteToConsole(String.Format("Backing up {0} files to {1}...", backupfiles.Count, backupfilename))
+
+backuplocation = DirectoryInfo(BACKUP_LOCATION)
+if not backuplocation.Exists :
+  backuplocation.Create()
+
+compressiontools = CompressionTools()
+compressiontools.Compress(ThisService.RootDirectory, backupfiles.ToArray(), Path.Combine(BACKUP_LOCATION, backupfilename))
+Script.WriteToConsole("The backup was created successfully.")
+
+# FTP SUPPORT
+Script.WriteToConsole("")
+Script.WriteToConsole("Uploading backup to FTP...")
+
+# CREATE PATH IN FTP
+try :
+  request=WebRequest.Create(String.Format("ftp://{0}:{1}{2}", FTP_IP, FTP_PORT, FTP_BACKUP_PATH))
+  request.Credentials = NetworkCredential(FTP_USER, FTP_PASSWORD)
+  request.Method = WebRequestMethods.Ftp.MakeDirectory
+  request.EnableSsl = ENABLE_FTP_SSL
+  with request.GetResponse() as response:
+    Script.WriteToConsole(String.Format("Create Directory Complete, status: {0}", response.StatusDescription))
+except:
+  pass
+
+# UPLOAD FILE
+request = WebRequest.Create(String.Format("ftp://{0}:{1}{2}/{3}", FTP_IP, FTP_PORT, FTP_BACKUP_PATH, backupfilename))
+request.Credentials = NetworkCredential(FTP_USER, FTP_PASSWORD)
+request.Method = WebRequestMethods.Ftp.UploadFile
+request.EnableSsl = ENABLE_FTP_SSL
+with File.OpenRead(Path.Combine(BACKUP_LOCATION, backupfilename)) as fileStream:
+  request.ContentLength = fileStream.Length
+  with request.GetRequestStream() as ftpStream:
+    fileStream.CopyTo(ftpStream)
+
+# MAKE LOCAL FILE 0 BYTES. IT'S A PLACE HOLDER JUST SO WE KNOW WHAT'S IN FTP
+File.Create(Path.Combine(BACKUP_LOCATION, backupfilename)).Close()  
+
+# DELETE OLD BACKUPS
+Script.WriteToConsole("")
+backupfiles=backuplocation.GetFiles("*.zip").OrderBy(lambda f: f.CreationTime).ToArray()
+for i in range(0,backupfiles.Count - MAX_BACKUPS):
+  # DELETE FROM FTP
+  try :
+    request = WebRequest.Create(String.Format("ftp://{0}:{1}{2}/{3}", FTP_IP, FTP_PORT, FTP_BACKUP_PATH, backupfiles[i].Name))
+    request.Credentials = NetworkCredential(FTP_USER, FTP_PASSWORD)
+    request.Method = WebRequestMethods.Ftp.DeleteFile
+    request.EnableSsl = ENABLE_FTP_SSL
+    with request.GetResponse() as response:
+      Script.WriteToConsole(String.Format("Deleted previous FTP backup {0}, status: {1}", backupfiles[i].Name, response.StatusDescription))
+  except :
+    pass
+  # DELETE LOCAL FILE
+  backupfiles[i].Delete()
+  Script.WriteToConsole(String.Format ("Deleted previous local backup: {0}", backupfiles[i].Name))
+
+if Environment.OSVersion.Platform == PlatformID.Unix :
+  if Linux.IsRoot() :
+    Linux.SetDirectoryOwnerAutoDetect(BACKUP_LOCATION, True)
+else :
+ owner = Windows.GetOwner(ThisService.RootDirectory)
+ Windows.SetDirectoryOwner(BACKUP_LOCATION, str(owner), True)
+
+Script.WriteToConsole("")
+```
+
+**Operating System:** Any  
+**Name:** Backup Your Settings  
+**Description:** Restore your game server's settings from a backup.  
+**Script Engine:** IronPython  
+**Event:** Custom Icon  
+**Sub admin access:** Checked  
+**Reseller access:** Checked  
+**User access:** Checked  
+**Server owner access:** Checked  
+**Stop service before executing:** heck if you want to stop the game server before restoring the backup.  
+Script: Configure BACKUP_FTP_IP, BACKUP_FTP_PORT, BACKUP_FTP_USER, BACKUP_FTP_PASSWORD, BACKUP_FTP_PATH as needed.
+
+:::tip
+If you change the backup location remember to update your file system permissions.
+:::
+
+```python
+import clr;
+clr.AddReference("TCAdmin.SDK");
+
+from System.IO import Path
+from System import String, Environment, PlatformID
+from TCAdmin.SDK.Misc import CompressionTools, Linux, Windows
+
+# FTP support
+from System.Net import WebRequest, WebRequestMethods, NetworkCredential
+from System.IO import StreamReader, File, FileStream
+from System.Text import Encoding
+
+# FTP Connection
+FTP_IP = "BACKUP_FTP_IP"
+FTP_PORT = BACKUP_FTP_PORT
+FTP_USER = "BACKUP_FTP_USERNAME"
+FTP_PASSWORD = "BACKUP_FTP_PASSWORD"
+# FTP Path should be something like /Backups/{0}
+FTP_BACKUP_PATH = String.Format("/BACKUP_FTP_PATH/{0}", ThisService.ServiceId)
+# Enable support for FTPS
+ENABLE_FTP_SSL = False
+
+# DOWNLOAD FILE
+Script.WriteToConsole(String.Format("Downloading backup {0}...", Path.GetFileNameWithoutExtension(ThisService.Variables["BackupFile"])))
+request = WebRequest.Create(String.Format("ftp://{0}:{1}{2}/{3}", FTP_IP, FTP_PORT, FTP_BACKUP_PATH, Path.GetFileName(ThisService.Variables["BackupFile"])))
+request.Credentials = NetworkCredential(FTP_USER, FTP_PASSWORD)
+request.Method = WebRequestMethods.Ftp.DownloadFile
+request.EnableSsl = ENABLE_FTP_SSL
+with request.GetResponse().GetResponseStream() as ftpStream :
+  with File.Create(ThisService.Variables["BackupFile"]) as fileStream:
+    ftpStream.CopyTo(fileStream)
+
+Script.WriteToConsole(String.Format("Restoring backup {0}...", Path.GetFileNameWithoutExtension(ThisService.Variables["BackupFile"])))
+
+compressiontools = CompressionTools()
+compressiontools.Decompress(ThisService.Variables["BackupFile"], ThisService.RootDirectory)
+
+# MAKE LOCAL FILE 0 BYTES. IT'S A PLACE HOLDER JUST SO WE KNOW WHAT'S IN FTP
+File.Create(ThisService.Variables["BackupFile"]).Close()  
+
+if Environment.OSVersion.Platform == PlatformID.Unix :
+  if Linux.IsRoot() :
+    Linux.SetDirectoryOwnerAutoDetect(ThisService.RootDirectory, True);
+else:
+ owner = Windows.GetOwner(ThisService.RootDirectory);
+ Windows.SetDirectoryOwner(ThisService.RootDirectory, str(owner), True);
+
+Script.WriteToConsole("The backup was restored successfully.")
+                                 
+Script.WriteToConsole("")
+```
+
+**Operating System:** Any  
+**Name:** Keep backups before reinstall  
+**Description:** Moves backups outside of root.  
+**Script Engine:** IronPython  
+**Event:** Before reinstall
+Ignore execution errors: Unchecked (if it fails you don't want to lose the backups) 
+
+Script: Configure BACKUP_LOCATION
+
+```python
+import clr;
+
+from System import String
+from System.IO import Path, Directory
+
+# Specify where backups are saved.
+# Default location is a folder named Backups in the game server's root.
+BACKUP_LOCATION = Path.Combine(ThisService.RootDirectory, "Backups")
+
+temp_location = Path.Combine(ThisService.RootDirectory, "..", String.Format("_{0}_Backups", ThisService.ServiceId))
+if Directory.Exists(BACKUP_LOCATION) :
+  Directory.Move(BACKUP_LOCATION, temp_location)
+```
+
+**Operating System:** Any  
+**Name:** Restore backups after install  
+**Description:** Moves backups back into root.  
+**Script Engine:** IronPython  
+**Event:** After reinstall     
+Script: Configure BACKUP_LOCATION
+
+```python
+import clr;
+
+from System import String
+from System.IO import Path, Directory
+
+# Specify where backups are saved.
+# Default location is a folder named Backups in the game server's root.
+BACKUP_LOCATION = Path.Combine(ThisService.RootDirectory, "Backups")
+
+temp_location = Path.Combine(ThisService.RootDirectory, "..", String.Format("_{0}_Backups", ThisService.ServiceId))
+if Directory.Exists(temp_location) :
+  Directory.Move(temp_location, BACKUP_LOCATION)
+```
+
+**Operating System:** Any  
+**Name:** Deletes backups  
+**Description:** Delete backups when service is deleted  
+**Script Engine:** IronPython  
+**Event:** Before delete     
+Script: Configure BACKUP_LOCATION, BACKUP_FTP_IP, BACKUP_FTP_PORT, BACKUP_FTP_USER, BACKUP_FTP_PASSWORD, BACKUP_FTP_PATH as needed.
+
+```python
+import clr;
+clr.AddReference("TCAdmin.SDK");
+ 
+import System;
+from System import Array, String, DateTime, Exception, Environment, PlatformID
+from System.IO import Path, DirectoryInfo, SearchOption
+from System.Collections.Generic import List
+from System.Globalization import CultureInfo
+from TCAdmin.SDK.Misc import CompressionTools, Linux, Windows
+ 
+clr.AddReference("System.Core")
+clr.ImportExtensions(System.Linq)
+ 
+# FTP support
+from System.Net import WebRequest, WebRequestMethods, NetworkCredential
+from System.IO import StreamReader, File
+from System.Text import Encoding
+ 
+# FTP Connection
+FTP_IP = "BACKUP_FTP_IP"
+FTP_PORT = BACKUP_FTP_PORT
+FTP_USER = "BACKUP_FTP_USERNAME"
+FTP_PASSWORD = "BACKUP_FTP_PASSWORD"
+# FTP Path should be something like /Backups/{0}
+FTP_BACKUP_PATH = String.Format("/BACKUP_FTP_PATH/{0}", ThisService.ServiceId)
+# Enable support for FTPS
+ENABLE_FTP_SSL = False
+ 
+# Specify where backups are saved.
+# Default location is a folder named Backups in the game server's root.
+BACKUP_LOCATION = Path.Combine(ThisService.RootDirectory, "Backups")
+ 
+# FTP SUPPORT
+Script.WriteToConsole("")
+Script.WriteToConsole("Deleting files from FTP...")
+ 
+backuplocation = DirectoryInfo(BACKUP_LOCATION)
+ 
+# DELETE OLD BACKUPS
+Script.WriteToConsole("")
+backupfiles=backuplocation.GetFiles("*.zip").OrderBy(lambda f: f.CreationTime).ToArray()
+for i in range(0, backupfiles.Count):
+  # DELETE FROM FTP
+  try :
+    request = WebRequest.Create(String.Format("ftp://{0}:{1}{2}/{3}", FTP_IP, FTP_PORT, FTP_BACKUP_PATH, backupfiles[i].Name))
+    request.Credentials = NetworkCredential(FTP_USER, FTP_PASSWORD)
+    request.Method = WebRequestMethods.Ftp.DeleteFile
+    request.EnableSsl = ENABLE_FTP_SSL
+    with request.GetResponse() as response:
+      Script.WriteToConsole(String.Format("Deleted previous FTP backup {0}, status: {1}", backupfiles[i].Name, response.StatusDescription))
+  except :
+    pass
+  # DELETE LOCAL FILE
+  backupfiles[i].Delete()
+  Script.WriteToConsole(String.Format ("Deleted previous local backup: {0}", backupfiles[i].Name))
+ 
+# DELETE PATH IN FTP
+try :
+  request=WebRequest.Create(String.Format("ftp://{0}:{1}{2}", FTP_IP, FTP_PORT, FTP_BACKUP_PATH))
+  request.Credentials = NetworkCredential(FTP_USER, FTP_PASSWORD)
+  request.Method = WebRequestMethods.Ftp.RemoveDirectory
+  request.EnableSsl = ENABLE_FTP_SSL
+  with request.GetResponse() as response:
+    Script.WriteToConsole(String.Format("Create Directory Complete, status: {0}", response.StatusDescription))
+except:
+  pass
+```

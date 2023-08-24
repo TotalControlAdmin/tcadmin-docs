@@ -1,0 +1,129 @@
+---
+sidebar_position: 1
+sidebar_label: Custom Query Protocol
+---
+
+# Custom Query Protocol
+
+You can set a custom script that queries the game server. This is useful if you want to add query support for games that don't have a supported query protocol.
+
+- Create a custom script. Set the script's event to `Custom query`. You can have more than one custom query script with different operating systems.
+- Set the game's query protocol to custom script.
+
+## Examples
+
+### Iron Python Script
+
+```python
+import clr
+import System
+from System import String
+ 
+XmlFormat="<?xml version=\"1.0\" encoding=\"UTF-8\"?><qstat><server type=\"CUSTOM\" address=\"{0}:{1}\" status=\"{2}\"><hostname>{0}:{1}</hostname><name>{3}</name><gametype>{4}</gametype><map>{5}</map><numplayers>{6}</numplayers><maxplayers>{7}</maxplayers><numspectators>0</numspectators><maxspectators>0</maxspectators><ping>0</ping><retries>0</retries><rules>{8}</rules><players>{9}</players></server></qstat>"
+Status="UP"
+Name="Cool Game Server"
+GameType="game mode"
+Map="map name"
+NumPlayers=2
+MaxPlayers=8
+Rules="<rule name=\"Rule 1\">rule value</rule><rule name=\"Rule 2\">rule value</rule>"
+Players="<player><name>Player 1</name><ping>0</ping><score>100</score></player><player><name>Player 2</name><ping>0</ping><score>200</score></player>"
+  
+ReturnValue=String.Format(XmlFormat, ThisService.IpAddress, ThisService.QueryPort, Status, Name, GameType, Map, NumPlayers, MaxPlayers, Rules, Players)
+```
+
+### C# Script
+
+```c#
+//If your script uses other assemblies you can reference them here:
+//refAssemblies: System.dll, TCAdmin.SDK.dll,TCAdmin.GameHosting.SDK.dll
+ 
+using System;
+ 
+public class CSharpScript : CSharpScriptBase
+{
+   
+  public void Main() {
+    var XmlFormat="<?xml version=\"1.0\" encoding=\"UTF-8\"?><qstat><server type=\"CUSTOM\" address=\"{0}:{1}\" status=\"{2}\"><hostname>{0}:{1}</hostname><name>{3}</name><gametype>{4}</gametype><map>{5}</map><numplayers>{6}</numplayers><maxplayers>{7}</maxplayers><numspectators>0</numspectators><maxspectators>0</maxspectators><ping>0</ping><retries>0</retries><rules>{8}</rules><players>{9}</players></server></qstat>";
+    var Status="UP";
+    var Name="Cool Game Server";
+    var GameType="game mode";
+    var Map="map name";
+    var NumPlayers=2;
+    var MaxPlayers=8;
+    var Rules="<rule name=\"Rule 1\">rule value</rule><rule name=\"Rule 2\">rule value</rule>";
+    var Players="<player><name>Player 1</name><ping>0</ping><score>100</score></player><player><name>Player 2</name><ping>0</ping><score>200</score></player>";
+  
+    var ReturnValue=String.Format(XmlFormat, ThisService.IpAddress, ThisService.QueryPort, Status, Name, GameType, Map, NumPlayers, MaxPlayers, Rules, Players);
+    Script.AddVariable("ReturnValue", ReturnValue);
+  }
+}
+```
+
+### Batch Script (Windows)
+
+```bash
+@echo off
+set Status=UP
+set Name=Cool Game Server
+set GameType=game mode
+set Map=map name
+set NumPlayers=2
+set MaxPlayers=8
+set Rules=^^^<rule name="Rule 1"^^^>rule value^^^</rule^^^>^^^<rule name="Rule 2"^^^>rule value^^^</rule^^^>
+set Players=^^^<player^^^>^^^<name^^^>Player 1^^^</name^^^>^^^<ping^^^>0^^^</ping^^^>^^^<score^^^>100^^^</score^^^>^^^</player^^^>^^^<player^^^>^^^<name^^^>Player 2^^^</name^^^>^^^<ping^^^>0^^^</ping^^^>^^^<score^^^>200^^^</score^^^>^^^</player^^^>
+
+echo ^<?xml version="1.0" encoding="UTF-8"?^>^<qstat^>^<server type="CUSTOM" address="%ThisService_IpAddress%:%ThisService_QueryPort%" status="%Status%"^>^<hostname^>%ThisService_IpAddress%:%ThisService_QueryPort%^</hostname^>^<name^>%Name%^</name^>^<gametype^>%GameType%^</gametype^>^<map^>%Map%^</map^>^<numplayers^>%NumPlayers%^</numplayers^>^<maxplayers^>%MaxPlayers%^</maxplayers^>^<numspectators^>0^</numspectators^>^<maxspectators^>0^</maxspectators^>^<ping^>0^</ping^>^<retries^>0^</retries^>^<rules^>%Rules%^</rules^>^<players^>%Players%^</players^>^</server^>^</qstat^>
+```
+
+### Shell Script (Linux)
+
+```bash
+Status="UP"
+Name="Cool Game Server"
+GameType="game mode"
+Map="map name"
+NumPlayers=2
+MaxPlayers=8
+Rules='<rule name="Rule 1">rule value</rule><rule name="Rule 2">rule value</rule>'
+Players='<player><name>Player 1</name><ping>0</ping><score>100</score></player><player><name>Player 2</name><ping>0</ping><score>200</score></player>'
+
+echo \<?xml version=\"1.0\" encoding=\"UTF-8\"?\>\<qstat\>\<server type=\"CUSTOM\" address=\"${ThisService_IpAddress}:${ThisService_QueryPort}\" status=\"${Status}\"\>\<hostname\>${ThisService_IpAddress}:${ThisService_QueryPort}\</hostname\>\<name\>${Name}\</name\>\<gametype\>${GameType}\</gametype\>\<map\>${Map}\</map\>\<numplayers\>${NumPlayers}\</numplayers\>\<maxplayers\>${MaxPlayers}\</maxplayers\>\<numspectators\>0\</numspectators\>\<maxspectators\>0\</maxspectators\>\<ping\>0\</ping\>\<retries\>0\</retries\>\<rules\>${Rules}\</rules\>\<players\>${Players}\</players\>\</server\>\</qstat\>
+```
+
+### XML Format
+This an example of the XML format supported by TCAdmin.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<qstat>
+ <server type="CUSTOM" address=":" status="UP">
+  <hostname>:</hostname>
+  <name>Cool Game Server</name>
+  <gametype>game mode</gametype>
+  <map>map name</map>
+  <numplayers>2</numplayers>
+  <maxplayers>8</maxplayers>
+  <numspectators>0</numspectators>
+  <maxspectators>0</maxspectators>
+  <ping>0</ping>
+  <retries>0</retries>
+  <rules>
+   <rule name="Rule 1">rule value</rule>
+   <rule name="Rule 2">rule value</rule>
+  </rules>
+  <players>
+   <player>
+    <name>Player 1</name>
+    <ping>0</ping>
+    <score>100</score>
+   </player>
+   <player>
+    <name>Player 2</name>
+    <ping>0</ping>
+    <score>200</score>
+   </player>
+  </players>
+ </server>
+</qstat>
+```

@@ -1,0 +1,42 @@
+---
+sidebar_position: 2
+sidebar_label: Troubleshooting
+---
+
+# Troubleshooting
+
+## Error: Curl error: couldn't connect to host Url: `http://x.x.x.x:8880/billingapi.aspx`
+
+This error means the server where WHMCS is hosted has outbound connections to port 8880 blocked. Ask your hosting provider if connections to that IP and port can be unblocked.
+
+## System.Exception: The billing API is disabled
+
+You need to [enable and configure the billing API](/billing-api/intro).
+
+## Logs\Web\BillingApi.LastCommand.log
+
+This log file contains the latest command parameters sent to the billing api. View the contents to troubleshoot your billing software configuration. Location is `/home/tcadmin/Logs/Web/BillingApi.LastCommand.log` on Linux and `Program Files\TCAdmin2\Logs\Web\BillingApi.LastCommand.log` on Windows.
+
+The required values for a game server are:
+
+- game_id
+- game_slots
+- game_datacenter
+
+The required values for a voice server are:
+
+- voice_id
+- voice_slots
+- voice_datacenter
+
+## Scheduled Task
+
+When the create and delete commands are accepted by the billing api a scheduled task will be created. If there is an error when executing the task you should be able to view the error message by going to System > General Settings > Scheduled Tasks. Click on the task that was created. If there are too many tasks for a single day select the daily view.
+
+If there is an error you don't need to send the command again after fixing it. Simply start the scheduled task and it will continue on the step that caused the error.
+
+If the task says Completed but it only created the user it means you are not sending the values to create a game/voice server. Check your billing API log.
+
+## Debug Mode
+
+You can view debug messages while the scheduled task is being executed by configuring your master monitor in Debug Mode. After enabling debug mode start the monitor in console mode and start the scheduled task again. This is useful if you get an error similar to "No Linux servers were found in datacenter 'XX' with the files for XXXX".
