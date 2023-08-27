@@ -5,23 +5,44 @@ sidebar_position: 16
 
 # Variables
 
-Variables allow you to have addtional values that the user can input when creating or configuring a service. These can be used in the game's configuration files (via the config editor) or in commandlines.
+Variables are an important part of TCAdmin. They allow you to set predefined values for specific elements (e.g. settings in a configuration file) or the command line. You can also use variables in custom scripts.
+If you want to use a variable in a configuration file or the commandline, you should use `$[DefaultVariableName]` or `![CustomVariable]`.
+If you want to use a variable in a custom script, please see the documentation for [ThisService](/customizations/scripts/script-objects/this-service#custom-variables).
 
-To use custom variables in the command line or in configuration use this format:
+## Default Variables
+All services have a few default variables configured. Some of these could be for the hostname, rcon password and private password.
 
-```
-![VariableName]
-```
-
-## Custom Variable
+## Custom Variables
+You can create your own variables for each of your game templates. This is done under the "Variables" tab in the game settings.
 
 - `Variable Name` - The unformatted name of the variable. You should not change the name if this variable is already in use.
 - `Default Value` - The default value for this variable. `For example 'changeme'.`
 
-## Commandline Parameter Options
+### Commandline Parameter Options
 
-- `User access` - Specify if the user is able to set the value of this variable when using the commandline builder.
+- `Admin/Sub admin/Reseller/User/Server owner access` - Specify if the given role is able to set the value of this variable when using the commandline builder or executing a custom script.
 - `Value is required` - Specify if the value is required.
 - `Item Type` - Select the type of item that will be used to capture the user's input.
 - `Parent Variable` - Select the item's parent value.
 - `Parent Value` - The item will only be displayed if the parent variable has this value.
+
+### Display formatting
+Starting from TCAdmin 2.0.187.5, you have the ability to manipulate how a specific variable is shown to the user.
+This is done using the 'Display Regex' and 'Display Format' fields.
+
+The following is an example on how you could manipulate the value of a ComboBox that is generated based on folders in `backups/worlds/` on the game service.
+The folders inside `backups/worlds/` are named based on the date and time they were created (%Y-%m-%d_%H%M%S):
+- 2023-08-27_220030
+- 2023-08-27_100030
+- 2023-08-26_220030
+
+If you want to manipulate how this is shown in the ComboBox, you can use regex to change how the values are shown:
+**Display Regex**: (\d{4}-\d{2}-\d{2})_(\d{2})(\d{2})(\d{2})
+**Display Format**: $1 $2:$3:$4
+
+The above will result in the following formatting:
+- 2023-08-27 22:00:30
+- 2023-08-27 10:00:30
+- 2023-08-26 22:00:30
+
+The actual value of the variable is not affected by the formatting.
