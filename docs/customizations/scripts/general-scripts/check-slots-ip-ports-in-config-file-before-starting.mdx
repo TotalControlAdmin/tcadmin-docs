@@ -1,0 +1,130 @@
+---
+sidebar_position: 6
+sidebar_label: Check slots, ip and port in config file before starting
+---
+
+# Check slots, ip and port in config file before starting
+
+## Option 1 - Update values if they have been modified (requires database connection)
+
+1. Go to the game's settings. 
+2. Click on the Custom Scripts icon. 
+3. Add the following script. 
+4. After creating the script go to the game's settings and click on Update Existing Services. 
+5. To test the script on a single game server go to the service settings and save. Then start the game server.
+
+:::note
+This script connects to the database. If the database is offline the script will fail. You should have "Ignore execution errors" checked in case the database connection is not available when the script executes.
+:::
+
+**Operating System:** Any  
+**Description:** Check slots, IP, and port in the config file before starting  
+**Script Engine:** IronPython  
+**Event:** Before started  
+**Ignore execution errors:** Checked
+
+
+```python
+import clr;
+from System.IO import File, Path
+from System import Environment
+ 
+#Load objects from database.
+clr.AddReference("TCAdmin.GameHosting.SDK")
+from TCAdmin.GameHosting.SDK.Objects import Server, Service, Game
+ThisService=Service(ThisService_ServiceId)
+ThisServer=Server(ThisService.ServerId)
+ThisGame=Game(ThisService.GameId)
+       
+#Update values if changed.
+ThisServer.GameHostingUtilitiesService.UpdateConfigFileVariableValues(ThisService.ServiceId)
+```
+
+## Option 2 - Prevent service from starting if values have been modified (no database connection required)
+
+1. Go to the game's settings. 
+2. Click on the Custom Scripts icon. 
+3. Add the following script. 
+4. This can also be configured as a global script. 
+5. After creating the script go to the game's settings and click on Update Existing Services. 
+6. To test the script on a single game server go to the service settings and save. 
+7. Then start the game server. 
+8. If the IP, port or slots don't have the correct values you will see an error message.
+9. Update the values of `slots_regex`, `ip_regex` and `port_regex` with regular expressions to read the current values. Remember to escape `\` to `\\`. By default these values are configured for San Andreas Multiplayer.
+
+**Operating System:** Any  
+**Description:** Check slots, IP, and port in the config file before starting  
+**Script Engine:** IronPython  
+**Event:** Before started  
+**Ignore execution errors:** Checked
+
+```python
+import clr;
+from System.IO import File, Path
+from System.Text.RegularExpressions import Regex, RegexOptions
+from System import Exception, String;
+
+slots_regex = "^\\s*maxplayers\\s+(?<slots>\\d+)"
+ip_regex = "^\s*bind\\s+(?<ip>[\\d\\.]+)"
+port_regex = "^\\s*port\\s+(?<port>\\d+)"
+
+configpath=Path.Combine(ThisService_RootDirectory, "server.cfg")
+if File.Exists(configpath):
+  contents=File.ReadAllText(configpath)
+  
+  #Match slots
+  matches = Regex.Matches(contents, slots_regex, RegexOptions.Multiline)
+  if matches.Count == 0:
+    raise Exception("maxplayers has been removed from server.cfg")
+ 
+  for match in matches:
+    realslots=int(match.Groups["slots"].Value)
+    allowslots=int(ThisService_Slots)
+    if realslots > allowslots:
+      raise Exception(String.Format("maxplayers has been increased to {0}. The correct value is {1}.", realslots, allowslots))
+   
+  #Match ip
+  matches = Regex.Matches(contents, ip_regex, RegexOptions.Multiline)
+  if matches.Count == 0:
+    raise Exception("bind has been removed from server.cfg")
+  
+  for match in matches:
+    realip=match.Groups["ip"].Value
+    allowip=ThisService_IpAddress
+    if realip != allowip:
+      raise Exception(String.Format("bind has been changed to {0}. The correct value is {1}.", realip, allowip))
+      
+  #Match port
+  matches = Regex.Matches(contents, port_regex, RegexOptions.Multiline)
+  if matches.Count == 0:
+    raise Exception("port has been removed from server.cfg")
+  
+  for match in matches:
+    realport=int(match.Groups["port"].Value)
+    allowport= int(ThisService_GamePort)
+    if realport != allowport:
+      raise Exception(String.Format("port has been changed to {0}. The correct value is {1}.", realport, allowport))
+```
+
+## Option 3 - JSON config file
+
+This script updates the ip, port and slots in a config file with json format. This example is for Rage MP
+
+```python
+import clr;
+import System;
+clr.AddReference("Newtonsoft.Json")
+from System.IO import File, Path
+from Newtonsoft.Json import JsonConvert, Formatting
+
+configpath=Path.Combine(ThisService_RootDirectory, "conf.json")
+
+if File.Exists(configpath):
+  contents=File.ReadAllText(configpath)
+  jsondata = JsonConvert.DeserializeObject(contents)
+  jsondata["bind"]=ThisService_IpAddress
+  jsondata["port"]=ThisService_GamePort
+  jsondata["maxplayers"]=ThisService_Slots
+  File.WriteAllText(configpath, JsonConvert.SerializeObject(jsondata, Formatting.Indented))
+
+```

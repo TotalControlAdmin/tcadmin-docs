@@ -1,0 +1,165 @@
+---
+sidebar_position: 9
+sidebar_label: Limit Service's Disk Space
+---
+
+# Limit Service's Disk Space
+
+## Configure disk quotas in your drive
+
+### Linux
+
+Follow these instructions to [configure disk quotas on Linux](/misc/linux-quotas)
+
+### Windows
+
+Enable quotas on the drive where the services will be created. The configuration shown in the screenshot is recommended.
+
+![](/img/customizations/scripts/Windows_quota.png)
+
+## Configure the game
+
+- Configure the game with Run As = User per Service. Go to `Settings` > `Games` > `select the game` > `Select the "Run As" tab`. Set Run As = User per service and save. This will create one Windows/Linux user for each service. The disk quota will be created for this user.
+
+:::tip
+If you have existing services of this type go to `Settings` > `Game Tools` and run the `Verify/Repair tool` on your server with **`Update run as user`** checked.
+:::
+
+- Configure a variable for the quota value. Click on the Variables icon. Click on new and enter these values:
+  - **Name:** DiskQuota
+  - **Default value:** 0
+  - **Is numeric:** Checked
+  - **Preserve value:** Checked
+
+- Select the Variable Options tab and configure these values:
+  - **Script parameter:** Checked
+  - **Save script parameter value:** Checked
+  - **Admin access:** Checked
+  - **Value is required:** Checked
+  - **Item Type:** Numeric textbox
+  - **Label:** Disk Quota (MB)
+  - **Description:** Specify the disk quota in MB. Set to 0 for unlimited space.
+  - **Decimal Digits:** 0
+
+Configure the scripts. Go back to the game's main settings. Click on the Custom Scripts icon. Create the following scripts.
+
+**Operating System:** Any  
+**Description:** Create disk quota when game server is created 
+**Script Engine:** IronPython  
+**Event:** After created  
+
+```python
+import clr;
+import System;
+from System import UInt64, String, Exception;
+
+diskquotamb = ThisService.Variables["DiskQuota"];
+serviceuser = ThisService.GetServiceCredentials().User;
+mountpoint = ThisServer.FileSystemService.GetMountPoint(ThisService.RootDirectory);
+
+if not ThisServer.FileSystemService.QuotasEnabled(ThisService.RootDirectory) :
+ raise Exception(String.Format("Disk quotas are not enabled on {0}", mountpoint));
+
+Script.WriteToConsole(String.Format("Creating {0}MB disk quota on {1} for {2}", diskquotamb, mountpoint, serviceuser));
+
+ThisServer.FileSystemService.SetQuota(serviceuser, mountpoint, UInt64.Parse(diskquotamb) * 1024 * 1024);
+```
+
+**Operating System:** Any  
+**Description:** Delete disk quota when the game server is deleted 
+**Script Engine:** IronPython  
+**Event:** Before deleted 
+
+```python
+import clr;
+import System;
+from System import UInt64, String, Exception;
+
+serviceuser = ThisService.GetServiceCredentials().User;
+mountpoint = ThisServer.FileSystemService.GetMountPoint(ThisService.RootDirectory);
+
+if not ThisServer.FileSystemService.QuotasEnabled(ThisService.RootDirectory) :
+ raise Exception(String.Format("Disk quotas are not enabled on {0}", mountpoint));
+
+Script.WriteToConsole(String.Format("Deleting disk quota on {0} for {1}", mountpoint, serviceuser));
+
+ThisServer.FileSystemService.SetQuota(serviceuser, mountpoint, 0);
+```
+
+Operating System: Any  
+Description: Configure the game server's disk quota  
+Script Engine: IronPython  
+Event: Custom action  
+Prompt for variable values: Checked  
+Name: Set Disk Quota  
+Script: 
+
+```python
+import clr;
+import System;
+from System import UInt64, String, Exception;
+
+diskquotamb = ThisService.Variables["DiskQuota"];
+serviceuser = ThisService.GetServiceCredentials().User;
+mountpoint = ThisServer.FileSystemService.GetMountPoint(ThisService.RootDirectory);
+
+if not ThisServer.FileSystemService.QuotasEnabled(ThisService.RootDirectory) :
+ raise Exception(String.Format("Disk quotas are not enabled on {0}", mountpoint));
+
+Script.WriteToConsole(String.Format("Creating {0}MB disk quota on {1} for {2}", diskquotamb, mountpoint, serviceuser));
+
+ThisServer.FileSystemService.SetQuota(serviceuser, mountpoint, UInt64.Parse(diskquotamb) * 1024 * 1024);
+```
+
+Operating System: Any  
+Description: Check the disk quota assigned to this game server  
+Script Engine: IronPython  
+Event: Custom action  
+Name: Check Disk Quota  
+Script: 
+
+```python
+import clr;
+import System;
+
+clr.AddReference("TCAdmin.Helper");
+from TCAdmin.Helper.Quotas import LinuxCuota, WindowsQuota;
+from System import Double, String, Exception, Math, Environment, PlatformID;
+
+serviceuser = ThisService.GetServiceCredentials().User;
+mountpoint = ThisServer.FileSystemService.GetMountPoint(ThisService.RootDirectory);
+
+if not ThisServer.FileSystemService.QuotasEnabled(ThisService.RootDirectory) :
+ raise Exception(String.Format("Disk quotas are not enabled on {0}", mountpoint));
+
+quotainfo = None;
+
+if Environment.OSVersion.Platform == PlatformID.Win32NT :
+ quotainfo = WindowsQuota.getQuota(mountpoint, Environment.MachineName, serviceuser);
+else :
+ quotainfo = LinuxCuota.getQuota(mountpoint, serviceuser);
+
+if quotainfo.HasQuota :
+ Script.WriteToConsole(String.Format("Disk Quota: {0}MB", quotainfo.LimitKB/1024));
+ Script.WriteToConsole(String.Format("Used: {0}MB ({1}%)", quotainfo.CurrentUsageKB/1024, Math.Round(Double.Parse(quotainfo.CurrentUsageKB.ToString())/quotainfo.LimitKB * 100,2)));
+ Script.WriteToConsole(String.Format("Available: {0}MB ({1}%)", quotainfo.AvailableKB/1024, Math.Round(Double.Parse(quotainfo.AvailableKB.ToString())/quotainfo.LimitKB * 100,2)));
+else:
+ Script.WriteToConsole(String.Format("{0} does not have a disk quota on {1}", serviceuser, mountpoint));
+ ```
+
+## Test your configuration
+
+- Create a new game server.
+- Select the game server, click on the actions tab. Click on Set Disk Quota. Enter the quota and execute.
+- A popup window should say it was executed successfully.
+- Select "Check Disk Quota". It should show the quota that you created and the current usage.
+
+## Specifying disk quota from WHMCS
+
+You can send the value for quota in your product's config file like this:
+
+```php
+$billing_api_values["gamevar_DiskQuota"] = "2048";
+```
+
+For more information read: [Sending Custom Variable Values](/billing-api/tcadmin2-advanced-module-for-whmcs#sending-custom-variable-values)

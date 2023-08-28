@@ -1,0 +1,301 @@
+---
+sidebar_position: 3
+sidebar_label: Automatically Create a MySQL Database
+---
+
+# Automatically Create a MySQL Database
+
+:::caution Use MySQL Manager
+Rather than utilizing these legacy scripts, we advise installing the MySQL Manager module for optimal results.
+:::
+
+## Preparing the server
+
+- Install the MySQL server on your server.
+- Install phpMyAdmin if you want to provide a way to manage the database.
+
+## Configure the game
+
+### Create variables
+
+- Configure variables for the MySQL user and password. Go to `Settings` > `Global Variables` or `Settings` > `Games` > `Select the game` > `Variables`. Create 2 new variables
+  - Name: `MySQLUser`
+  - Preserve value: `Checked`
+  - Name: `MySQLPassword`
+  - Preserve value: `Checked`
+
+### Create the scripts
+
+- Go to `Settings` > `Global Scripts` or `Settings` > `Games` > `Select the game` > `Custom Scripts`. Add the following scripts. They will create the database and user when the service is created and delete them when the service is deleted. Make sure you update the value of mysql_password in all of the scripts.
+- If you are using MySQL 8 remove the MySQL 5 command and uncomment the MySQL 8 commands.
+- These scripts work without any additional changes if MySQL is installed on all servers (master and remotes). If you have a single MySQL server where all remotes connect you will have to change user@localhost to user@% in the user commands and configure your root user to allow connections from all IPs.
+
+**Operating System:** Any  
+**Description:** Generate MySQL user and password  
+**Script Engine:** IronPython  
+**Event:** Before created  
+**Ignore execution errors:** Unchecked  
+Script:
+
+
+```python
+import clr;
+import System;
+
+clr.AddReference("TCAdmin.SDK");
+from TCAdmin.SDK.Misc import Random;
+from System import String;
+
+ThisService.Variables["MySQLUser"] = String.Format("db{0}", ThisService.ServiceId);
+ThisService.Variables["MySQLPassword"] = Random.RandomString(10,True,True);
+ThisService.Save();
+```
+
+**Operating System:** Any  
+**Description:** Create MySQL database and user  
+**Script Engine:** IronPython  
+**Event:** After created  
+**Ignore execution errors:** Unchecked  
+Script:
+
+
+
+```python
+import clr;
+import System;
+
+clr.AddReference("TCAdmin.DatabaseProviders.MySql");
+clr.AddReference("TCAdmin.SDK");
+from TCAdmin.DatabaseProviders.MySql import MySqlManager;
+from System import String;
+
+mysql_server="localhost";
+mysql_root="root";
+mysql_password="";
+
+with MySqlManager() as mysql:
+ escapeduser=mysql.PrepareSqlValue(ThisService.Variables["MySQLUser"]);
+ escapedpass=mysql.PrepareSqlValue(ThisService.Variables["MySQLPassword"]);
+ mysql.DisableReplication=True;
+ mysql.Connect(String.Format("Data Source={0};User Id={1};Password={2};Pooling=False;", mysql_server, mysql_root, mysql_password));
+
+ mysql.ExecuteNonQuery(String.Format("DROP DATABASE IF EXISTS {0};", escapeduser));
+ if mysql.Execute(String.Format("SELECT * FROM mysql.user WHERE user='{0}' AND host='localhost';", escapeduser)).Rows.Count == 1 :
+  mysql.ExecuteNonQuery(String.Format("DROP USER {0}@'localhost';", escapeduser));
+
+ mysql.ExecuteNonQuery(String.Format("CREATE DATABASE {0};", escapeduser));
+ ## MYSQL 5 SYNTAX
+ mysql.ExecuteNonQuery(String.Format("GRANT ALL PRIVILEGES ON {0}.* TO '{0}'@'localhost' IDENTIFIED BY '{1}';", escapeduser, escapedpass));
+ ## MYSQL 8 SYNTAX
+ #mysql.ExecuteNonQuery(String.Format("CREATE USER '{0}'@'localhost' IDENTIFIED BY '{1}';", escapeduser, escapedpass));
+ #mysql.ExecuteNonQuery(String.Format("GRANT ALL PRIVILEGES ON {0}.* TO '{0}'@'localhost';", escapeduser));
+
+#Add these lines  to the "Create MySQL database and user" script if you want to execute a .sql file 
+with MySqlManager() as mysql2:
+ mysql2.DisableReplication=True;
+ mysql2.Connect(String.Format("Data Source={0};Database={1};User Id= {1};Password={2};Pooling=False;", mysql_server, ThisService.Variables["MySQLUser"], ThisService.Variables["MySQLPassword"]));
+ mysql2.ImportDatabase(ThisService.RootDirectory + "db.sql");
+ ```
+
+**Operating System:** Any  
+**Description:** Delete MySQL database and user  
+**Script Engine:** IronPython  
+**Event:** Before deleted  
+**Ignore execution errors:** Unchecked  
+Script:
+
+```python
+import clr;
+import System;
+
+clr.AddReference("TCAdmin.DatabaseProviders.MySql");
+clr.AddReference("TCAdmin.SDK");
+from TCAdmin.DatabaseProviders.MySql import MySqlManager;
+from System import String;
+
+mysql_server="localhost";
+mysql_root="root";
+mysql_password="";
+
+if not ThisService.Variables.HasValue("MySQLUser") :
+ Script.Exit();
+
+if ThisService.Variables["MySQLUser"] == String.Empty:
+ Script.Exit();
+
+with MySqlManager() as mysql:
+ escapeduser=mysql.PrepareSqlValue(ThisService.Variables["MySQLUser"]);
+ mysql.DisableReplication=True;
+ mysql.Connect(String.Format("Data Source={0};User Id={1};Password={2};Pooling=False;", mysql_server, mysql_root, mysql_password));
+
+ mysql.ExecuteNonQuery(String.Format("DROP DATABASE IF EXISTS {0};", escapeduser));
+ if mysql.Execute(String.Format("SELECT * FROM mysql.user WHERE user='{0}' AND host='localhost';", escapeduser)).Rows.Count == 1 :
+  mysql.ExecuteNonQuery(String.Format("DROP USER {0}@'localhost';", escapeduser));
+```
+
+### Create the custom link to phpMyadmin
+
+- If you installed phpMyAdmin you can create a custom link. Go back to the game's main settings. Click on the Custom Links icon. Add a new link with these values:
+  - Name: `phpMyAdmin`
+  - Description: `Manage your database with phpMyAdmin`
+  - Url:` http://$[Service.IpHostname]/phpMyAdmin/index.php?pma_username=![MySQLUser]&pma_password=![MySQLPassword] (you can also use https://phpmyadmin.tcadmin.com)`
+  - Icon URL: `~/App_Themes/Default/Images/ControlPanel/MenuIcons/Base/Database.png`
+  - Open in a new window: `Checked`
+
+:::note update
+Newer phpMyAdmin versions don't allow logging in to mysql with the username/password in the url. [https://www.phpmyadmin.net/files/4.9.0.1/](https://www.phpmyadmin.net/files/4.9.0.1/)
+:::
+
+### Using the MySQL variables in templates
+
+You can use the following variables in your mail and config file templates:
+
+- **`![MySQLUser]`**
+- **`[MySQLPassword]`**
+
+### Optional scripts
+
+#### Icon to Change MySQL Password
+
+Create a variable named NewMySQLPassword. with:
+
+- These options checked: "Script parameter", "Save script parameter value", "Admin access", "Sub admin access", "Reseller access", "User access", "Server owner access", "Value is required"
+- Label=New Password
+- Mode=Password
+- Deny Characters=;&"'\/
+
+**Operating System:** Any  
+**Description:** Change MySQL Password  
+**Script Engine:** IronPython  
+**Event:** Custom Icon  
+**Ignore execution errors:** Unchecked  
+Script:
+
+```python
+import clr;
+import System;
+clr.AddReference("TCAdmin.DatabaseProviders.MySql");
+clr.AddReference("TCAdmin.SDK");
+from TCAdmin.DatabaseProviders.MySql import MySqlManager;
+from System import String;
+
+mysql_server="localhost";
+mysql_root="root";
+mysql_password="";
+
+with MySqlManager() as mysql:
+ escapeduser=mysql.PrepareSqlValue(ThisService.Variables["MySQLUser"]);
+ escapedpass=mysql.PrepareSqlValue(ThisService.Variables["MySQLPassword"]);
+ escapednewpass=mysql.PrepareSqlValue(ThisService.Variables["NewMySQLPassword"]);
+ mysql.DisableReplication=True;
+ mysql.Connect(String.Format("Data Source={0};User Id={1};Password={2};Pooling=False;", mysql_server, mysql_root, mysql_password));
+ mysql.ExecuteNonQuery(String.Format("SET PASSWORD FOR '{0}'@'localhost' = PASSWORD('{1}');", escapeduser, escapednewpass));
+ mysql.ExecuteNonQuery("FLUSH PRIVILEGES;");
+ ThisService.Variables["MySQLPassword"] = ThisService.Variables["NewMySQLPassword"]
+ ThisService.Variables["NewMySQLPassword"] = String.Empty
+ ThisService.Save()
+  
+Script.WriteToConsole("Your password has been updated successfully.")
+Script.WriteToConsole("")
+```
+### Backup the database when the service is moved and restore it on the new server
+
+**Operating System:** Any  
+**Description:** Backup MySQL database before moving  
+**Script Engine:** IronPython  
+**Event:** Before move  
+**Ignore execution errors:** Unchecked  
+Script:
+
+```python
+import clr;
+import System;
+
+clr.AddReference("TCAdmin.DatabaseProviders.MySql");
+clr.AddReference("TCAdmin.SDK");
+from TCAdmin.DatabaseProviders.MySql import MySqlManager;
+from System import String;
+from System.IO import FileStream, Path, FileMode, FileAccess;
+
+mysql_server="localhost";
+mysql_root="root";
+mysql_password="";
+
+if not ThisService.Variables.HasValue("MySQLUser") :
+ Script.Exit();
+ 
+if ThisService.Variables["MySQLUser"] == "" :
+ Script.Exit();
+
+backupfile=Path.Combine(ThisService.RootDirectory, "_backup.sql");
+
+with MySqlManager() as mysql:
+ escapeduser=mysql.PrepareSqlValue(ThisService.Variables["MySQLUser"]);
+ escapedpass=mysql.PrepareSqlValue(ThisService.Variables["MySQLPassword"]);
+ mysql.AutoDisconnect = False;
+ mysql.DisableReplication=True;
+ mysql.Connect(String.Format("Data Source={0};User Id={1};Password={2};Pooling=False;", mysql_server, mysql_root, mysql_password));
+ #only make a backup if database exists and has tables
+ if mysql.Execute(String.Format("SHOW DATABASES LIKE '{0}';", escapeduser)).Rows.Count == 1 :
+  mysql.ExecuteNonQuery(String.Format("USE {0};", escapeduser));
+  if mysql.Execute("SHOW TABLES;").Rows.Count > 0 :
+   with FileStream(backupfile, FileMode.Create, FileAccess.Write) as file:
+    mysql.DumpDatabase(file);
+
+ mysql.ExecuteNonQuery(String.Format("DROP DATABASE IF EXISTS {0};", escapeduser));
+ if mysql.Execute(String.Format("SELECT * FROM mysql.user WHERE user='{0}' AND host='localhost';", escapeduser)).Rows.Count == 1 :
+  mysql.ExecuteNonQuery(String.Format("DROP USER '{0}'@'localhost';", escapeduser));
+```
+**Operating System:** Any  
+**Description:** Restore MySQL database after move  
+**Script Engine:** IronPython  
+**Event:** After move  
+**Ignore execution errors:** Unchecked  
+Script:
+
+```python
+import clr;
+import System;
+
+clr.AddReference("TCAdmin.DatabaseProviders.MySql");
+clr.AddReference("TCAdmin.SDK");
+from TCAdmin.DatabaseProviders.MySql import MySqlManager;
+from System import String;
+from System.IO import File, Path;
+
+mysql_server="localhost";
+mysql_root="root";
+mysql_password="";
+
+if not ThisService.Variables.HasValue("MySQLUser") :
+ Script.Exit();
+
+if ThisService.Variables["MySQLUser"] == "" :
+ Script.Exit();
+
+backupfile=Path.Combine(ThisService.RootDirectory, "_backup.sql");
+
+with MySqlManager() as mysql:
+ escapeduser=mysql.PrepareSqlValue(ThisService.Variables["MySQLUser"]);
+ escapedpass=mysql.PrepareSqlValue(ThisService.Variables["MySQLPassword"]);
+ mysql.DisableReplication=True;
+ mysql.Connect(String.Format("Data Source={0};User Id={1};Password={2};Pooling=False;", mysql_server, mysql_root, mysql_password));
+ 
+ mysql.ExecuteNonQuery(String.Format("DROP DATABASE IF EXISTS {0};", escapeduser));
+ if mysql.Execute(String.Format("SELECT * FROM mysql.user WHERE user='{0}' AND host='localhost';", escapeduser)).Rows.Count == 1 :
+  mysql.ExecuteNonQuery(String.Format("DROP USER '{0}'@'localhost';", escapeduser));
+
+ ## MYSQL 5 SYNTAX
+ mysql.ExecuteNonQuery(String.Format("CREATE DATABASE {0};", escapeduser));
+ mysql.ExecuteNonQuery(String.Format("GRANT ALL PRIVILEGES ON {0}.* TO '{0}'@'localhost' IDENTIFIED BY '{1}';", escapeduser, escapedpass));
+ ## MYSQL 8 SYNTAX
+ #mysql.ExecuteNonQuery(String.Format("CREATE USER '{0}'@'localhost' IDENTIFIED BY '{1}';", escapeduser, escapedpass));
+ #mysql.ExecuteNonQuery(String.Format("GRANT ALL PRIVILEGES ON {0}.* TO '{0}'@'localhost';", escapeduser)); 
+
+if File.Exists(backupfile) :
+ with MySqlManager() as mysql2:
+  mysql2.DisableReplication=True;
+  mysql2.Connect(String.Format("Data Source={0};Database={1};User Id={1};Password={2};Pooling=False;", mysql_server, ThisService.Variables["MySQLUser"], ThisService.Variables["MySQLPassword"]));
+  mysql2.ImportDatabase(backupfile);
+  File.Delete(backupfile);
+```

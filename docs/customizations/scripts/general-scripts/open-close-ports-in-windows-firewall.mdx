@@ -1,0 +1,33 @@
+---
+sidebar_position: 10
+sidebar_label: Open and close ports in Windows firewall
+---
+
+# Open and close ports in Windows firewall
+
+If you enable support for Windows firewall in TCAdmin it will add the game server's executable to the firewall exceptions. If the game server is started with a .bat this will not work. You can set a custom batch script for the after created event that opens the game server's ports or adds the correct executable and a script for the after deleted event that closes the ports.
+
+## To open the game server's game, query and rcon ports
+
+```bash
+netsh advfirewall firewall add rule name="%ThisService_ConnectionInfo%" dir=in action=allow protocol=TCP localport=%ThisService_GamePort%
+netsh advfirewall firewall add rule name="%ThisService_ConnectionInfo%" dir=in action=allow protocol=TCP localport=%ThisService_QueryPort%
+netsh advfirewall firewall add rule name="%ThisService_ConnectionInfo%" dir=in action=allow protocol=TCP localport=%ThisService_RConPort%
+netsh advfirewall firewall add rule name="%ThisService_ConnectionInfo%" dir=in action=allow protocol=UDP localport=%ThisService_GamePort%
+netsh advfirewall firewall add rule name="%ThisService_ConnectionInfo%" dir=in action=allow protocol=UDP localport=%ThisService_QueryPort%
+netsh advfirewall firewall add rule name="%ThisService_ConnectionInfo%" dir=in action=allow protocol=UDP localport=%ThisService_RConPort%
+```
+
+## To add the game server's executable to the firewall exceptions
+
+Replace MyGame.exe with the correct relative path and filename.
+
+```bash
+netsh advfirewall firewall add rule name="%ThisService_ConnectionInfo%" dir=in action=allow program="%ThisService_RootDirectory%MyGame.exe" enable=yes
+```
+
+## To close the game server's ports or remove the executable
+
+```bash
+netsh advfirewall firewall delete rule name="%ThisService_ConnectionInfo%"
+```

@@ -1,0 +1,42 @@
+---
+sidebar_position: 3
+sidebar_label: ASP.NET Themes
+---
+
+# ASP.NET Themes
+
+## Themes
+
+Themes allow administrators and resellers to specify custom colors, style sheets, headers, and footers.
+
+### Creating
+To create a new theme, follow these steps:
+1. Go to `System` > `General Settings` > `Themes` > `New`.
+2. Configure the following settings:
+
+- **Location**: The path where the theme files are located.
+- **Theme Owner**: The user that owns the theme. Specify "System" to create a top-level template.
+- **Name**: The name shown in the themes list.
+- **Page Title**: The prefix added to the page titles.
+- **Hostname**: This theme is selected automatically when the control panel is accessed using this hostname. For example, your reseller can create a hostname like `panel.resellerdomain.com`. When you access that hostname, the theme will be selected automatically. The hostname must resolve to the control panel's IP.
+- **Logout URL**: The URL where the user is redirected after logging out. Leave blank to use the default URL configured by the administrator.
+- **Default Reseller Theme**: If checked, a copy of this theme is assigned to the reseller when it is created. It can still be disabled if you don't want it to show up in the themes list.
+- **Enabled**: Disable this theme if you don't want it to show up in the themes list.
+- **Default**: If the user has not selected a theme, the default theme is used.
+
+3. Configure Theme Options for custom colors and images, and use the Advanced section for custom CSS, header, and footer.
+
+### Using Custom Icon Images
+To use custom images, you need to recreate the same directory structure under the theme's folder.
+
+For example, the URL to the Users icon is: `http://127.0.0.1:8880/App_Themes/Default/Images/ControlPanel/MenuIcons/Base/Users.png`.
+
+Create this directory structure with your custom image. Make sure the `tcadmin` or `TCAWeb` user has permissions to read the file.
+- Windows: `C:\Program Files\TCAdmin2\ControlPanel\User_Themes\1\00000000-0000-0000-0000-000000000001\Images\ControlPanel\MenuIcons\Base\Users.png`
+- Linux: `/home/tcadmin/ControlPanel/User_Themes/1/00000000-0000-0000-0000-000000000001/Images/ControlPanel/MenuIcons/Base/Users.png`
+
+For resellers, since they don't have direct access to create the directory structure, you can export your theme, create the directory structure in the zip file, and import it again. Only image and CSS files are allowed.
+Note: You also need to create the 16x16 and 24x24 icons for this to work (e.g., `Users16x16.png` and `Users24x24.png`).
+
+### Resellers
+Resellers can have their own themes. You can specify the maximum number of themes a reseller can have in the role settings.

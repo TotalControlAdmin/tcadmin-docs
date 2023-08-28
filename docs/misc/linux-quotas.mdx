@@ -1,0 +1,98 @@
+---
+sidebar_position: 4
+sidebar_label: Linux Quotas
+---
+
+# Linux Quotas
+
+## How to Set Up User Quotas
+
+The following instructions are provided for your convenience. We are not responsible for errors caused by these instructions and we do not provide support for configuring quotas. For detailed instructions read the reference manual for your distro.
+
+## CentOS / Fedora / Redhat
+
+### Install quota
+
+Run the following command to install the quota package.
+
+```
+yum install quota
+```
+
+### Modify /etc/fstab
+
+Enable quotas on the partitions in `/etc/fstab`. Partitions that do not have quotas enabled normally look something like:
+
+```
+/dev/hda1       /       ext2    defaults        1       1
+/dev/hda2       /usr    ext2    defaults        1       1
+```
+
+To enable user quota support on a file system, add ,usrquota to the fourth field containing the word "defaults" (man fstab for details).
+
+```
+/dev/hda1       /       ext2    defaults,usrquota        1       1
+/dev/hda2       /usr    ext2    defaults,usrquota       1       1
+```
+
+### Enable quotas on startup
+
+Edit /etc/rc.local and add the following command.
+
+```
+quotaon -a
+```
+
+### Add weekly quota check
+
+Edit `/etc/crontab` and add the following command.
+
+```
+0  3  *  *  0 quotaoff -a;/sbin/quotacheck -aum;quotaon -a;
+```
+
+### Restart and create quota database
+
+Restart your server to activate quotas. After restarting execute the following commands.
+
+```
+quotaoff -a
+quotacheck -caum
+quotaon -a
+```
+
+## Debian / Ubuntu
+
+### Install quota
+
+Run the following command to install the quota package.
+
+```
+apt-get install quota
+```
+
+### Modify /etc/fstab
+
+Enable quotas on the partitions in /etc/fstab. Partitions that do not have quotas enabled normally look something like:
+
+```
+/dev/hda1       /       ext2    defaults        1       1
+/dev/hda2       /usr    ext2    defaults        1       1
+```
+
+To enable user quota support on a file system, add ,usrquota to the fourth field containing the word "defaults" (man fstab for details).
+
+```
+/dev/hda1       /       ext2    defaults,usrquota        1       1
+/dev/hda2       /usr    ext2    defaults,usrquota       1       1
+```
+
+### Restart and create quota database
+
+Restart your server to activate quotas. After restarting execute the following commands.
+
+```
+quotaoff -a
+quotacheck -caum
+quotaon -a
+```

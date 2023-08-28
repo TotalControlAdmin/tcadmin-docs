@@ -1,0 +1,59 @@
+---
+sidebar_position: 2
+sidebar_label: Rust Custom Query
+---
+
+# Rust Custom Query
+
+The Rust query reports players in queue as connected players. This causes the game monitor to think the max slots setting has been changed and restart the game server if it's full and players are in queue. The following custom script prevents this by getting connected players from the value of game_tag.
+
+This script is included in the Rust script created by Dennis: [https://community.tcadmin.com/files/file/65-rust-automatic-wipeupdate-oxide-plugin-installer/](https://community.tcadmin.com/files/file/65-rust-automatic-wipeupdate-oxide-plugin-installer/)
+
+**Operating System:** Any    
+**Description:** Rust Query  
+**Script Engine:** IronPython  
+**Event:** Custom Query   
+**Ignore execution errors** Unchecked 
+
+:::note
+Instructions After creating this script go to the game's settings and set the query protocol to custom script.
+:::
+
+```python
+import clr
+import System
+clr.AddReference("TCAdmin.GameHosting.SDK")
+from System import String
+from System.Text.RegularExpressions import Regex
+from TCAdmin.GameHosting.SDK.GameMonitor import ServerQuery
+ 
+querydata=ThisServer.GameAdminService.GetQueryResult("a2s",ThisService.IpAddress, ThisService.QueryPort, ThisService.RootDirectory, ThisService.ServiceId)
+results=ServerQuery.GetQueryResults(querydata)
+ 
+XmlFormat="<?xml version=\"1.0\" encoding=\"UTF-8\"?><qstat><server type=\"CUSTOM\" address=\"{0}:{1}\" status=\"{2}\"><hostname>{0}:{1}</hostname><name>{3}</name><gametype>{4}</gametype><map>{5}</map><numplayers>{6}</numplayers><maxplayers>{7}</maxplayers><numspectators>0</numspectators><maxspectators>0</maxspectators><ping>0</ping><retries>0</retries><rules>{8}</rules><players>{9}</players></server></qstat>"
+Status="UP"
+Name=results.Name
+GameType=results.GameType
+Map=results.Map
+ 
+Rules=""
+for rule in results.Rules:
+    Rules=Rules+String.Format("<rule name=\"{0}\">{1}</rule>", rule.Key, rule.Value)
+ 
+Players=""
+for player in results.Players:
+    Players=Players+String.Format("<player><name>{0}</name><ping>{1}</ping><score>{2}</score></player>", player.Name, player.Ping, player.Score)
+ 
+NumPlayers=results.NumPlayers
+MaxPlayers=results.MaxPlayers
+ 
+if results.Rules.ContainsKey("game_tag") :
+  match = Regex.Match(results.Rules["game_tag"], "cp(\d*)")
+  if match.Success :
+    NumPlayers = match.Value.Substring(2)
+  match = Regex.Match(results.Rules["game_tag"], "mp(\d*)")
+  if match.Success :
+    MaxPlayers = match.Value.Substring(2)
+ 
+ReturnValue=String.Format(XmlFormat, ThisService.IpAddress, ThisService.QueryPort, Status, Name, GameType, Map, NumPlayers, MaxPlayers, Rules, Players)
+```

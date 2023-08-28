@@ -1,0 +1,29 @@
+---
+sidebar_position: 13
+sidebar_label: Restart service when last player disconnects
+---
+
+# Restart service when last player disconnects
+
+This script will stop the game server if it has been empty for 2 days. Add the IronPython script for the query monitoring event.
+
+:::info required
+**A MySQL database is required.**
+:::
+
+```python
+import clr
+clr.AddReference('TCAdmin.SDK')
+from System import DateTime, String
+from TCAdmin.SDK.Database import DatabaseManager
+ 
+now = DateTime.UtcNow
+start = ThisService.StartTime
+if now.Subtract(start).Days >= 2 :
+  Script.WriteToConsole("Checking stats for players in the last 2 days...")
+  db = DatabaseManager.CreateDatabaseManager()
+  dt = db.Execute(String.Format("select * from tc_game_service_detailed_stats where service_id={0} and players > 0 and detailed_date >= ( CURDATE() - INTERVAL 2 DAY )", ThisService.ServiceId))
+  if dt.Rows.Count == 0 :
+    Script.WriteToConsole("Stopping...")
+    ThisService.Stop("No players connected in the last 2 days")
+```

@@ -1,0 +1,20 @@
+---
+sidebar_position: 1
+sidebar_label: Allow User to Change the Exe
+---
+
+# Allow User to Change the Exe
+
+1. Create an iron python script for the game's Custom Icon event with these lines. Check `Prompt for variable values` and allow user access.
+
+```python
+ThisService.Executable = ThisService.RootDirectory + ThisService.Variables["CustomExe"];
+ThisService.Save();
+ThisService.Configure();
+```
+
+2. Create a new variable named "CustomExe". In the variable settings tab check "Script parameter" and "Save script parameter value". 
+
+3. Allow user access. Set the type to Combobox. Add an item for each exe that you want to allow.
+
+4. With that your user should be able to see the icon in the service home page to change the exe.

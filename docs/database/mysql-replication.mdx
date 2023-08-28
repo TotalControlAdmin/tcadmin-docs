@@ -1,0 +1,160 @@
+---
+sidebar_position: 2
+sidebar_label: MySQL Replication
+---
+
+# MySQL Replication
+
+Replication enables data from one MySQL database server (the master) to be replicated to one or more MySQL database servers (the slaves). This improves performance if you have servers in different regions. All updates to the database must take place in the MySQL master. The connection to the MySQL slave is read-only. TCAdmin will only create a connection to the MySQL master if the database needs to be updated.
+
+
+# How to Set Up MySQL Replication
+
+:::note
+The following instructions are provided for your convenience. We do not provide support for configuring replication on your MySQL server.
+:::
+
+For detailed instructions, read the [MySQL reference manual](http://dev.mysql.com/doc/refman/5.1/en/replication-howto.html). You can also follow the instructions from this [article](http://www.howtoforge.com/mysql_database_replication).
+
+## Create User for Replication
+
+Execute these commands on your MySQL master while logged in as root. Replace `SLAVEUSER` and `SLAVEPASS` with the user and password that you want to create. For increased security, replace `%` with the IP of your MySQL slave.
+
+```sql
+CREATE USER 'SLAVEUSER'@'%' IDENTIFIED BY 'SLAVEPASS';
+GRANT REPLICATION SLAVE ON *.* TO 'SLAVEUSER'@'%';
+```
+
+## MySQL Master Configuration
+
+Add the following to your MySQL master's `my.ini` or `my.cnf` under `[mysqld]`. Then restart the MySQL service.
+
+```ini
+log-bin=mysql-bin
+server-id=1
+sync_binlog=1
+```
+
+## Obtain the Master Binary Log Coordinates
+
+Log in to your MySQL master as root and execute the following commands. **DO NOT CLOSE THIS MYSQL SESSION YET.** These commands lock your database to prevent writing. This is required to guarantee data integrity while the data is being transferred to the MySQL slave.
+
+```sql
+FLUSH TABLES WITH READ LOCK;
+SHOW MASTER STATUS;
+```
+
+You should see output similar to the following. The log file name and position will be required for the following steps.
+
+```
++------------------+----------+--------------+------------------+
+| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB |
++------------------+----------+--------------+------------------+
+| mysql-bin.000002 |   609384 |              |                  |
++------------------+----------+--------------+------------------+
+1 row in set (0.00 sec)
+```
+
+## Transfer the Current Database to the MySQL Slave
+
+Create an empty database and user on the MySQL slave. The database should be named the same as your TCAdmin database on the MySQL master. Execute the following command to backup and restore the database to the slave. Replace the values as needed.
+
+```sh
+mysqldump -hMASTERIP -uMASTERDBUSER -pMASTERDBPASS TCADMINDB | mysql -hSLAVEIP -uSLAVEDBUSER -pSLAVEDBPASS --database=TCADMINDB
+```
+
+After the command completes, go to the session connected to the MySQL master and execute this command to unlock the tables.
+
+```sql
+UNLOCK TABLES;
+```
+
+## MySQL Slave Configuration
+
+Add the following to your MySQL Slave's `my.ini` or `my.cnf` under `[mysqld]`. Replace the values as needed. Then restart the MySQL service.
+
+```ini
+server-id=2
+replicate-do-db=TCADMINDB
+read-only
+```
+
+After restarting the service, log in to the MySQL Slave server as root. Execute the following commands. Replace the values as needed.
+
+```sql
+stop slave;
+change master to master_host='MYSQLMASTERIP', master_user='REPLICATIONUSER', master_password='REPLICATIONPASSWORD', master_log_file='LOGFILENAME', master_log_pos=LOGFILEPOSITION;
+start slave;
+```
+
+## Testing your Configuration
+
+Log in to your MySQL master and execute these commands. Replace the database name as needed. This command will update the admin's last name to 'REPLICATION SUCCESS'. You can change it back later.
+
+```sql
+use tcadmin2;
+UPDATE tc_users SET last_name='REPLICATION SUCCESS' WHERE user_id=3;
+```
+
+Now log in to your MySQL slave and execute these commands. Replace the database name as needed.
+
+```sql
+use tcadmin2;
+SELECT last_name FROM tc_users WHERE user_id=3;
+```
+
+If you see the following, it means you have configured replication correctly.
+
+```
++---------------------+
+| last_name           |
++---------------------+
+| REPLICATION SUCCESS |
++---------------------+
+1 row in set (0.00 sec)
+```
+
+## Adding More Slaves
+
+The process to add more slaves is exactly the same. Just make sure you assign a unique `server-id` to the slave's `my.ini` or `my.cnf`. If you specified the replication user's IP, you will need to create a new user with the new slave's IP.
+
+## Configuring TCAdmin
+
+1. Go to **Server Management > Remote DB Connections**. Configure the connection that remote servers will use to connect to the MySQL master. This connection is used for writing.
+
+2. Go to **Server Management > Datacenters > Select the datacenter**. In the Remote DB Connection tab, set the type to "MySQL master-slave replication". Configure the database connection to the MySQL slave.
+
+3. Install TCAdmin on the remote server and configure it with a new `ConfigUtility.config`. If the remote server has already been configured, download and save the `ConfigUtility.config` to `/home/tcadmin/Monitor` or `C:\Program Files\TCAdmin2\Monitor`, and restart the remote monitor.
+
+## Configuring TCAdmin (old instructions)
+
+These instructions are still valid, but the new instructions are recommended.
+
+Configure a remote or master as you normally would using the TCAdmin Configuration Utility. When you get to the database settings, configure it to connect to the nearest MySQL slave or master.
+
+If you already have it configured, you might not be able to use the configuration utility again. You can update the Remote DB Connection with the MySQL slave connection info. Download a new `ConfigUtility.config` for the remote and save it to the remote's Monitor folder.
+
+After applying the configuration with the Configuration Utility, create a file named `Replication.config` in `Program Files\TCAdmin2\Monitor` or `/home/tcadmin/Monitor` with the following. Replace the values as needed. Then restart the TCAdmin monitor.
+
+```xml
+<?xml version="1.0" encoding="utf-16" standalone="yes"?>
+<values>
+  <add key="TCAdmin.Database.MySql.ConnectionString" value="Data Source=MYSQLMASTERIP;User Id=MYSQLMASTERUSER;Password=MYSQLMASTERPASS;Database=TCADMINDB;Pooling=false;Compress=false;Connection Lifetime=900;" type="System.String,mscorlib" />
+  <add key="TCAdmin.Database.MySql.ConnectionString.Encrypted" value="False" type="System.Boolean,mscorlib" />
+  <add key="Replication.WaitSync" value="5000" type="System.Int32,mscorlib" />
+</values>
+```
+
+:::note
+If you specify a value greater than 0 for `Replication.WaitSync`, TCAdmin will verify that records added to the MySQL master are updated on the MySQL slave before continuing. The value specified is the maximum milliseconds to wait for the slave to update. Set to 0 or remove the line to disable this feature. If the time limit is reached, an entry is added to the monitor's console and error logs.
+
+The connection information in this file is for the MySQL Master. When TCAdmin needs to update the database, it will connect to the MySQL Master. When it needs to read values, it will connect to the MySQL Slave.
+:::
+
+## Testing Replication in TCAdmin
+
+Start the monitor in console mode, then execute this command in the console:
+
+```
+replication-test
+```

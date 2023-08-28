@@ -28,7 +28,7 @@ const config = {
       "classic",
       {
         docs: {
-          routeBasePath: '/',
+          routeBasePath: "/",
           sidebarPath: require.resolve("./sidebars.js"),
           showLastUpdateTime: true,
           editUrl:
@@ -48,17 +48,17 @@ const config = {
     typesense: {
       // Replace this with the name of your index/collection.
       // It should match the "index_name" entry in the scraper's "config.json" file.
-      typesenseCollectionName: 'tcadmin-docs',
+      typesenseCollectionName: "tcadmin-docs",
 
       typesenseServerConfig: {
         nodes: [
           {
-            host: 'typesense.tcadmin.k8s.ovh.alexr03.dev',
+            host: "typesense.tcadmin.k8s.ovh.alexr03.dev",
             port: 443,
-            protocol: 'https',
+            protocol: "https",
           },
         ],
-        apiKey: 'fzpKd6Esfg47mr8Nh9f4Km1Kbbi1OiFM',
+        apiKey: "fzpKd6Esfg47mr8Nh9f4Km1Kbbi1OiFM",
       },
 
       // Optional: Typesense search parameters: https://typesense.org/docs/0.24.0/api/search.html#search-parameters
@@ -67,7 +67,6 @@ const config = {
       // Optional
       contextualSearch: true,
     },
-
     navbar: {
       title: "",
       logo: {
@@ -111,6 +110,7 @@ const config = {
     prism: {
       theme: lightCodeTheme,
       darkTheme: darkCodeTheme,
+      additionalLanguages: ['php', 'cshtml', 'csharp'],
     },
     colorMode: {
       respectPrefersColorScheme: true,
@@ -118,10 +118,10 @@ const config = {
   },
   plugins: [
     [
-      'docusaurus-theme-search-typesense',
+      "docusaurus-theme-search-typesense",
       {
         typesenseSearchParameters: {
-          queryBy: 'title,keywords,content',
+          queryBy: "title,keywords,content",
           numTypos: 2,
         },
       },

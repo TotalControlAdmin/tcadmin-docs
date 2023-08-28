@@ -1,0 +1,407 @@
+---
+sidebar_position: 24
+sidebar_label: Common Errors
+---
+
+# Common Errors
+
+## General
+
+### Changed MySQL IP or login and TCAdmin can't connect
+
+#### If the master can't connect to the database
+
+- Download/extract [ConfigUtility-Unencrypted.zip](/downloads/ConfigUtility-Unencrypted.zip) and open with notepad.
+- Update the value of TCAdmin.ConfigUtility.Database.ConnectionString with the new information.
+- Save it to `C:\Program Files\TCAdmin2\Monitor\ConfigUtility.config` or `/home/tcadmin/Monitor/ConfigUtility.config` and restart the monitor.
+- If the control panel website is disabled you should enable it again so the web config files get updated with the new database connection.
+   - Create a copy of `TCAdmin2\ControlPanel\Web.config` and `TCAdmin2\ControlPanel.MVC\Web.config`. Name it `Windows.Custom.config` in the same folder.
+   - Execute this command on the database and restart the monitor.
+
+   ```sql
+   INSERT INTO tc_server_enabled_components (module_id, component_id, server_id) values ('07405876-e8c2-4b24-a774-4ef57f596384', 2, 1);
+   ```
+
+#### If a remote server can't connect to the database
+
+- Go to `Server Management `> `Remote DB Connection`. Update the connection information.
+- Download a new `ConfigUtility.config` from the remote server settings. Save it to the remote server's `TCAdmin2\Monitor` and restart it.
+
+### Slow MySQL Connections
+
+This usually happens when it takes a long time for the MySQL server to resolve the client's IP. To fix this you must add the following line to your MySQL server's `my.ini` under **`[mysqld]`**:
+
+```
+skip-name-resolve
+```
+
+:::tip
+If you run MySQL on the same server use 127.0.0.1 to connect instead of the public IP.
+:::
+
+### Starting/Stopping a Service is Slow
+
+This is usually caused by having uPnP support enabled and the server is not behind a router or firewall with uPnP enabled. Select the server. In the Router/Firewall tab uncheck "Enable support for uPnP port forwarding". Restart the monitor service. Wait 10 seconds and restart the service manager service.
+
+### 401 Error/Slow Access to Services
+
+If you get this error while accessing a game server located on the master this usually means there is an error when verifying your license. Go to `System` > `About`. If there was an error updating your license you will see the error message there.
+
+If you get this error while accessing a game server located on a remote this usually means the remote can't connect to the master. Make sure you can view [https://masterip:secureport/Monitor](https://masterip:secureport/Monitor) using the server's browser. On Linux you can use wget. It is normal to get a security warning when doing this.
+
+### Error - Cannot find central directory
+
+This error means the zip file that TCAdmin is trying to extract is corrupt or it is not a standard zip file.
+
+### Server did not recognise the value of HTTP header SOAPAction
+
+This means one of your remote servers is not running the same version as the master. Go to Servers and click on Show Versions. Do a manual update on servers that have a different version.
+
+### Web console doesn't work on some PCs
+
+Bitdefender has been known to cause a white page when viewing the log viewer. Try disabling the built in browser protection. AVG users turn off `Online Shield`.
+
+### The server with id `'2'` does not exist.
+
+This usually happens when the remote server is configured to connect to an empty mysql database. It needs to connect to the master's database.
+
+### Can't connect to MySQL server on 'x.x.x.x' (10061): Authentication failed.
+
+Add this to your mysql server's `my.ini` or `my.cnf` under **`[mysqld]`**:
+
+```
+default-authentication-plugin=mysql_native_password
+```
+
+Restart MySQL then create a new mysql user for TCAdmin.
+
+## Windows
+
+### Could not load file or assembly `'TCAdmin.SDK'`
+
+Your server is member of an active directory domain and you get this error when the monitor is starting the control panel website. To fix this error:
+
+- Open a command prompt. Execute this command. Fix the path to `TCAdmin2\Monitor` as needed:
+
+```bash
+echo %USERDNSDOMAIN%>"C:\Program Files\TCAdmin2\Monitor\ServerDomain.txt"
+```
+
+or to configure TCAdmin to use local users:
+
+```bash
+echo %COMPUTERNAME%>"C:\Program Files\TCAdmin2\Monitor\ServerDomain.txt"
+```
+
+- Restart the TCAdmin Monitor service.
+
+### An error occurred while attempting to impersonate. Execution of this request cannot continue
+
+Same as above.
+
+### Services have StartError or Error status after restarting Windows
+
+This is fixed by increasing the page file size.
+
+### System.OutOfMemoryException: Exception of type 'System.OutOfMemoryException' was thrown.
+
+This is fixed by increasing the page file size.
+
+### Form of the specified string is not suitable for e-mail address
+
+This is caused by an invalid configuration in IIS:
+
+1. Log in to your server's remote desktop.
+2. Go to `Start` > `Administrative Tools` > `IIS Manager`.
+3. Select the server node on the left.
+4. Double click on the `SMTP E-mail` icon.
+   - Set E-mail address blank
+   - Check Deliver e-mail to SMTP server
+   - Set SMTP Server blank.
+   - Use localhost unchecked
+   - Port 25
+   - Authentication Settings: Not required.
+
+### `steam validation rejected` or `Running in LAN mode only` when starting source games
+
+#### Cause
+
+Installing steam client onto the dedicated box, it tricks `srcds.exe` to try and login to the account that was linked to the steam client install, thus causing the servers to run in local only as it cant verify the game.
+
+#### Solutions, fix
+
+Uninstall steam client from the machine, and then follow with running regedit from the start menu or run. search for the term `steam` and remove all `valve` steam related directories.
+
+### System.IO.FileNotFoundException: Could not load file or assembly 'TCAdmin.WebServer, Version=2.0.XX.0 ....'
+
+Make sure the following folder exists:
+
+#### Windows 32bit
+
+`C:\Windows\Microsoft.NET\Framework86\v2.0.50727\Temporary ASP.NET Files`
+
+#### Windows 64bit
+
+`C:\Windows\Microsoft.NET\Framework64\v2.0.50727\Temporary ASP.NET Files`
+
+### Method not found: 'Void System.Web.UI.HtmlControls.HtmlForm.set_Action(System.String)'.
+
+This happens when you don't have the `.NET 3.5 `service pack installed. Run Windows Update and install all .NET updates that are available.
+
+### TCAdmin can't start game servers and the server is member of a domain
+
+#### If you are running TCAdmin on a Domain Member server, do the following:
+
+- Open `Control Panel` -> `Administrative Tools` -> `Local Security Policy`
+- In the right-pane, expand `Security Settings` -> `Local Policies` -> `User Rights Assignment`
+- Scroll down in the left-pane until you find `Log on as a batch job`, right-click on it then left-click on Properties
+- Add `TCAdmin Game Users` to the policy then click OK
+- Close out of the editor, the changes will take effect within the next 15 minutes, or directly after a reboot.
+
+#### If you are running TCAdmin on a Domain Controller:
+
+- Open `Control Panel` -> `Administrative Tools` -> `Group Policy Management` (GMPC)
+- Create a new Group Policy Object (GPO)
+- Link that GPO to the Active Directory (AD) Organizational Unit (OU) where your domain controller is located
+- Edit the GPO that was just created.
+- In the right-pane, expand `Computer Configuration` -> `Policies` -> `Windows Settings` -> S`ecurity Settings` -> `Local Policies` -> `User Rights Assignment`
+- Scroll down in the left-pane until you find `Log on as a batch job`, right-click on it then left-click on Properties
+- Add `TCAdmin Game Users` to the policy then click OK
+- Close out of the Editor
+- Close out of the GPMC
+- If you have multiple Domain Controllers, wait 15 minutes for replication (or longer if your replication settings are not set to default)
+- Open a Command Prompt as an Administrator
+- Run the following command: `gpupdate.exe /force /sync`
+- At both prompts select N for no
+- Once completed, close out of the Command Prompt
+- That should do it... if it does not work, give it 15 minutes then try again, or just reboot.
+- The gpupdate command may need to be run on each domain controller that TCA is running on.
+- The new GPO can be applied to member servers as well to resolve this issue using GPMC, or the above method can be used.
+
+### The page was not displayed because the request entity is too large
+
+- Go to IIS Manager.
+- Click on your TCAdmin website.
+- In the features (icons), chose the configuration editor.
+- Click on the settings dropdown on the top and select `system.webServer` > `security` > `requestFiltering` > `requestLimits` > `maxAllowedContentLength` and set it to `334217728`. (Then hit enter and then apply on the top right).
+
+### BSOD when starting/stopping a service
+Npcap versions lower than 0.9995 may cause BSOD. Update your Npcap to the latest version.
+[https://github.com/nmap/npcap/blob/master/CHANGELOG.md](https://github.com/nmap/npcap/blob/master/CHANGELOG.md)
+[https://nmap.org/download.html](https://nmap.org/download.html)
+
+### "System.Net.Sockets.SocketException `(0x80004005)`: No such host is known" when monitor starts up
+
+Check the server's computername. If it's all numbers change it so it has at least one alphabetical character. For example if the computername is 123456 change it to SERVER123456
+
+### An operation on a socket could not be performed because the system lacked sufficient buffer space or because a queue was full
+
+Apply these registry changes and reboot: [https://docs.oracle.com/cd/E35319_01/Search.10-2/ATGSearchAdmin/html/s1507adjustingtcpsettingsforheavyload01.html](https://docs.oracle.com/cd/E35319_01/Search.10-2/ATGSearchAdmin/html/s1507adjustingtcpsettingsforheavyload01.html)
+
+## Linux
+
+### Not all CPUs are detected by TCAdmin
+
+Edit `/home/tcadmin/Monitor/tcadmin-config`. Change this line:
+
+```
+export NUMBER_OF_PROCESSORS=`nproc`
+````
+
+to:
+
+```
+export NUMBER_OF_PROCESSORS=`cat /proc/cpuinfo | grep "processor\s*:\s*" | wc -l`
+```
+
+or just set the number of processors directly:
+
+```
+export NUMBER_OF_PROCESSORS=8
+```
+
+### Errors: 'Too many open files', 'Resource temporarily unavailable', 'Could not create thread', 'Thread abort', 'MonoError reused after mono_error_cleanup'
+
+Add these lines to `/etc/security/limits.conf`:
+
+```
+tcadmin soft nofile 500000
+tcadmin hard nofile 500000
+tcadmin soft nproc 500000
+tcadmin hard nproc 500000
+tcagame soft nofile 500000
+tcagame hard nofile 500000
+tcagame soft nproc 500000
+tcagame hard nproc 500000
+```
+
+Restart the server for the changes to take effect.
+
+### High VIRTUAL MEMORY used by Mono
+
+According to the .NET team this is normal and it's not really using that amount of memory. See this github issue for details: [https://github.com/dotnet/runtime/issues/9199#issuecomment-341132539](https://github.com/dotnet/runtime/issues/9199#issuecomment-341132539)
+
+### Failed to create shadow copy .ini file.
+
+This error usually means the partition where TCAdmin is installed or the `/tmp` folder does not have any space available. After freeing some space restart the monitor:
+
+```bash
+cd /home/tcadmin/Monitor/
+monitor-service restart
+```
+
+### Reqested font family not found
+
+Install the msttcorefonts on the master.
+
+### This platform is not supported
+
+This can happen when running a steam update or streaming logs. It can also cause the rounded borders to not render correctly. It happens when the file `/proc/net/snmp` does not exist. You can install it by executing these commands. On Debian/Ubuntu:
+
+```
+apt-get install snmpd
+```
+
+On CentOS:
+
+```
+yum install net-snmp net-snmp-utils
+```
+
+Then restart the monitor:
+
+```bash
+cd /home/tcadmin/Monitor
+./monitor-service restart
+```
+
+### Error writing request: The authentication or decryption has failed.
+
+Fix this error by executing these commands. Replace 2.11.4 with the mono version that you are currently running.
+
+```bash
+/opt/mono-2.11.4/bin/mozroots --import --sync --quiet
+/home/tcadmin/Monitor/monitor-service restart
+```
+
+### Access to the path "/home/tcadmin/*" is denied.
+
+Fix this error by executing these commands.
+
+```
+chown --recursive tcadmin:tcadmin /home/tcadmin
+/home/tcadmin/Monitor/monitor-service restart
+```
+
+### Communication errors between Linux monitors
+
+If you see a connection error when you go to Servers and click on Show Versions or if the page freezes when trying to create a game server on the remote server:
+
+- Make sure both servers have Mono 4.8 or greater.
+- Edit /home/tcadmin/Monitor/tcadmin-config. Uncomment this line at the bottom and restart the monitor:
+
+```
+export MONO_TLS_PROVIDER=legacy
+```
+
+- If the Mono versions are correct and you are still having issues try disabling keep alive in the router/firewall tab in both server's settings and restart both monitors.
+
+- Edit the master and remote's `/home/tcadmin/Monitor/TCAdminMonitor.exe.config`. Change the value of `TCAdmin.WebServices.KeepAlive` to False:
+
+```
+<add key="TCAdmin.WebServices.KeepAlive" value="False" />
+```
+
+- If none of the above fix the error add this line to both server's `/home/tcadmin/Monitor/TCAdminMonitor.exe.config` under `<appSettings>`:
+
+
+```
+<add key="TCAdmin.ForceStandardPort" value="True" />
+```
+
+### SMTP AUTH is required for message submission on port 587
+
+- On cPanel reset the Exim configuration to `Reset the entire Exim configuration to the default settings provided with cPanel & WHM`.
+- Added the TCAdmin IP to `Trusted SMTP IP addresses`.
+- Added the TCAdmin IP to `Whitelist: IP addresses that should not be checked against RBLs`.
+
+#### On TCadmin mail server settings:
+
+- SSL/TLS Mode: Disabled.
+- Server: cPanel IP or DNS.
+- Port: 587.
+- User: The email login.
+- Password: The email password.
+
+### Wrong CPU usage in server widget
+
+#### Install sysstat.
+
+CentOS:
+
+```bash
+yum install sysstat
+```
+
+Ubuntu/Debian:
+
+```bash
+apt-get install sysstat
+```
+
+Edit `/home/tcadmin/Monitor/tcadmin-config`. Add this line at the end:
+
+```
+export TCA_TOTAL_CPU_USAGE_METHOD=mpstat
+```
+
+Then restart the monitor:
+
+```
+/home/tcadmin/Monitor/monitor-service restart
+```
+
+### Running a game server with wine can make the log viewer hang with high CPU usage
+
+Add this line to the script configured as the game server's execute:
+
+```
+export HOME=/home/`whoami`
+```
+
+### SteamCMD Disk write failure
+
+This can be fixed by deleting the SteamCMD folders.
+
+```
+rm -fr /home/tcadmin/Monitor/Tools/SteamCmd
+rm -fr /home/tcagame/SteamCmd
+```
+
+### SteamCMD Waiting for user info...FAILED (Timed out)
+
+CentOS:
+
+```bash
+yum install SDL2
+```
+
+Ubuntu/Debian:
+
+```bash
+apt install libsdl2-dev
+```
+
+## CloudFlare
+
+### File manager upload/download works but web console/log streaming doesn't
+
+- Disable response buffering in your CloudFlare configuration. [https://developers.cloudflare.com/support/network/setting-up-response-buffering/](https://developers.cloudflare.com/support/network/setting-up-response-buffering/)
+- If you use CloudFlare's free tier: In the CF control panel, click on Speed > optimization > Content Optimization. Make sure that under Auto-Minify, HTML is checked, Javascript unchecked. Go to Caching after that and purge the entire cache.
+- Railgun is known to affect streaming of logs and web console even if Cloudflare is not enabled in your TCAdmin subdomain.
+
+### Web console does not scroll automatically when using Cloudflare
+
+- disable Brotli
+
+![Disable Brotli](/img/using-tca/disable-brotli.png)

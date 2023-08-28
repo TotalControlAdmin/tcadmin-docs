@@ -1,0 +1,42 @@
+---
+sidebar_position: 12
+sidebar_label: Restart service when last player disconnects
+---
+
+# Restart service when last player disconnects
+
+## Create the scripts
+
+Go to the game's settings. Click on the Custom Scripts icon. Add the following script. This can also be configured as a global script.
+
+**Operating System:** Any  
+**Description:** Restart game server after the last player disconnects  
+**Script Engine:** IronPython  
+**Event:** Query Monitoring  
+**Ignore execution errors:** Checked  
+**Script:** 
+
+```python
+import clr
+import System
+from System import String
+
+if QueryResults.Running == False :
+  Script.Exit()
+
+NumPlayers = QueryResults.NumPlayers
+LastNumPlayers = 0
+
+if ThisService.Variables.HasValue("LastNumPlayers") :
+  LastNumPlayers = ThisService.Variables["LastNumPlayers"]
+
+Script.WriteToConsole(String.Format("{0} - Previous Players: {1} Current Players: {2}", ThisService.ConnectionInfo, LastNumPlayers, NumPlayers))
+
+if LastNumPlayers > 0 and NumPlayers == 0 :
+  Script.WriteToConsole(String.Format("{0} - Last player disconnected. Restarting...", ThisService.ConnectionInfo))
+  ThisService.Restart()
+
+if NumPlayers != LastNumPlayers or ThisService.Variables.HasValue("LastNumPlayers") == False:
+  ThisService.Variables["LastNumPlayers"] = NumPlayers
+  ThisService.Save()
+```

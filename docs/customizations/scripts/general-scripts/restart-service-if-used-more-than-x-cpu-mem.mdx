@@ -1,0 +1,109 @@
+---
+sidebar_position: 11
+sidebar_label: Restart service if used more than x cpu or memory for the last 3 queries
+---
+
+# Restart service if used more than x cpu or memory for the last 3 queries
+
+## Create a query monitoring rule
+
+In the game's query monitoring add this rule and configure it to restart the service:
+
+```
+HighResources=True
+```
+
+## Create the scripts
+
+Go to the game's settings. Click on the Custom Scripts icon. Add the following scripts. Then click on Update Existing Services in the game's settings. These can also be configured as global scripts.
+
+**Operating System:** Any  
+**Description:** Check resource usage.  
+**Script Engine:** IronPython  
+**Event:** Query Monitoring  
+**Ignore execution errors:** Checked  
+**Script:** 
+
+```python
+import clr
+import System
+clr.AddReference("TCAdmin.SDK")
+
+from System.Collections.Generic import List
+from System.IO import Path, File
+from System import String
+from TCAdmin.SDK.Misc import ObjectXml
+
+#Script parameters. Change values as needed.
+MaxStoredValues=3
+MaxCPU=50
+MaxMemoryMB=4096
+CPUFile=Path.Combine(ThisService.RootDirectory, "cpu.xml")
+MemoryFile=Path.Combine(ThisService.RootDirectory, "memory.xml")
+
+#Read CPU and memory values stored in files
+if File.Exists(CPUFile) :
+  CPUValues = ObjectXml.XmlToObject(File.ReadAllText(CPUFile), (List[float]()).GetType())
+else :
+  CPUValues = List[float]()
+
+if File.Exists(MemoryFile) :
+  MemoryValues = ObjectXml.XmlToObject(File.ReadAllText(MemoryFile), (List[float]()).GetType())
+else :
+  MemoryValues = List[float]()
+ 
+#Add current CPU and memory values
+CPUValues.Add(ThisService.Status.CpuLastSecond)
+MemoryValues.Add(ThisService.Status.MemoryLastSecond/1024/1024)
+
+#Limit stored values to specified length
+while CPUValues.Count > MaxStoredValues :
+  CPUValues.RemoveAt(0)
+while MemoryValues.Count > MaxStoredValues :
+  MemoryValues.RemoveAt(0)
+
+#Save values to files
+File.WriteAllText(CPUFile, ObjectXml.ObjectToXml(CPUValues))
+File.WriteAllText(MemoryFile, ObjectXml.ObjectToXml(MemoryValues))
+
+#Check if stored values are higher than limits
+AllCPUHigher=True
+if CPUValues.Count == MaxStoredValues :
+  for i in range(0, MaxStoredValues - 1):
+    if CPUValues.Item[i] < MaxCPU :
+      AllCPUHigher=False
+else :
+  AllCPUHigher=False
+   
+AllMemoryHigher=True
+if MemoryValues.Count == MaxStoredValues :
+  for i in range(0, MaxStoredValues - 1):
+    if MemoryValues.Item[i] < MaxMemoryMB :
+      AllMemoryHigher=False
+else :
+  AllMemoryHigher=False
+
+if AllCPUHigher | AllMemoryHigher :
+  Script.WriteToConsole(String.Format("High resources detected for {0}", ThisService.ConnectionInfo))
+  QueryResults.Rules.Add("HighResources", "True")
+```
+
+**Operating System:** Any  
+**Description:** Delete CPU and memory files.  
+**Script Engine:** IronPython  
+**Event:** Before Started  
+**Ignore execution errors:** Checked  
+**Script:** 
+
+```python
+import clr
+import System
+from System.IO import Path, File
+CPUFile=Path.Combine(ThisService.RootDirectory, "cpu.xml")
+MemoryFile=Path.Combine(ThisService.RootDirectory, "memory.xml")
+
+if File.Exists(CPUFile) :
+ File.Delete(CPUFile)
+if File.Exists(MemoryFile) :
+ File.Delete(MemoryFile)
+```

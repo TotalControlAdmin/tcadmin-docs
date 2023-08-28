@@ -1,0 +1,143 @@
+---
+sidebar_position: 3
+sidebar_label: Improve MySQL Connection Speed
+---
+
+# Improve MySQL Connection Speed
+
+## Disable name resolve
+
+To improve MySQL connection speed or fix the "Server did not respond within the specified timeout interval" error add skip-name-resolve to your MySQL server's my.ini or my.cnf under [mysqld]. Then restart the MySQL server.
+
+```
+[mysqld]
+skip-name-resolve
+```
+
+:::caution
+Sometimes if you disable name resolve you lose the ability to log in with root@localhost. If this happens enable name resolve again and create root@127.0.0.1
+:::
+
+## MySQL Query Cache
+
+If you have query cache enabled use MySQL Workbench to monitor your client connections. Set refresh to 0.5 seconds. If you see "waiting for query cache lock" every once in a while you might get better performance with query cache disabled.
+
+## Change the tables to the InnoDB engine
+
+If you have a large database you can improve performance by changing your tables to the InnoDB engine. Execute these commands on your database:
+
+```sql
+ALTER TABLE tc_api_config ENGINE = InnoDB;
+ALTER TABLE tc_company_info ENGINE = InnoDB;
+ALTER TABLE tc_countries ENGINE = InnoDB;
+ALTER TABLE tc_custom_variables ENGINE = InnoDB;
+ALTER TABLE tc_datacenters ENGINE = InnoDB;
+ALTER TABLE tc_datasource_fields ENGINE = InnoDB;
+ALTER TABLE tc_dc_licenses ENGINE = InnoDB;
+ALTER TABLE tc_default_variables ENGINE = InnoDB;
+ALTER TABLE tc_dynamic_form_items ENGINE = InnoDB;
+ALTER TABLE tc_dynamic_forms ENGINE = InnoDB;
+ALTER TABLE tc_file_providers ENGINE = InnoDB;
+ALTER TABLE tc_file_servers ENGINE = InnoDB;
+ALTER TABLE tc_fileserver_reports ENGINE = InnoDB;
+ALTER TABLE tc_game_bukkit_config ENGINE = InnoDB;
+ALTER TABLE tc_game_cmdlines ENGINE = InnoDB;
+ALTER TABLE tc_game_config_files ENGINE = InnoDB;
+ALTER TABLE tc_game_fast_download ENGINE = InnoDB;
+ALTER TABLE tc_game_general_config ENGINE = InnoDB;
+ALTER TABLE tc_game_identity ENGINE = InnoDB;
+ALTER TABLE tc_game_keys ENGINE = InnoDB;
+ALTER TABLE tc_game_links ENGINE = InnoDB;
+ALTER TABLE tc_game_mail_templates ENGINE = InnoDB;
+ALTER TABLE tc_game_map_packs ENGINE = InnoDB;
+ALTER TABLE tc_game_mods ENGINE = InnoDB;
+ALTER TABLE tc_game_packages ENGINE = InnoDB;
+ALTER TABLE tc_game_paths ENGINE = InnoDB;
+ALTER TABLE tc_game_permissions ENGINE = InnoDB;
+ALTER TABLE tc_game_ports ENGINE = InnoDB;
+ALTER TABLE tc_game_protocols ENGINE = InnoDB;
+ALTER TABLE tc_game_punkbuster_config ENGINE = InnoDB;
+ALTER TABLE tc_game_query_monitoring ENGINE = InnoDB;
+ALTER TABLE tc_game_scripts ENGINE = InnoDB;
+ALTER TABLE tc_game_service_custom_cmdlines ENGINE = InnoDB;
+ALTER TABLE tc_game_service_detailed_stats ENGINE = InnoDB;
+ALTER TABLE tc_game_service_historical_stats ENGINE = InnoDB;
+ALTER TABLE tc_game_service_live_stats ENGINE = InnoDB;
+ALTER TABLE tc_game_service_workshop_files ENGINE = InnoDB;
+ALTER TABLE tc_game_services ENGINE = InnoDB;
+ALTER TABLE tc_game_spiget_config ENGINE = InnoDB;
+ALTER TABLE tc_game_steam_config ENGINE = InnoDB;
+ALTER TABLE tc_game_templates ENGINE = InnoDB;
+ALTER TABLE tc_game_text_console ENGINE = InnoDB;
+ALTER TABLE tc_game_tracker_config ENGINE = InnoDB;
+ALTER TABLE tc_game_updates ENGINE = InnoDB;
+ALTER TABLE tc_game_variables_config ENGINE = InnoDB;
+ALTER TABLE tc_game_web_console ENGINE = InnoDB;
+ALTER TABLE tc_games ENGINE = InnoDB;
+ALTER TABLE tc_global_game_scripts ENGINE = InnoDB;
+ALTER TABLE tc_info ENGINE = InnoDB;
+ALTER TABLE tc_installed_plugins ENGINE = InnoDB;
+ALTER TABLE tc_lang_datasource_fields ENGINE = InnoDB;
+ALTER TABLE tc_lang_page_icons ENGINE = InnoDB;
+ALTER TABLE tc_lang_panelbar_categories ENGINE = InnoDB;
+ALTER TABLE tc_lang_properties ENGINE = InnoDB;
+ALTER TABLE tc_lang_site_map ENGINE = InnoDB;
+ALTER TABLE tc_languages ENGINE = InnoDB;
+ALTER TABLE tc_mail_config ENGINE = InnoDB;
+ALTER TABLE tc_mail_template_types ENGINE = InnoDB;
+ALTER TABLE tc_mail_templates ENGINE = InnoDB;
+ALTER TABLE tc_module_commands ENGINE = InnoDB;
+ALTER TABLE tc_module_processes ENGINE = InnoDB;
+ALTER TABLE tc_module_server_components ENGINE = InnoDB;
+ALTER TABLE tc_modules ENGINE = InnoDB;
+ALTER TABLE tc_object_required_permissions ENGINE = InnoDB;
+ALTER TABLE tc_packages ENGINE = InnoDB;
+ALTER TABLE tc_page_icon_categories ENGINE = InnoDB;
+ALTER TABLE tc_page_icons ENGINE = InnoDB;
+ALTER TABLE tc_panelbar_categories ENGINE = InnoDB;
+ALTER TABLE tc_permission_categories ENGINE = InnoDB;
+ALTER TABLE tc_permissions ENGINE = InnoDB;
+ALTER TABLE tc_private_networks ENGINE = InnoDB;
+ALTER TABLE tc_recurring_tasks ENGINE = InnoDB;
+ALTER TABLE tc_role_permissions ENGINE = InnoDB;
+ALTER TABLE tc_roles ENGINE = InnoDB;
+ALTER TABLE tc_script_engines ENGINE = InnoDB;
+ALTER TABLE tc_security ENGINE = InnoDB;
+ALTER TABLE tc_server_enabled_components ENGINE = InnoDB;
+ALTER TABLE tc_server_ips ENGINE = InnoDB;
+ALTER TABLE tc_servers ENGINE = InnoDB;
+ALTER TABLE tc_services ENGINE = InnoDB;
+ALTER TABLE tc_site_map ENGINE = InnoDB;
+ALTER TABLE tc_support_categories ENGINE = InnoDB;
+ALTER TABLE tc_support_config ENGINE = InnoDB;
+ALTER TABLE tc_support_ticket_attachments ENGINE = InnoDB;
+ALTER TABLE tc_support_ticket_replies ENGINE = InnoDB;
+ALTER TABLE tc_support_tickets ENGINE = InnoDB;
+ALTER TABLE tc_task_categories ENGINE = InnoDB;
+ALTER TABLE tc_task_steps ENGINE = InnoDB;
+ALTER TABLE tc_tasks ENGINE = InnoDB;
+ALTER TABLE tc_teamspeak_permissions ENGINE = InnoDB;
+ALTER TABLE tc_teamspeak_servers ENGINE = InnoDB;
+ALTER TABLE tc_teamspeak_service_snapshots ENGINE = InnoDB;
+ALTER TABLE tc_teamspeak_services ENGINE = InnoDB;
+ALTER TABLE tc_user_messages ENGINE = InnoDB;
+ALTER TABLE tc_user_packages ENGINE = InnoDB;
+ALTER TABLE tc_user_widgets ENGINE = InnoDB;
+ALTER TABLE tc_usercontrols ENGINE = InnoDB;
+ALTER TABLE tc_users ENGINE = InnoDB;
+```
+
+## Increase the value of innodb_buffer_pool_size in my.ini
+Execute this query in your mysql server.
+
+```sql
+SELECT CEILING(Total_InnoDB_Bytes*1.6/POWER(1024,3)) RIBPS FROM
+(SELECT SUM(data_length+index_length) Total_InnoDB_Bytes
+FROM information_schema.tables WHERE engine='InnoDB') A;
+```
+
+Set that value in my.ini in gigabytes. For example if it returns 5 update the value of innodb_buffer_pool_size like this:
+
+```
+innodb_buffer_pool_size=5G
+```

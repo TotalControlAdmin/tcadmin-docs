@@ -1,0 +1,32 @@
+---
+sidebar_position: 2
+sidebar_label: Mail Templates
+---
+
+# Mail Templates
+
+## Overview
+Mail Templates are configured in `System` > `General Settings` > `Mail Templates`. TCAdmin includes all required templates by default. You can create new ones in case you need a custom template for a specific game.
+
+Resellers can have their own templates. By default, the ones configured at the administrator level are used.
+
+It is recommended that you use the Company Info variables (`General Settings` > `Company Info`) instead of entering your company information directly into the template. This way, the reseller only needs to update their own company info and does not need to change the mail templates.
+
+## Creating/Modifying a Template
+To modify a template, simply click on it. To create a new one, click the *New* button. You will be asked to select which email template it will be based on. Available variables change depending on the template type.
+
+- **Template Name**: The name used to identify the template.
+- **Enable this template**: Disable this template if you want to prevent it from being sent.
+- **"From" Name**: The name shown in the 'from' mail header. Leave blank to use the default value.
+- **"From" Email**: The email shown in the 'from' mail header. Leave blank to use the default value.
+- **To Emails**: A list of emails separated by ';' where a copy of the message will be sent.
+- **CC Emails**: A list of emails separated by ';' where a copy of the message will be sent.
+- **BCC Emails**: A list of emails separated by ';' where a copy of the message will be sent.
+- **To Roles**: A list of roles separated by ';' where a copy of the message will be sent.
+- **CC Roles**: A list of roles separated by ';' where a copy of the message will be sent.
+- **BCC Roles**: A list of roles separated by ';' where a copy of the message will be sent.
+- **Subject**: The template's subject. It can contain variables from the list above.
+- **Body**: The message's body. HTML and plain text formats can be specified. Leave the HTML template blank to always send the email message in plain text. Enter both templates if you want the email client to determine which format to use.
+
+## Default Mail Templates
+In case you have modified the mail templates included in TCAdmin, you can find the original templates here.

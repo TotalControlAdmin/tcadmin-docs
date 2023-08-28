@@ -1,0 +1,28 @@
+---
+sidebar_position: 3
+sidebar_label: Custom RCON Protocol
+---
+
+# Custom RCON Protocol
+
+You can set a custom script that executes RCON commands on the game server. This is useful if you want to add RCON support for games that don't have a supported RCON protocol.
+
+Create a custom script. Set the script's event to "Custom RCON". Set the game's RCON protocol to "Custom".
+
+The following example uses `TCAdmin2\MonitorTools\\mcrcon.exe` to execute RCON commands on the game server.
+
+```python
+import clr;
+import System;
+from System import String, Environment, PlatformID;
+from System.IO import Directory, Path;
+from System.Diagnostics import Process;
+p = Process();
+p.StartInfo.FileName=Path.Combine(Directory.GetCurrentDirectory(), "Tools\\mcrcon.exe");
+p.StartInfo.Arguments=String.Format("-c -H {0} -P {1} -p \"{2}\" \"{3}\"", ThisService.IpAddress, ThisService.RConPort, RConPassword, RConCommand);
+p.StartInfo.WorkingDirectory=Path.Combine(Directory.GetCurrentDirectory(), "Tools");
+p.StartInfo.UseShellExecute = False;
+p.StartInfo.RedirectStandardOutput = True;
+p.Start();
+ReturnValue= p.StandardOutput.ReadToEnd();
+```

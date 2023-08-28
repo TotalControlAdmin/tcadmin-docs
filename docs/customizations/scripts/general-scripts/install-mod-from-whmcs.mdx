@@ -1,0 +1,100 @@
+---
+sidebar_position: 7
+sidebar_label: Install mod from WHMCS
+---
+
+# Install mod from WHMCS
+
+## Game Mods
+
+The following Iron python script will install a mod after the game server has been created. Create a variable named "ModToInstall". Configure WHMCS to send the mod id to be installed after creating the game server. Configure it for the game's after created event. The script and variable can be configured as global.
+
+```python
+import clr;
+import System;
+ 
+if (not ThisService.Variables.HasValue("ModToInstall")) or ThisService.Variables["ModToInstall"] == "":
+  Script.Exit()
+ 
+clr.AddReference("TCAdmin.SDK");
+clr.AddReference("TCAdmin.GameHosting.SDK");
+clr.AddReference("TCAdmin.GameHosting.ModuleApi");
+clr.AddReference("TCAdmin.TaskScheduler.SDK");
+ 
+from System import String;
+from TCAdmin.SDK.Misc import ObjectXml;
+from TCAdmin.GameHosting.SDK.Automation import GameHostingModInstallInfo;
+from TCAdmin.GameHosting.ModuleApi import ModuleDef;
+from TCAdmin.TaskScheduler.SDK.Objects import TaskStep;
+ 
+modinfo = GameHostingModInstallInfo();
+GameHostingModInstallInfo.ServiceId.SetValue(modinfo, ThisService.ServiceId);
+GameHostingModInstallInfo.ModId.SetValue(modinfo, int(ThisService.Variables["ModToInstall"]));
+GameHostingModInstallInfo.Variables.SetValue(modinfo, String.Empty);
+ 
+modstep = TaskStep();
+modstep.TaskId = ThisTaskStep.Arguments.TaskId;
+modstep.ModuleId = ModuleDef.ModuleId;
+modstep.ProcessId = 8;
+modstep.ServerId = ThisService.ServerId;
+modstep.Name = "Install mod";
+modstep.Arguments = ObjectXml.ObjectToXml(modinfo);
+modstep.GenerateKey();
+modstep.Save();
+```
+
+## Minecraft Mod Packs
+
+The following Iron python script will install a mod pack after the game server has been created. You can use this script for minecraft mod packs. Create a variable named "ModToInstall". Configure WHMCS to send the mod to be installed after creating the game server. Configure it for the game's after created event. In this example if the value of ModToInstall is "RLCraft 1.12.2" it will install that version of RLCraft. You will need to add other modpack ids as needed.
+
+You can find PackId, VersionId and ModType of any mod pack with your web browser's developer console. Press F12. Select the network tab. Install a mod and view the install request to get the values of modid, version and type.
+
+```python
+import clr
+import System
+from System import Exception
+ 
+clr.AddReference("TCAdmin.SDK")
+clr.AddReference("TCAdmin.GameHosting.SDK")
+clr.AddReference("TCAdmin.GameHosting.ModuleApi")
+clr.AddReference("TCAdmin.TaskScheduler.SDK")
+ 
+from System import String
+from TCAdmin.SDK.Database import XmlField
+from TCAdmin.GameHosting.ModuleApi import ModuleDef
+from TCAdmin.TaskScheduler.SDK.Objects import TaskStep
+ 
+if (not ThisService.Variables.HasValue("ModToInstall")) or ThisService.Variables["ModToInstall"] == "":
+  Script.Exit()
+ 
+PackId = 0
+VersionId = 0
+ModType = ""
+   
+if ThisService.Variables["ModToInstall"] == "RLCraft 1.12.2" :
+  PackId = 285109
+  VersionId = 3655670
+  ModType = "curseforge"
+ 
+if PackId == 0 :
+  raise Exception("Value '{0}' for ModToInstall is not valid".format(ThisService.Variables["ModToInstall"]))
+ 
+modpackinfo = """<?xml version="1.0" encoding="utf-16"?>
+<ModpackInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <ServiceId>{0}</ServiceId>
+  <ModpackId>{1}</ModpackId>
+  <VersionId>{2}</VersionId>
+  <Type>{3}</Type>
+  <JarVariable>{4}</JarVariable>
+</ModpackInfo>""".format(ThisService.ServiceId, PackId, VersionId, ModType, "customjar")
+ 
+modstep = TaskStep()
+modstep.TaskId = ThisTaskStep.Arguments.TaskId
+modstep.ModuleId = "b48cfbc9-7acc-4980-89c4-2b6a1f784aa0"
+modstep.ProcessId = 1
+modstep.ServerId = ThisService.ServerId
+modstep.Name = "Install modpack"
+modstep.Arguments = modpackinfo
+modstep.GenerateKey()
+modstep.Save()
+```
