@@ -5,7 +5,7 @@ sidebar_label: MVC Templates
 
 # MVC Templates
 
-MVC Templates allow you to edit the HTML for all or each individual page. If you only want to edit colors of the theme see [MVC Themes](#).
+MVC Templates allow you to edit the HTML for all or each individual page. If you only want to edit colors of the theme see [MVC Themes](/customizations/themes/mvc-templates).
 
 ## Features
 
@@ -44,8 +44,8 @@ New installations already have MVC enabled by default
 ```
 - Restart the monitor service.
 
-:::danger Important for Linux users
-Https is not supported by the built in web server when `TCAdmin.Public.MVC` is set to True. To use https you must [**configure your control panel with Nginx**](#).
+:::warning Important for Linux users
+Https is not supported by the built in web server when `TCAdmin.Public.MVC` is set to True. To use https you must [**configure your control panel with Nginx**](/customizations/web-server-configurations/setting-up-nginx).
 :::
 
 ## Update the WHMCS module (optional)
@@ -54,11 +54,11 @@ Make a backup of your `/whmcs/modules/servers/tcadmin2_advanced/tcadmin2_advance
 
 ## Linux Nginx configuration (optional)
 
-Configure Nginx with these instructions [Configure TCAdmin to run with Nginx](#)
+Configure Nginx with these instructions [Configure TCAdmin to run with Nginx](/customizations/web-server-configurations/setting-up-nginx)
 
 ## Windows IIS configuration (optional) 
 
-Configure the website in IIS with these instructions: [Configure TCAdmin to run with IIS](#)
+Configure the website in IIS with these instructions: [Configure TCAdmin to run with IIS](/customizations/web-server-configurations/setting-up-iis)
 
 ## Edit Templates in Visual Studio 2017/2019
 

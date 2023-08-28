@@ -321,3 +321,69 @@ case "2GB":
 - Select your reseller product in WHMCS. In the module settings tab set the config file to reseller.php
 
 ### Other configuration parameters
+
+- **game_start / voice_start**
+  - Start the service after it has been created.
+  - Allowed values are 1 and 0.
+  - The default value is 1.
+
+- **game_startup / voice_startup**
+  - Specify the service's startup.
+  - Allowed values are Automatic, Manual, Disabled.
+  - The default value is Automatic.
+
+- **game_additional_slots / voice_additional_slots**
+  - Value added to game_slots.
+  - Default value is 0.
+
+- **game_priority / voice_priority**
+  - Specify the CPU priority.
+  - Allowed values are Idle, BelowNormal, Normal, AboveNormal, High, RealTime.
+  - The default value is Normal.
+
+- **game_server / voice_server**
+  - Specify the server id for service creation.
+  - Can be used instead of game_datacenter.
+
+- **game_cpu / voice_cpu**
+  - Specify a value from 1 to 100 (Windows) or 1 to (100 x number of processors) (Linux).
+  - See [Limit Service CPU and Memory Usage **(Windows)**](/misc/limit-service-cpu-andmemory-usage#windows).
+  - See [Limit Service CPU and Memory Usage **(Linux)**](/misc/limit-service-cpu-andmemory-usage#linux).
+
+- **game_memory / voice_memory**
+  - Specify the max allowed memory in MB.
+
+- **game_virtual_memory / game_virtual_memory**
+  - Specify the max allowed virtual memory in MB (Windows only).
+
+### Specifying Different Module Value and Display Value
+
+In WHMCS, you can configure dropdowns and radios to send a different value to the module than the one that is displayed in the order form. This is useful because you must send ids to the TCAdmin billing api but you want to show a friendly name to the client. The module value and display value are separated by the pipe character "|". The format is ModuleValue|DisplayValue For example: You can create a dropdown list that has the locations New York and Dallas but you want the billing api to receive the datacenter ids 1 and 2. You can create a `Custom Field` of type `Drop Down` with these options: 1|Dallas,2|NewYork
+
+### Troubleshooting
+
+- The values sent to TCAdmin are saved in the log file `/home/tcadmin/Logs/Web/BillingApi.LastCommand.log` or `C:\Program Files\TCAdmin2\Logs\Web\BillingApi.LastCommand.log` Make sure TCAdmin is receiving the correct values. The values required to create a game server are: game_id, game_slots, game_datacenter.
+- If TCAdmin accepts the values a scheduled task is created. If the game server is never created go to System > General Settings > Scheduled Tasks. Select the Day view and click on the task that was created. You should see the error message preventing the game server from being created. Correct the problem and start the task again. You don't need to send the command from WHMCS again.
+
+### Update Products and Services from tcadmin to tcadmin2_advanced
+
+If you are going to keep the same custom fields and configurable options in your products you need to follow these steps:
+- Update the module settings in the product. Switch from tcadmin to tcadmin2_advanced module and map the required tcadmin attributes to custom fields and configurable options.
+- Update the server field in the client's service.
+
+If you are going to change custom fields and configurable options we recommend you create a copy of the product and modify the copy (Duplicate link at the top of the products page). When the new product is ready go to the client's service. Change the package and server. Enter the correct values again and save.
+
+:::warning warning
+After you change the package all the values of custom fields and configurable options for that service will be lost and you will not be able to recover them.
+:::
+
+To enable direct client login from WHMCS to TCAdmin you must configure the serviceâs username and password. To disable this feature leave the username and password fields blank.
+
+### Cloudflare
+
+If Cloudflare is blocking requests to the billing api go to the `Cloudflare control panel` > Security > Web Application Firewall (WAF) > Tools and allow your WHMCS IP.
+
+![WHMCS_WAF](/img/billing-api/WHMCS_WAF.png)
+
+![WHMCS_WAF2](/img/billing-api/WHMCS_WAF2.png)
+

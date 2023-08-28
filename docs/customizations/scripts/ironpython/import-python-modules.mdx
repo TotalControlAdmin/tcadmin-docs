@@ -2,11 +2,16 @@
 sidebar_label: Import Python Modules
 sidebar_position: 1
 ---
+
+# Import Python Modules
+
 IronPython is regular Python but with the option of using .NET classes or DLL files (e.g. the TCAdmin SDK).
 
 ## Use .NET in IronPython
+
 If you want to use any of the .NET classes, you will need to import them into the IronPython script like you would in Python. Before using any .NET classes, you will need to import the clr module, however.
 This is an example of how to use the .NET WebClient class, so we can use the `DownloadFile()` method:
+
 ```py
 from System.Net import WebClient
 from System.IO import Path
@@ -20,7 +25,9 @@ except Exception as e:
 ```
 
 ## Use the TCAdmin SDK
+
 Before you can use the TCAdmin SDK (or any DLL files for that matter), you need to reference them first. This is done by using the `clr.AddReference()` method.
+
 ```py
 import clr
 clr.AddReference('TCAdmin.SDK')
@@ -32,7 +39,9 @@ Script.WriteToConsole(company_info.ControlPanelUrl)
 ```
 
 ## Use custom Python modules
+
 In some cases, you might need to use a module that is not included in the default Python library.
+
 ```py
 import sys
 sys.path.append('C:\\CustomPythonModules\\Lib')

@@ -1,65 +1,62 @@
 ---
-sidebar_position: 14
+sidebar_position: 3
 sidebar_label: Limit Service CPU and Memory Usage
 ---
 
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
-
 # Limit Service CPU and Memory Usage
 
-<Tabs>
-  <TabItem value="windows" label="Windows">
+:::warning
+If you updated your Windows server to TCAdmin **2.0.142** you must reboot before you can apply memory and CPU limits.
+:::
+
+## Windows
 
 ### Limiting a service's CPU usage
-:::tip
+
 The maximum value for CPU limit is 100%. CPU limit is affected by the number of cores assigned to the service or virtual server. For example if the service has 1 core assigned and limit is set to 50% the actual limit is 50% of 1 core.
-:::
 
 To set the CPU limit go to the game server's service settings, set the value of CPU limit and save. The CPU limit is applied immediately. The service does not need to be restarted.
 
 ### Limiting a service's memory and virtual memory
 
-:::info important notes
+:::note Important notes
+
 - If you limit a service's memory it will use more virtual memory. This can increase your server's disk activity.
 - If you set the virtual memory limit too low the service might crash while starting up or it might crash later if it requires more memory than allowed.
-- If you set the virtual memory limit and the service is currently using more than allowed you will have to restart it to apply the limit.
-- Memory usage might go slightly over 100%, specially if the game server is started with a .bat because it will add memory usage from cmd.exe and from the main exe.
+- If you set the virtual memory limit and the service is currently using more than allowed
 :::
 
 To set the memory or virtual memory limit go to the game server's service settings, set the values and save. The memory and virtual memory limit is applied immediately. The service does not need to be restarted.
 
 ### Virtual Servers
 
-:::info important notes
+:::note Important notes
+
 - When a service belongs to a virtual server the memory limit in service settings can't be set higher than the memory assigned to the virtual server.
 - A single process can't use more memory than what is assigned in the virtual server's settings even if there is no limit assigned in service settings.
 - CPU limit of a service is affected by the number of cores assigned to the service or virtual server. For example if the parent server has 16 cores, the virtual server has 4 cores and CPU limit of a service is set to 50% it will use up to 2 cores. In this case if you change the virtual server's cores the service needs to be restarted for the change to take effect.
 :::
 
+## Linux
 
-  </TabItem>
-    <TabItem value="linux" label="Linux">
-
- ### Limiting a service's CPU usage
+### Limiting a service's CPU usage
 
 Each core is 100%. The maximum value is 100 multiplied by the number of cores. For example 200% means 2 full cores.
+
 To set the CPU limit go to the game server's service settings, set the value of CPU limit and save. The CPU limit is applied after the service is restarted.
 
 ### Limiting a service's memory usage
 
 This feature is supported starting in TCAdmin version 2.0.161 and greater.
 
-:::warning
-**CentOS 7.9** does not support setting memory/virtual memory. If the game server crashes when setting memory or virtual memory set the limit to 0.
+:::caution
+CentOS 7.9 does not support setting memory/virtual memory. If the game server crashes when setting memory or virtual memory set the limit to 0.
 :::
-  </TabItem>
-</Tabs>
 
 ## Billing API
 
-- To limit the service's CPU configure your module to send a value for game_cpu
-- To limit the service's memory configure your module to send a value for game_memory or game_virtual_memory
+- To limit the service's CPU configure your module to send a value for `game_cpu`
+- To limit the service's memory configure your module to send a value for `game_memory` or `game_virtual_memory`
 - The billing api supports setting these values when creating a new service and when updating the settings.
 
 ## Scripting
