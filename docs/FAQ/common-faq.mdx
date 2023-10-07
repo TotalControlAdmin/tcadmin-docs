@@ -1,0 +1,155 @@
+---
+sidebar_position: 1
+sidebar_label: Common FAQ
+---
+
+# Common FAQ
+
+## General
+
+**Q1.** What should I do if there are no game servers available on the selected server?
+
+**A1.** If there are no game servers available on the selected server, follow these steps:
+
+- **Steam-Based Games:** TCAdmin does not include dedicated game files. STEAM-based games are freely available for download via STEAM. TCAdmin generates download scripts for STEAM games. You can find the scripts in the following directories:
+  - Windows: `C:\TCAFiles\Games`
+  - Linux: `/home/tcadmin/tcafiles/games`
+
+- **Non-Steam Games:** Some games have free downloadable dedicated server files, while others will require you to install the game on your computer, zip or compress the game directory, and upload the files to your server. Make sure to place the game's files in its subdirectory in either:
+  - Windows: `C:\TCAFiles\Games`
+  - Linux: `/home/tcadmin/tcafiles/games`
+
+**Q2.** What are the default ports used by TCAdmin?
+
+**A2.** The default ports used by TCAdmin are as follows:
+
+### For Windows:
+- **Web/Monitor:** 8880, 8881 TCP
+- **FTP:** 8821 TCP
+- **FTP Passive Mode:** 5000 to 5100 TCP
+- **SFTP (disabled by default):** 8822 TCP
+
+### For Linux:
+- **Web:** 8880, 8881 TCP
+- **Monitor:** 8890, 8891 TCP
+- **FTP:** 8821 TCP
+- **FTP Passive Mode:** 5000 to 5100 TCP
+- **SFTP (disabled by default):** 8822 TCP
+
+**Q3.** What compression formats are supported?
+
+**A3.** To know which compression formats are supported, please refer to the TCAdmin documentation under the section titled [See Compression.](/misc/compression/)
+
+**Q4.** How can I limit a game/voice server's disk space?
+
+**A4.** To limit a game or voice server's disk space, please follow the instructions provided in this article: [Limit Service's Disk Space](/customizations/scripts/general-scripts/limits-services-disk-space/).
+
+**Q5.** How can I delete the default game data?
+
+**A5.** To delete the default game data, execute the following commands on your database. Remember to make a backup of your database before proceeding:
+
+```sql
+DELETE FROM tc_games;
+DELETE FROM tc_game_paths;
+DELETE FROM tc_game_general_config;
+DELETE FROM tc_game_ports;
+DELETE FROM tc_game_cmdlines;
+DELETE FROM tc_game_punkbuster_config;
+DELETE FROM tc_game_query_monitoring;
+DELETE FROM tc_game_mail_templates;
+DELETE FROM tc_game_steam_config;
+DELETE FROM tc_game_identity;
+DELETE FROM tc_game_config_files;
+DELETE FROM tc_game_scripts;
+DELETE FROM tc_game_templates;
+DELETE FROM tc_game_permissions;
+DELETE FROM tc_game_variables_config;
+DELETE FROM tc_custom_variables;
+DELETE FROM tc_dynamic_forms;
+DELETE FROM tc_dynamic_form_items;
+DELETE FROM tc_game_tracker_config;
+DELETE FROM tc_game_mods;
+DELETE FROM tc_game_updates;
+DELETE FROM tc_game_map_packs;
+DELETE FROM tc_game_text_console;
+DELETE FROM tc_game_web_console;
+DELETE FROM tc_game_fast_download;
+DELETE FROM tc_game_bukkit_config;
+DELETE FROM tc_game_links;
+```
+
+**Q6.** How can I use random IDs instead of incremental IDs?
+
+**A6.** To use random IDs instead of incremental IDs, execute the following command on your database:
+
+```sql
+INSERT INTO tc_info (name, value) VALUES ('TCAdmin.RandomIds', 'True');
+```
+
+Alternatively, you can start the monitor in console mode and paste this command in the console:
+
+```sql
+sql INSERT INTO tc_info (name, value) VALUES ('TCAdmin.RandomIds', 'True');
+```
+
+**Q7.** How can I use a custom Web.config?
+
+**A7.** To use a custom Web.config, follow these steps:
+
+1. Make a copy of your Web.config and name it `Windows.Custom.config` or `Linux.Custom.config`.
+2. When the monitor is restarted, it will use a copy of that file as the new Web.config.
+
+## Game Configuration
+
+**Q8.** Why do Linux Game Details Show Fewer Options?
+
+**A8.** Game servers that run on both Windows and Linux usually have the same configuration, with only the executable name changing. To avoid duplicate configurations, the Windows version of the config serves as a template for the Linux config. If you want to make specific changes to the Linux version, follow these steps:
+
+- Select the Linux game.
+- Click on "Export" and save the file.
+- Go to the "Templates" tab.
+- Clear the template for each section and save.
+- Go back to the games list.
+- Click on "Import."
+- Select "Overwrite existing game."
+- Select the Linux game you are updating.
+- Select the config file that you downloaded.
+- Click on "Import."
+
+**Q9.** How can I disable the Text Editor for a Single File?
+
+**A9.** To disable the Text Editor for a single file, follow these steps:
+
+1. Go to "Settings" > "Games."
+2. Select the game's details and click on the "File System Permissions" icon.
+3. Expand subadmin, reseller, or user.
+4. Click on "Add permission by file name."
+5. Enter the file name that you want to block.
+6. Select "No permissions."
+7. Click on the "Add" button.
+8. Click on the "Save" button.
+
+You can also use "Add permission by file path." The difference is that this option will only block the file in the specified path. You can have files with the same name in other folders, and they will not be blocked. "Add permission by file name" blocks a file with that name in any folder.
+
+**Q10.** How can I allow access to *.jar, *.dll, and *.so files?
+
+**A10.** To allow access to these files, follow these steps:
+
+1. Go to "Settings" > "Games."
+2. Select the game. If you are running Linux, select the Windows version of the game.
+3. Select the "File System Permissions" icon.
+4. Expand subadmin, reseller, or user.
+5. Expand "Add permission by file name" and select the permission.
+6. Remove `*.jar`, `*.dll`, or `*.so` from the list.
+7. Click on the "Update" button.
+8. Click on the "Save" button.
+
+On Linux, if some files are still not visible, edit `/home/tcadmin/Monitor/Override.config` and set `RestrictLinuxExe` to `False`.
+
+**Q11.** How can I configure mods for a game?
+
+**A11.** Each mod installation is different depending on the game. TCAdmin can provide an overview of what you might need to do when configuring a mod. Read the Mod Configuration Page in the documentation for details.
+
+**Q12.** How can I limit the resource usage of a service?
+
+**A12.** You can specify CPU and memory limits in the game server's service settings. You can also use the game's query monitoring to create rules that check a service's CPU, memory, and bandwidth usage. Refer to the Query
