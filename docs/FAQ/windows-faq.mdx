@@ -1,0 +1,51 @@
+---
+sidebar_position: 2
+sidebar_label: Windows FAQ
+---
+
+# Windows FAQ
+
+## Configure the TCAdmin Website to Run with IIS
+
+**Q1.** How can I configure the TCAdmin website to run with IIS on Windows?
+
+**A1.** To configure the TCAdmin website to run with IIS on Windows, follow the instructions provided in the article titled [Setting Up IIS With TCAdmin.](/customizations/web-server-configurations/setting-up-iis)
+
+## Use a Custom SSL Certificate (Windows)
+
+**Q2.** How can I use a custom SSL certificate for the control panel website on Windows?
+
+**A2.** To use a custom SSL certificate for the control panel website on Windows, follow these steps: [Use Custom SSL Certificate (Windows)](/customizations/web-server-configurations/setting-up-iis#use-custom-ssl-certificate-windows-optional)
+
+## Enable Web Console for Game Servers with Text Console
+
+This method allows you to enable the web console for Windows game servers that have a text console, even if they don't create a log file with the output.
+
+**Q3.** How can I enable the web console for a game server with a text console on Windows?
+
+**A3.** To enable the web console for a game server with a text console on Windows, follow these steps:
+
+1. Go to "Settings" > "Games."
+2. Select the specific game for which you want to enable the web console.
+3. Navigate to the "Custom Scripts" section.
+
+4. Add a new batch script for the after-start event with the following command. Leave "Execute as the service's user" unchecked and set the order to 0:
+   ```batch
+   copy /y "%TCAdminFolder%\Monitor\Tools\TCAdminConsoleWrapper.exe" "%ThisService_RootDirectory%TCAdminConsoleWrapper.exe"
+   ```
+
+5. Add another batch script for the after-start event with this command. This time, check "Execute as the service's user" and set the order to 1:
+   ```batch
+   cd /d "%ThisService_RootDirectory%"
+   start TCAdminConsoleWrapper.exe -pid=%ThisService_Pid% -output=console.log
+   ```
+
+6. Return to the game settings.
+
+7. In the "Web Console" tab, enable the web console and set the web console output to `console.log`.
+
+8. Save your changes and click on "Update Existing Services."
+
+9. Go to the game server and restart it. If you click on the web console, it should work.
+
+Now, the web console should be enabled for your Windows game server with a text console, allowing you to access it via the TCAdmin control panel.

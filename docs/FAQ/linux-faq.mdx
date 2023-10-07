@@ -1,0 +1,124 @@
+---
+sidebar_position: 3
+sidebar_label: Linux FAQ
+---
+
+# Linux FAQ
+
+## Configure the Website on Port 80
+
+By default, the TCAdmin website user runs with a normal account, and normal users can't open ports lower than 1024. To work around this limitation, you can redirect port 80 to 8880 using iptables.
+
+**Q1.** How can I configure the website to run on port 80 on Linux?
+
+**A1.** To configure the TCAdmin website to run on port 80, follow these steps:
+
+1. Open a terminal on your Linux server.
+
+2. Use the following command to redirect incoming traffic from port 80 to port 8880 using iptables:
+   ```bash
+   iptables -A PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-port 8880
+   ```
+
+   If your server has more than one IP, and you want to redirect on a specific IP, use this command, replacing `1.2.3.4` with your server's IP address:
+   ```bash
+   iptables -A PREROUTING -t nat -p tcp --dport 80 -d 1.2.3.4 -j REDIRECT --to-port 8880
+   ```
+
+3. After making the changes, save your iptables settings. Use one of the following commands, depending on your Linux distribution:
+
+   For CentOS:
+   ```bash
+   service iptables save
+   ```
+
+   For Debian/Ubuntu:
+   ```bash
+   iptables-save
+   ```
+
+4. You have successfully configured the TCAdmin website to run on port 80, and incoming traffic will be redirected to port 8880.
+
+**Q2.** How can I redirect port 21 to port 8821 for FTP?
+
+**A2.** To redirect port 21 to port 8821 for FTP, you can use a similar iptables command:
+
+```bash
+iptables -A PREROUTING -t nat -p tcp --dport 21 -j REDIRECT --to-port 8821
+```
+
+This command will redirect FTP traffic from port 21 to port 8821.
+
+## Enable HTTPS for the Control Panel Website
+
+**Q3.** How can I enable HTTPS for the control panel website on Linux?
+
+**A3.** To enable HTTPS for the control panel website on Linux, follow these steps:
+
+1. Open the file `/home/tcadmin/Monitor/tcadmin-config` for editing.
+
+2. Add the following line to the file to specify the secure web port (e.g., 8881):
+   ```bash
+   SECURE_WEB_PORT="8881"
+   ```
+
+3. Open the necessary port in your firewall to allow HTTPS traffic. You can use a command like `firewall-cmd` to do this.
+
+4. After making these changes, restart the monitor service:
+   ```bash
+   /home/tcadmin/Monitor/monitor-service restart
+   ```
+
+Now, the control panel website should be accessible over HTTPS on the specified port.
+
+## Use a Custom SSL Certificate (Linux)
+
+**Q4.** How can I use a custom SSL certificate for the control panel website on Linux?
+
+**A4.** To use a custom SSL certificate for the control panel website on Linux, follow these steps: [Create a self signed certificate](/customizations/web-server-configurations/setting-up-nginx#create-a-self-signed-certificate-optional)
+
+This should allow you to use a custom SSL certificate for the control panel website.
+
+## Configure the TCAdmin Website to Run with Nginx
+
+**Q5.** How can I configure the TCAdmin website to run with Nginx on Linux?
+
+**A5.** To configure the TCAdmin website to run with Nginx on Linux, follow the instructions provided in the article titled [Setting Up Nginx With TCAdmin](/customizations/web-server-configurations/setting-up-nginx)
+
+## File Visibility Issues in FTP or File Manager
+
+**Q6.** Some/all files are not visible in FTP or the file manager. How can I resolve this issue?
+
+**A6.** By default, TCAdmin protects files with execute permissions. Only files that require execute permissions should have them. To remove execute permissions from a single file, use the following command:
+
+```bash
+chmod -x /path/to/file
+```
+
+To remove execute permissions for all files with a specific extension, you can use a command like this:
+
+```bash
+find /path/to/game/server/root -type f -name '*.cfg' -exec chmod -x {} \;
+```
+
+To fix this issue on all new game servers, update the permissions in `/home/tcadmin/tcafiles/games/gamefolder`.
+
+Another option is to set the value of `RestrictLinuxExe` to `False` in the server's `Override.config`. If you do this, it is recommended to use the game's File System Permissions to hide important files like the startup script and main binary.
+
+## Open Game Server Ports When Service Is Created (firewalld)
+
+**Q7.** How can I open game server ports when a service is created using firewalld?
+
+**A7.** To open game server ports automatically when a service is created using firewalld, you can configure a global game script for the game server's after-created event. Use the following commands as an example:
+
+```bash
+firewall-cmd --zone=public --permanent --add-port=${ThisService_GamePort}/tcp
+firewall-cmd --zone=public --permanent --add-port=${ThisService_GamePort}/udp
+firewall-cmd --zone=public --permanent --add-port=${ThisService_QueryPort}/tcp
+firewall-cmd --zone=public --permanent --add-port=${ThisService_QueryPort}/udp
+firewall-cmd --zone=public --permanent --add-port=${ThisService_RConPort}/tcp
+firewall-cmd --zone=public --permanent --add-port=${ThisService_RConPort}/udp
+firewall-cmd --reload
+```
+
+These commands will add the specified ports to the firewalld configuration, making them accessible for the game server service when it is created.
