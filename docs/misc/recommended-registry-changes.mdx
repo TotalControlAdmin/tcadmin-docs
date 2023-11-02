@@ -1,0 +1,37 @@
+---
+sidebar_position: 7
+sidebar_label: Recommended Registry Changes
+---
+
+# Recommended Registry Changes
+
+These registry changes adjust the memory available for desktop heaps created by non-interactive services. This resolves start errors that may happen on some servers a few days after a reboot.
+
+## Windows 2008/2012/2016/2019/2022
+
+Open the Registry (regedit.exe) and go to:
+
+```
+Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management
+```
+
+And adjust two keys:
+
+```
+SessionPoolSize (this is 4 by default, put it to be 10 - remember, 10 as hexadecimal)
+SessionViewSize (this is 30 by default, put it to 80 - again, hexadecimal)
+```
+
+Go to:
+
+```
+Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\SubSystems
+```
+
+Double-click on the Windows key. What is important (and the only thing that gets changed for that matter) is
+
+```
+SharedSection=1024,20480,2048
+```
+
+Close the registry and reboot the server for changes to take affect.
