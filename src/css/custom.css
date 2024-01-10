@@ -101,6 +101,28 @@
   box-shadow: inset 0 0 14px 14px transparent;
 }
 
+/* Gecko (Firefox) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #1062FE #0f1114;
+}
+
+/* Edge (Blink-based) */
+*::-ms-scrollbar {
+  background-color: #0f1114;
+  height: 6px;
+  width: 6px;
+}
+*::-ms-scrollbar-thumb {
+  background-color: var(--ifm-tabs-color-active);
+  border: 4px solid transparent;
+  border-radius: 8px;
+}
+*::-ms-scrollbar-track {
+  border: 4px solid transparent;
+  box-shadow: inset 0 0 14px 14px transparent;
+}
+
 /* Capitalize the h1 tags */
 h1 {
   text-transform: Capitalize;
