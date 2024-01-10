@@ -200,7 +200,7 @@ If your script starts a process that will be left running in the background it i
 "%TCAdminFolder%\Monitor\Tools\StartProcess.bat" -exec c:\myscripts\myexe.exe -workdir c:\myscripts
 ```
 
-:::caution
+:::warning
 Doing it any other way may prevent the FTP server to start correctly if the monitor is restarted.
 :::
 
@@ -312,7 +312,7 @@ If you need the code to execute when the user saves the file using the config ed
 
 **This feature is only available for MVC**. These are Iron Python scripts but the same can be done with batch/shell scripts. Make sure you have `Ignore execution errors` unchecked.
 
-:::caution
+:::warning
 This feature is not compatible with `Enable dynamic content compression` in IIS
 :::
 
