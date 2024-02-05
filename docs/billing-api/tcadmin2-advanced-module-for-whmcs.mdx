@@ -198,6 +198,12 @@ $billing_api_values["game_id_switch_1"]=10;
 $billing_api_values["game_id_switch_2"]=20;
 $billing_api_values["game_id_switch_3"]=30;
 ```
+### Game Switching from WHMCS
+
+Instead of sending the values explained above, you can switch the game directly from WHMCS by sending a different value for game_id from the WHMCS upgrade/downgrade function.
+To do this, go to the product's configuration. In the Upgrade tab select the allowed games. When the user upgrades his package the game server will be reinstalled with the new game.
+
+Optionally, you can send game_delete_on_switch=1 to delete the game server and create a new one. This way it will go through the process of finding a different server according to your billing API configuration.
 
 ### Custom Config File
 
