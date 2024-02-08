@@ -38,13 +38,12 @@ ThisService_StopCommandWait
 ThisService_StopDelay
 ThisService_WorkingDirectory
 ThisService_RunAsUserName
+ThisServiceController - In IronPython and C# scripts, this can be used to read and update values in the game server's `TCAdmin2\Monitor\Services\ServiceId\Service.cfg`.
 ```
 
 The following variables are available in the `After Started`, `Before Stopped` and `After Stopped` events.
 
 - `ThisService_Pid` - Id of the process that was started/stopped.
-
-- `ThisServiceController` - In IronPython and C# scripts, there is a variable named ThisServiceController. This can be used to read and update values in the game server's `TCAdmin2\Monitor\Services\ServiceId\Service.cfg`.
 
 :::note example
 
