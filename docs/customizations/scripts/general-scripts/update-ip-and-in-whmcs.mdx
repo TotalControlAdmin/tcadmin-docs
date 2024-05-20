@@ -70,26 +70,41 @@ except urllib2.HTTPError, e:
 **Script:** 
 
 ```python
-import clr
+import clr;
+import System;
 import urllib2
 import urllib
- 
-clr.AddReference("TCAdmin.GameHosting.SDK")
-from TCAdmin.GameHosting.SDK.Objects import Service
- 
-WHMCS_URL = "https://your-whmcs-site.com/includes/api.php"
+
+WHMCS_URL = 'https://your-whmcs-site.com/includes/api.php' 
 WHMCS_API_IDENTIFIER = "xxxxxxx"
 WHMCS_API_SECRET = "yyyyyyy"
- 
-AllServices = Service.GetServices()
- 
+WHMCS_API_ACCESS_KEY = "" 
+
+clr.AddReference("TCAdmin.GameHosting.SDK")
+from System import String
+from TCAdmin.GameHosting.SDK.Objects import Service, Server, Game
+
+#Check if run as a scheduled task. We check if ThisTaskStep.WriteLog is callable. If it is, set WriteLog = ThisTaskStep.WriteLog. If it is not, set WriteLog = WriteLog.
+try:
+    ThisTaskStep.WriteLog
+except NameError:
+    WriteLog1 = Script.WriteToConsole
+else:
+    WriteLog1 = ThisTaskStep.WriteLog
+
+def WriteLog(msg):
+  WriteLog1("[{0}] {1}".format(ThisService.ServiceId, msg))
+
+AllServices = list(filter(lambda s: s.BillingId !="", Service.GetServices()))
+
 for ThisService in AllServices:
-  Script.WriteToConsole("Updating " + ThisService.ConnectionInfo)
-  query = urllib.urlencode({'action' : 'UpdateClientProduct', 'username' : WHMCS_API_IDENTIFIER, 'password' : WHMCS_API_SECRET, 'serviceid' : ThisService.BillingId, 'domain' : ThisService.ConnectionInfo, 'responsetype' : 'json'})
   try:
-    urllib2.urlopen(WHMCS_URL, data=query)
+    query = urllib.urlencode({'action' : 'UpdateClientProduct', 'username' : WHMCS_API_IDENTIFIER, 'password' : WHMCS_API_SECRET, 'accesskey' : WHMCS_API_ACCESS_KEY, 'serviceid' : ThisService.BillingId, 'domain' : ThisService.ConnectionInfo, 'responsetype' : 'json'})
+    response = urllib2.urlopen(WHMCS_URL, data=query)
+    content = response.read()
+    Script.WriteToConsole(content)
   except urllib2.HTTPError, e:
-    Script.WriteToConsole("Error updating " + ThisService.ConnectionInfo + ": " + str(e.code) + " " + e.reason)
+    WriteLog(e.ToString())
 ```
 
 :::note
