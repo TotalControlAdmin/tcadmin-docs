@@ -83,14 +83,26 @@ If using Let's Encrypt, bind the website to a specific IP and hostname to preven
 Ensure that you assign the correct permissions to `IIS APPPOOL\.NET v4.5`. Missing or incorrect permissions can cause issues with the TCAdmin control panel.
 :::
 
-Grant full control to `IIS APPPOOL\.NET v4.5` on the following directories:
+1. Grant full control to `IIS APPPOOL\.NET v4.5` on the following directories:
 
-- `C:\Program Files\TCAdmin2\Cache`
-- `C:\Program Files\TCAdmin2\Temp`
-- `C:\Program Files\TCAdmin2\Logs\Web`
-- `C:\Program Files\TCAdmin2\ControlPanel`
-- `C:\Program Files\TCAdmin2\ControlPanel.MVC`
-- `C:\Program Files\TCAdmin2\Database`
+   - `C:\Program Files\TCAdmin2\Cache`
+   - `C:\Program Files\TCAdmin2\Temp`
+   - `C:\Program Files\TCAdmin2\Logs\Web`
+   - `C:\Program Files\TCAdmin2\ControlPanel`
+   - `C:\Program Files\TCAdmin2\ControlPanel.MVC`
+   - `C:\Program Files\TCAdmin2\Database`
+
+2. Under **"Connect as..."**, enter the user and password of the Windows user that runs your website.
+
+:::important TCAWeb Setup
+If using **TCAWeb**, start the monitor in **console mode** and execute `tcaweb-pass` to obtain the password or attach `TCAdmin2\Monitor\TCAWeb.config` to a support ticket for assistance.
+:::
+
+```bash
+tcaweb-pass
+```
+
+3. Configure the Aspx application to run with the same user as the main website.
 
 ## Step 4: Database Configuration
 
