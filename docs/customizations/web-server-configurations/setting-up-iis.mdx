@@ -5,122 +5,205 @@ sidebar_label: Setting up IIS with TCAdmin
 
 # Setting up IIS with TCAdmin
 
-## Install IIS with Support for ASP.NET 4.0/4.5 Development
+## Prerequisites
 
-1. Install IIS on your system with support for ASP.NET 4.0/4.5 development. ASP.NET development can be found in Server Roles -> Web Server (IIS) -> Application Development - > .NET Extensibility 4.x.
-
-## Set up SQLite Database
-
-1. Copy `TCAdmin2\Monitor\sqlite3.dll` to `C:\Windows\System32` if you are using an SQLite database.
-
-## Configure IIS
-
-1. Add the user `TCAWeb` to the `IIS_IUSRS` group.
-
-2. Manually create a website in IIS Manager:
-
-   - Web root: `Program Files\TCAdmin2\ControlPanel.MVC`
-   - Application pool: `.NET v4.5`
-
-3. In IIS Manager, right-click on the created website and select "Add Application":
-
-   - Name: `Aspx` (case-sensitive)
-   - Web root: `Program Files\TCAdmin2\ControlPanel`
-   - Application pool: `.NET v4.5`
-
-4. Select the website in IIS Manager:
-
-   - Click on "Basic Settings"
-   - Under "Connect as...", enter the user and password of the Windows user that runs your website.
-   - Ensure this user has full permissions on the following folders:
-     - ControlPanel
-     - ControlPanel.MVC
-     - Cache
-     - Temp
-     - Logs
-     - Database
-     - Read permissions on Monitor\Shared
-
-5. If using TCAWeb, start the monitor in console mode and execute `tcaweb-pass` to obtain the password or attach `TCAdmin2\Monitor\TCAWeb.config` to a support ticket for assistance.
-
-6. Configure the `Aspx` application to run with the same user as the main website.
-
-7. If using Let's Encrypt, bind the website to a specific IP and hostname to prevent TCAdmin from changing the website's certificate.
-
-8. Give full permissions to `IIS APPPOOL\.NET v4.5` on the following folders:
-   - C:\Program Files\TCAdmin2\Cache
-   - C:\Program Files\TCAdmin2\Temp
-   - C:\Program Files\TCAdmin2\Logs\Web
-   - C:\Program Files\TCAdmin2\ControlPanel
-   - C:\Program Files\TCAdmin2\ControlPanel.MVC
-   - C:\Program Files\TCAdmin2\Database
-
-## Database Configuration
-
-1. Execute the following command on your database to disable the built-in web server:
-
-   ```sql
-   DELETE FROM tc_server_enabled_components WHERE module_id = '07405876-e8c2-4b24-a774-4ef57f596384' AND component_id = 2 AND server_id = 1;
-   ```
-
-2. If you need to enable the built-in web server again, use the following command:
-
-   ```sql
-   INSERT INTO tc_server_enabled_components (module_id, component_id, server_id) values ('07405876-e8c2-4b24-a774-4ef57f596384', 2, 1);
-   ```
-
-## Disable Output Caching
-
-1. Disable output caching to prevent issues with user sessions:
-   - Open IIS Manager
-   - Select your website
-   - Double click on "Output Caching"
-   - Under Actions on the right side, click on "Edit Feature Settings"
-   - Uncheck "Enable Cache" and "Enable kernel cache"
-   - Click OK
-
-## Configure IIS with Multiple Worker Processes
-
-1. Follow the instructions above to disable the built-in web server.
-
-2. Start the ASP.NET state service and set the startup to Automatic:
-
-   - Go to Start > Administrative Tools > Services
-
-3. Edit `TCAdmin2\ControlPanel\Web.config` and `TCAdmin2\ControlPanel.MVC\Web.config`:
-
-   - Replace `<sessionState timeout="30"/>` with `<sessionState mode="StateServer" stateConnectionString="tcpip=localhost:42424" cookieless="false" timeout="30" />`
-
-4. Open IIS Manager and select the advanced properties of the .NET Application pool. Increase the number of worker processes as needed.
-
-## Lets Encrpyt Install (recommended)
-
-## Installation
-
-1. **Download Certify The Web:**
-   Visit the official website of Certify The Web at [https://certifytheweb.com/](https://certifytheweb.com/) and download the appropriate version for your operating system (Windows).
-
-2. **Install Certify The Web:**
-   Run the installer and follow the on-screen instructions to install Certify The Web on your system.
-
-:::tip
-Here is the full documentation to Certify The Web [https://docs.certifytheweb.com/](https://docs.certifytheweb.com/)
+:::info Prerequisite
+Make sure you are running a supported Windows Server environment and have already downloaded and installed TCAdmin 2 before starting this guide.
 :::
 
-## Use Custom SSL Certificate (Windows) (optional)
+:::caution Warning for IIS Users
 
-1. Install the SSL certificate in Windows. Follow the instructions at [Trustico](https://www.trustico.com/install/import/iis7/iis7-pfx-installation.php).
+If you are using IIS with TCAdmin, **do not configure your monitor ports as 80 or 443**. Instead, use the default ports **8880 and 8881**.  
 
-2. Launch the TCAdmin 2 Configuration Utility:
+When the monitor starts, it reconfigures the ports using the HTTP listener. If ports 80 or 443 are assigned to the monitor, this can cause conflicts with IIS, resulting in service disruptions or unexpected behavior.  
 
-   - Go to Start > Programs > TCAdmin 2 > Configuration Utility
+To avoid issues, ensure that your monitor ports are correctly set to **8880 and 8881** in the TCAdmin configuration.
 
-3. Navigate through the utility until you reach the IP and port settings.
-
-4. Check the option to use a custom certificate and select it from the list.
-
-5. Continue through the utility until the monitor is restarted.
-
-:::note
-The actual URLs, paths, and commands may need adjustments based on your specific setup and requirements.
 :::
+
+Before setting up IIS with TCAdmin, ensure that:
+
+- You are running a Windows Server environment.
+- You have downloaded and installed TCAdmin 2.
+
+## Step 1: Install IIS with ASP.NET 4.0/4.5 Support
+
+1. Open **Server Manager** and select **Add Roles and Features**.
+2. Select **Web Server (IIS)** under **Server Roles**.
+3. Under **Application Development**, ensure the following features are enabled:
+   - **ASP.NET 4.x**
+   - **.NET Extensibility 4.x**
+4. Complete the installation process.
+
+## Step 2: Set up SQLite Database (Skip if using MySQL)
+
+:::tip Using SQLite
+If you are using an SQLite database, ensure you copy `sqlite3.dll` to the correct location (`C:\Windows\System32`).
+:::
+
+If you're using SQLite for TCAdmin:
+
+1. Copy the `sqlite3.dll` file from `TCAdmin2\Monitor\sqlite3.dll` to `C:\Windows\System32`.
+
+## Step 3: Configure IIS for TCAdmin
+
+### 1. Add User to IIS Group
+
+- Add the `TCAWeb` user to the `IIS_IUSRS` group. This ensures proper permissions for web access.
+
+### 2. Create a Website in IIS Manager
+
+1. Open **IIS Manager**.
+2. Right-click **Sites** > **Add Website**:
+   - Set **Physical Path** to `C:\Program Files\TCAdmin2\ControlPanel.MVC`.
+   - Set **Application Pool** to `.NET v4.5`.
+3. Right-click on the newly created website and select **Add Application**:
+   - Name the application **Aspx** (case-sensitive).
+   - Set **Physical Path** to `C:\Program Files\TCAdmin2\ControlPanel`.
+   - Use the same **.NET v4.5** application pool.
+
+### 3. Configure Website Settings
+
+1. In IIS Manager, select the website, click **Basic Settings**, and click **Connect As**.
+2. Enter the credentials for the Windows user running the TCAdmin website.
+3. Ensure this user has **full permissions** on the following folders:
+   - `ControlPanel`
+   - `ControlPanel.MVC`
+   - `Cache`
+   - `Temp`
+   - `Logs`
+   - `Database`
+   - Read permissions for `Monitor\Shared`
+
+### 4. Configure `Aspx` Application
+
+Ensure the **Aspx** application uses the same user as the main website (from step 3).
+
+### 5. Let's Encrypt (Optional)
+
+:::note Let's Encrypt Option
+Using Let's Encrypt for SSL certificates is recommended if you don’t already have a custom SSL certificate.
+:::
+
+If using Let's Encrypt, bind the website to a specific IP and hostname to prevent TCAdmin from changing the certificate.
+
+### 6. Set Folder Permissions
+
+:::caution Permissions
+Ensure that you assign the correct permissions to `IIS APPPOOL\.NET v4.5`. Missing or incorrect permissions can cause issues with the TCAdmin control panel.
+:::
+
+1. Grant full control to `IIS APPPOOL\.NET v4.5` on the following directories:
+
+   - `C:\Program Files\TCAdmin2\Cache`
+   - `C:\Program Files\TCAdmin2\Temp`
+   - `C:\Program Files\TCAdmin2\Logs\Web`
+   - `C:\Program Files\TCAdmin2\ControlPanel`
+   - `C:\Program Files\TCAdmin2\ControlPanel.MVC`
+   - `C:\Program Files\TCAdmin2\Database`
+
+2. Under **"Connect as..."**, enter the user and password of the Windows user that runs your website.
+
+:::important TCAWeb Setup
+If using **TCAWeb**, start the monitor in **console mode** and execute `tcaweb-pass` to obtain the password or attach `TCAdmin2\Monitor\TCAWeb.config` to a support ticket for assistance.
+:::
+
+```bash
+tcaweb-pass
+```
+
+3. Configure the Aspx application to run with the same user as the main website.
+
+## Step 4: Database Configuration
+
+:::caution Warning
+Disabling the built-in TCAdmin web server is permanent unless you run the re-enable command provided.
+:::
+
+1. To disable the built-in TCAdmin web server, run the following SQL command:
+
+   ```sql
+   DELETE FROM tc_server_enabled_components 
+   WHERE module_id = '07405876-e8c2-4b24-a774-4ef57f596384' 
+   AND component_id = 2 
+   AND server_id = 1;
+   ```
+   If you ever wish to enable the built in web server again you can run the following SQL command:
+
+   ```sql
+   INSERT INTO tc_server_enabled_components 
+   (module_id, component_id, server_id) 
+   VALUES ('07405876-e8c2-4b24-a774-4ef57f596384', 2, 1);
+   ```
+## Step 5: Disable Output Caching
+
+1. In IIS Manager, select your website.
+2. Double-click Output Caching.
+3. Under Actions, click Edit Feature Settings.
+4. Uncheck both Enable Cache and Enable kernel cache.
+5. Click OK.
+
+## Step 6: Configure IIS for Multiple Worker Processes
+
+:::tip Multiple Worker Processes
+Running multiple worker processes improves performance for high-traffic websites but requires proper session state configuration.
+:::
+
+
+1. Follow the instructions in Step 4 to disable the built-in web server.
+
+2. Start the ASP.NET State Service and set it to Automatic:
+   - Go to Start > Administrative Tools > Services.
+   - Right click on ASP.net state service > properties > Recovery
+     - First failure: `Restart`
+     - Second failure: `Restart`
+     - Subsequent failures: `Restart`
+
+3. Edit the following web.config files:
+
+   - TCAdmin2\ControlPanel\Web.config
+   - TCAdmin2\ControlPanel.MVC\Web.config
+
+   3.1. Replace the session state configuration:
+
+   ```html
+   <sessionState timeout="30" />
+   ```
+   With:
+
+   ```html
+   <sessionState mode="StateServer" stateConnectionString="tcpip=localhost:42424" cookieless="false" timeout="30" />
+   ```
+
+## Step 7: SSL Certificate Installation
+
+### Option 1: Install Let's Encrypt SSL (Recommended)
+
+:::info Let's Encrypt Tip
+For automatic SSL management, Let's Encrypt is the recommended option. Certify The Web provides a simple interface to manage certificates.
+:::
+
+1. Download Certify The Web: Download it from [Certify The Web](https://certifytheweb.com/).
+
+2. Install and Configure:
+
+   - Follow the on-screen instructions for installation.
+   - For detailed documentation, visit [Certify The Web Documentation](https://docs.certifytheweb.com/).
+
+### Option 2: Use a Custom SSL Certificate
+
+:::caution SSL Certificate Installation
+Ensure that the SSL certificate is correctly installed in Windows following the linked guide, as an incorrectly configured certificate can cause connection issues.
+:::
+
+1. Install your custom SSL certificate following this [guide](https://www.trustico.com/install/import/iis7/iis7-pfx-installation.php).
+
+2. Open the TCAdmin 2 Configuration Utility and navigate to IP and Port Settings.
+
+3. Select your custom SSL certificate from the list and apply the changes.
+
+:::tip Best Practices
+It’s a good idea to back up your configuration and website settings before making any major changes to the IIS or TCAdmin setup.
+:::
+
+Adjust URLs, file paths, and commands based on your specific setup and configuration. For additional support, consult the official TCAdmin or IIS documentation.
