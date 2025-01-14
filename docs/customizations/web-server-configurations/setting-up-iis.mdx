@@ -11,6 +11,16 @@ sidebar_label: Setting up IIS with TCAdmin
 Make sure you are running a supported Windows Server environment and have already downloaded and installed TCAdmin 2 before starting this guide.
 :::
 
+:::caution Warning for IIS Users
+
+If you are using IIS with TCAdmin, **do not configure your monitor ports as 80 or 443**. Instead, use the default ports **8880 and 8881**.  
+
+When the monitor starts, it reconfigures the ports using the HTTP listener. If ports 80 or 443 are assigned to the monitor, this can cause conflicts with IIS, resulting in service disruptions or unexpected behavior.  
+
+To avoid issues, ensure that your monitor ports are correctly set to **8880 and 8881** in the TCAdmin configuration.
+
+:::
+
 Before setting up IIS with TCAdmin, ensure that:
 
 - You are running a Windows Server environment.
