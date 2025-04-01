@@ -5,11 +5,36 @@ sidebar_label: Kill all processes running from the game server's root folder
 
 # Kill all processes running from the game server's root folder
 
-This Windows batch script kills all running processes located in the game server's root directory and sub directories.
+These batch/shell scripts kill all running processes located in the game server's root directory and sub directories. You can configure it on the after stopped event.
 
+* Windows
 ```
 set exelocation=%ThisService_RootDirectory:\=\\%
 wmic path win32_process where "ExecutablePath like '%%%exelocation%%%'" call terminate
+```
+
+* Linux
+```
+#!/bin/bash
+
+# Remove any trailing slash from the directory path for consistency
+ThisService_RootDirectory=${ThisService_RootDirectory%/}
+
+# Loop through all process IDs
+for pid in $(ps -eo pid --no-headers); do
+    # Get the executable path of the process using the /proc filesystem
+    exe=$(readlink /proc/$pid/exe)
+    # Check if the executable path was retrieved successfully (not empty)
+    if [ -n "$exe" ]; then
+        # Extract the directory of the executable
+        exe_dir=$(dirname "$exe")
+        # Check if the executable's directory is the specified directory or a subdirectory
+        if [[ $exe_dir == $ThisService_RootDirectory || $exe_dir == $ThisService_RootDirectory/* ]]; then
+            # Terminate the process
+            kill $pid
+        fi
+    fi
+done
 ```
 
 This Windows batch script kills a specific process located in the game server's root directory.
