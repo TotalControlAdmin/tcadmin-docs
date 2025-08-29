@@ -75,3 +75,12 @@ If you ever need to enable the built in web server again execute this command.
 ```sql
 INSERT INTO tc_server_enabled_components (module_id, component_id, server_id) values ('07405876-e8c2-4b24-a774-4ef57f596384', 2, 1);
 ```
+
+## Common Errors
+
+If you encounter a **"wrong username or password"** error when trying to log in to the new separate control panel, please check the following:
+
+- Copy the files from the master's `TCAdmin2\ControlPanel.MVC\bin-extensions` directory to the same directory on the new server.
+- Copy the files from the master's `TCAdmin2\Monitor\Shared\bin-extensions` directory to the same directory on the new server.
+
+You should then be able to now login to the control panel.
