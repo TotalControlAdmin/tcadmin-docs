@@ -132,3 +132,84 @@ h1 {
 nav li a {
   text-transform: Capitalize;
 }
+
+/* General settings for all icon containers */
+.header-github-link,
+.header-discord-link,
+.header-website-link,
+.header-billing-link,
+.header-forum-link {
+  display: flex; /* Flexbox for centering */
+  align-items: center; /* Vertically align content */
+  justify-content: center; /* Horizontally align content */
+  width: 42px; /* Set the circle size (adjust if needed) */
+  height: 42px;
+  border-radius: 50%; /* Makes the container circular */
+  transition: background var(--ifm-transition-fast); /* Smooth hover transition */
+  -webkit-tap-highlight-color: transparent; /* Prevent tap highlight for touch devices */
+  background-color: transparent; /* Start with no background */
+}
+
+/* Hover effect for all icons */
+.header-github-link:hover,
+.header-discord-link:hover,
+.header-website-link:hover,
+.header-billing-link:hover,
+.header-forum-link:hover {
+  background-color: var(--ifm-color-emphasis-200); /* Change background color on hover */
+}
+
+/* General icon (pseudo-element) settings */
+.header-github-link::before,
+.header-discord-link::before,
+.header-website-link::before,
+.header-billing-link::before,
+.header-forum-link::before {
+  content: "";
+  display: block;
+  width: 100%; /* Scale icon proportionally within the container */
+  height: 100%;
+  background-repeat: no-repeat; /* Prevent icon tiling */
+  background-position: center; /* Center the icon visually */
+  background-size: contain; /* Ensure the icon fits within the container */
+}
+
+/* GitHub icon settings */
+.header-github-link::before {
+  background-image: url("/img/github-mark.svg");
+}
+[data-theme="dark"] .header-github-link::before {
+  background-image: url("/img/github-mark-white.svg"); /* Adjust if needed for dark mode */
+}
+
+/* Discord icon settings */
+.header-discord-link::before {
+  background-image: url("/img/discord-mark-blue.svg");
+}
+[data-theme="dark"] .header-discord-link::before {
+  background-image: url("/img/discord-mark-white.svg");
+}
+
+/* Website icon settings */
+.header-website-link::before {
+  background-image: url("/img/globe-solid.svg");
+}
+[data-theme="dark"] .header-website-link::before {
+  background-image: url("/img/globe-solid-white.svg");
+}
+
+/* Billing icon settings */
+.header-billing-link::before {
+  background-image: url("/img/money-check-dollar-solid.svg");
+
+}
+[data-theme="dark"] .header-billing-link::before {
+  background-image: url("/img/money-check-dollar-solid-white.svg");
+}
+/* Forum icon settings */
+.header-forum-link::before {
+  background-image: url("/img/comments-solid-full.svg");
+}
+[data-theme="dark"] .header-forum-link::before {
+  background-image: url("/img/comments-solid-full-white.svg");
+}
