@@ -14,8 +14,13 @@ const config = {
   organizationName: "TotalControlAdmin",
   projectName: "tcadmin-docs",
   onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "warn",
   onBrokenAnchors: "ignore",
+
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: "warn",
+    },
+  },
 
   i18n: {
     defaultLocale: "en",
@@ -32,6 +37,18 @@ const config = {
           showLastUpdateTime: true,
           editUrl:
             "https://github.com/TotalControlAdmin/tcadmin-docs/blob/master/",
+          lastVersion: "2",
+          onlyIncludeVersions: ["2", "3"],
+          includeCurrentVersion: false,
+          versions: {
+            "2": {
+              label: "V2",
+            },
+            "3": {
+              label: "V3",
+              banner: "none",
+            },
+          },
         },
         blog: false,
         theme: {
@@ -74,35 +91,38 @@ const config = {
           label: "Documentation",
         },
         {
+          type: "docsVersionDropdown",
+          position: "left",
+        },
+        {
           href: "https://github.com/TotalControlAdmin/tcadmin-docs",
           position: "right",
-
-          className: "header-github-link", // Add custom classes for styling icons
+          className: "header-github-link",
           "aria-label": "GitHub repository",
         },
         {
           href: "https://discord.com/invite/ptN2pGf",
           position: "right",
-
           className: "header-discord-link",
+          "aria-label": "Discord",
         },
         {
           href: "https://www.tcadmin.com/",
           position: "right",
-
           className: "header-website-link",
+          "aria-label": "TCAdmin Website",
         },
         {
           href: "https://clients.tcadmin.com/billing/clientarea.php",
           position: "right",
-
           className: "header-billing-link",
+          "aria-label": "Client Area",
         },
         {
           href: "https://community.tcadmin.com",
           position: "right",
-
           className: "header-forum-link",
+          "aria-label": "Community Forum",
         },
       ],
     },
