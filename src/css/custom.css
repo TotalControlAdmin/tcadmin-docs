@@ -148,6 +148,7 @@ nav li a {
   transition: background var(--ifm-transition-fast); /* Smooth hover transition */
   -webkit-tap-highlight-color: transparent; /* Prevent tap highlight for touch devices */
   background-color: transparent; /* Start with no background */
+  position: relative; /* For tooltip positioning */
 }
 
 /* Hover effect for all icons */
@@ -157,6 +158,46 @@ nav li a {
 .header-billing-link:hover,
 .header-forum-link:hover {
   background-color: var(--ifm-color-emphasis-200); /* Change background color on hover */
+}
+
+/* Tooltip styling */
+.header-github-link::after,
+.header-discord-link::after,
+.header-website-link::after,
+.header-billing-link::after,
+.header-forum-link::after {
+  content: attr(aria-label);
+  position: absolute;
+  bottom: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--ifm-color-emphasis-800);
+  color: var(--ifm-color-white);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 1000;
+}
+
+[data-theme="dark"] .header-github-link::after,
+[data-theme="dark"] .header-discord-link::after,
+[data-theme="dark"] .header-website-link::after,
+[data-theme="dark"] .header-billing-link::after,
+[data-theme="dark"] .header-forum-link::after {
+  background-color: var(--ifm-color-emphasis-200);
+  color: var(--ifm-color-emphasis-900);
+}
+
+.header-github-link:hover::after,
+.header-discord-link:hover::after,
+.header-website-link:hover::after,
+.header-billing-link:hover::after,
+.header-forum-link:hover::after {
+  opacity: 1;
 }
 
 /* General icon (pseudo-element) settings */
