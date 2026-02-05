@@ -38,7 +38,7 @@ const config = {
           editUrl:
             "https://github.com/TotalControlAdmin/tcadmin-docs/blob/master/",
           lastVersion: "2",
-          onlyIncludeVersions: ["2", "3"],
+          onlyIncludeVersions: ["2"], // v3 hidden until public release
           includeCurrentVersion: false,
           versions: {
             "2": {
