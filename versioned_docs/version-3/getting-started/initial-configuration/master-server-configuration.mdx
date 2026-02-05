@@ -1,0 +1,152 @@
+---
+sidebar_position: 1
+sidebar_label: Master Server Configuration
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Master Server Configuration
+
+How to get going with TCAdmin once installed.
+
+## Installation Process
+
+After running the TCAdmin installer, you will be prompted with the following:
+
+### 1. Select Components
+
+Select the components to install:
+- **monitor** - The TCAdmin Monitor service that manages game servers
+- **web** - The TCAdmin Control Panel web interface
+
+Both components are required for a master server installation.
+
+### 2. Installation Directory
+
+Enter the installation directory or press Enter to use the default:
+
+<Tabs>
+  <TabItem value="windows" label="Windows">
+
+**Default:** `C:\Program Files\TCAdmin3`
+
+  </TabItem>
+  <TabItem value="linux" label="Linux">
+
+**Default:** `/opt/tcadmin3`
+
+  </TabItem>
+</Tabs>
+
+### 3. Server Type
+
+Select whether this is a **Master** or **Remote** server:
+- **Master (primary server with database)** - The main server that hosts the database and coordinates all operations
+- **Remote (connects to existing master)** - Additional servers that connect to an existing master installation
+
+For your first installation, select **Master**.
+
+### 4. Database Configuration
+
+Enter your MySQL database connection details:
+- **MySQL IP or hostname** - The address of your MySQL server (default: `localhost`)
+- **MySQL port** - The port MySQL is listening on (default: `3306`)
+- **MySQL username** - A MySQL user with permissions to create/modify tables
+- **MySQL password** - The password for the MySQL user
+- **MySQL database** - The database name (default: `tcadmin3`)
+
+:::tip
+If the database doesn't exist and your MySQL user has CREATE privileges, the installer will offer to create it for you.
+:::
+
+### 5. Add to PATH
+
+Choose whether to add the TCAdmin CLI (`tca`) to your system PATH for easy access from any terminal.
+
+## Backup Your Encryption Key
+
+:::danger Critical Security Step
+After installation completes, you will be shown a **Master Encryption Key**. This key is used to encrypt all sensitive data in your database.
+
+**You MUST backup this key securely:**
+- Store it in a password manager or secure vault
+- Do NOT store it on the same server as TCAdmin
+- Keep multiple secure backups in different locations
+- This key is required for disaster recovery
+
+**If you lose this key, you will NOT be able to decrypt your data!**
+:::
+
+## Access Your Control Panel
+
+:::info Default Credentials
+
+Username: **admin**
+
+Password: **Password!23**
+
+:::
+
+<Tabs>
+  <TabItem value="windows" label="Windows">
+
+View `https://127.0.0.1:31001` using the server's browser or `https://public_server_ip:31001` using your PC's browser.
+
+  </TabItem>
+  <TabItem value="linux" label="Linux">
+
+View `https://public_server_ip:31001` using your PC's browser.
+
+  </TabItem>
+</Tabs>
+
+:::tip
+If you are using NAT, make sure you have port forwarded in Windows Firewall, your router, or iptables/ufw.
+
+**Default Ports:**
+- HTTP: `31000`
+- HTTPS: `31001`
+:::
+
+:::note Self-Signed Certificate
+The installer creates a self-signed certificate for HTTPS connections. Your browser will show a security warning - this is expected. You can proceed past the warning or configure a trusted certificate later.
+:::
+
+## Getting Started
+
+After logging in, you will see the **Getting Started** widget on your dashboard. This widget guides you through the essential setup tasks to get your TCAdmin system ready.
+
+### 1. Change Your Password
+
+Secure your account by changing the default password. Click the **Change Password** button in the widget to update your password.
+
+:::warning
+You must change the default password before proceeding with other setup tasks.
+:::
+
+### 2. Configure Your License
+
+Set up a valid license for your server to unlock all features. Click on the server name in the widget to open the license configuration dialog.
+
+Enter your license key to activate your TCAdmin installation. Without a valid license, you will not be able to import games or Docker configurations from the plugin repository.
+
+### 3. Import Game Configurations
+
+Add game and voice service configurations to start hosting game servers. Click **Import** to browse and install game configurations from the TCAdmin plugin repository.
+
+You can also click **Skip** if you plan to configure games manually later.
+
+:::tip
+The plugin repository contains pre-configured settings for popular games like Minecraft, CS2, Rust, ARK, and many more.
+:::
+
+### 4. Import Docker Configurations
+
+Set up Docker blueprints for containerized services. Click **Import** to browse available Docker configurations from the plugin repository.
+
+You can also click **Skip** if you don't plan to use Docker containers.
+
+---
+
+Once all tasks are completed, the widget will display a success message and you can close it. Your TCAdmin system is now ready to use!

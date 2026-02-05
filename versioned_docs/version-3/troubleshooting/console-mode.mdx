@@ -1,0 +1,130 @@
+---
+sidebar_position: 1
+sidebar_label: Running in Console Mode
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Running in Console Mode
+
+If TCAdmin services fail to start or you encounter errors during startup, you can run the Monitor or Web service in console mode to view detailed error messages.
+
+## Stop the Service
+
+First, stop the service that you want to troubleshoot:
+
+<Tabs>
+  <TabItem value="windows" label="Windows">
+
+```powershell
+# Stop the Monitor service
+Stop-Service TCA3Monitor
+
+# Stop the Web service
+Stop-Service TCA3Web
+```
+
+Or using the Services management console:
+1. Press `Win + R`, type `services.msc`, and press Enter
+2. Find **TCAdmin 3.0 Monitor** or **TCAdmin 3.0 Control Panel**
+3. Right-click and select **Stop**
+
+  </TabItem>
+  <TabItem value="linux" label="Linux">
+
+```bash
+# Stop the Monitor service
+sudo systemctl stop tca3monitor
+
+# Stop the Web service
+sudo systemctl stop tca3web
+```
+
+  </TabItem>
+</Tabs>
+
+## Run in Console Mode
+
+Navigate to the component directory and run the executable directly:
+
+:::note Web Service (Windows)
+Switching between the Web service and console mode will log out all users.
+:::
+
+<Tabs>
+  <TabItem value="windows" label="Windows">
+
+```powershell
+# Run the Monitor in console mode
+cd "C:\Program Files\TCAdmin3\components\monitor"
+.\TCAdmin.Monitor.exe
+
+# Run the Web in console mode
+cd "C:\Program Files\TCAdmin3\components\web"
+.\TCAdmin.Web.exe
+```
+
+  </TabItem>
+  <TabItem value="linux" label="Linux">
+
+```bash
+# Run the Monitor in console mode
+cd /opt/tcadmin3/components/monitor
+./TCAdmin.Monitor
+
+# Run the Web in console mode
+cd /opt/tcadmin3/components/web
+./TCAdmin.Web
+```
+
+  </TabItem>
+</Tabs>
+
+## Reading the Output
+
+When running in console mode, you will see log messages printed directly to the terminal. Look for:
+
+- **Error** or **Fatal** messages that indicate startup failures
+- **Exception** details with stack traces
+- **Configuration** errors (missing settings, invalid values)
+- **Database** connection issues
+- **Network** or port binding errors
+
+### Common Errors
+
+| Error | Possible Cause | Solution |
+|-------|----------------|----------|
+| Port already in use | Another process is using the port | Check for conflicting services or change the port in configuration |
+| Database connection failed | Invalid credentials or MySQL not running | Verify database settings in `config/appsettings.global.json` |
+| Certificate error | Invalid or missing SSL certificate | Check certificate path in `config/web/appsettings.Overrides.json` |
+| Redis connection failed | Redis not running or wrong password | Verify Redis settings in configuration |
+
+## Restart the Service
+
+After troubleshooting, stop the console process (`Ctrl+C`) and restart the service:
+
+<Tabs>
+  <TabItem value="windows" label="Windows">
+
+```powershell
+# Start the Monitor service
+Start-Service TCA3Monitor
+
+# Start the Web service
+Start-Service TCA3Web
+```
+
+  </TabItem>
+  <TabItem value="linux" label="Linux">
+
+```bash
+# Start the Monitor service
+sudo systemctl start tca3monitor
+
+# Start the Web service
+sudo systemctl start tca3web
+```
+
+  </TabItem>
+</Tabs>

@@ -1,0 +1,183 @@
+---
+sidebar_position: 2
+sidebar_label: Remote Server Configuration
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Remote Server Configuration
+
+The recommended way to add a remote server is by using **TCAdmin Flash**. This allows the remote server to automatically pull its configuration from the master server.
+
+## Prerequisites
+
+Before adding a remote server, you must configure the master server to share its database and Redis connection information with remote servers.
+
+### 1. Configure Global Server Settings
+
+1. Go to **Settings** > **Global Server Configuration**
+2. Add the master's MySQL database connection information:
+   - `TCAdmin:Database:Host` - Master server IP and port (e.g., `192.168.1.100:3306`)
+   - `TCAdmin:Database:Database` - Database name (e.g., `tcadmin3`)
+   - `TCAdmin:Database:User` - Database username
+   - `TCAdmin:Database:Password` - Database password
+
+3. In the **Advanced** section, add the following Redis settings:
+
+| Key | Value | Description |
+|-----|-------|-------------|
+| `TCAdmin:Redis:Mode` | `External` | Tells remote servers to connect to the master's Redis |
+| `TCAdmin:Redis:Server` | Master server IP | The IP address of your master server |
+| `TCAdmin:Redis:Port` | `6379` | Default Redis port (or your custom port) |
+| `TCAdmin:Redis:Password` | Redis password | Found in master's `config/appsettings.global.json` |
+
+:::tip Finding the Redis Password
+The Redis password is located in the master server's configuration file:
+- **Windows:** `C:\Program Files\TCAdmin3\config\appsettings.global.json`
+- **Linux:** `/opt/tcadmin3/config/appsettings.global.json`
+
+Look for the `TCAdmin:Redis:Password` value.
+:::
+
+### 2. Add the Remote Server
+
+1. Go to **Settings** > **Servers**
+2. Click **Add Server**
+3. Enter the server information:
+   - **Name** - A friendly name for the server
+   - **IP Address** - The remote server's IP address
+   - **Operating System** - Windows or Linux
+4. Click **Save**
+
+### 3. Configure License (Optional)
+
+1. Select the newly created server
+2. Click **Configuration** on the left menu
+3. Enter the license key for this server
+4. Click **Save**
+
+### 4. Generate Deployment Token
+
+1. Go back to the server settings
+2. Select the **Flash / Deployment** tab
+3. Click **Reset Deployment Token**
+4. Copy the generated token - you will need this during installation
+
+## Install TCAdmin on the Remote Server
+
+<Tabs>
+  <TabItem value="windows" label="Windows">
+
+1. Open **PowerShell** as Administrator
+2. Execute the following command:
+
+```powershell
+& ([scriptblock]::Create((irm "https://v3.tcafiles.com/win-x64-beta.ps1")))
+```
+
+  </TabItem>
+  <TabItem value="linux" label="Linux">
+
+Run the installer as root:
+
+```bash
+bash <(curl -fsSL https://v3.tcafiles.com/linux-beta.sh)
+```
+
+Or with sudo:
+
+```bash
+sudo bash <(curl -fsSL https://v3.tcafiles.com/linux-beta.sh)
+```
+
+  </TabItem>
+</Tabs>
+
+## Remote Server Installation Steps
+
+After running the installer, you will be prompted with the following:
+
+### 1. Select Components
+
+Select the components to install:
+- **monitor** - The TCAdmin Monitor service (required for remote servers)
+- **web** - The TCAdmin Control Panel web interface (optional for remote servers)
+
+:::info
+Remote servers typically only need the **monitor** component. The web interface is only needed if you want users to access the control panel directly from this server.
+:::
+
+### 2. Installation Directory
+
+Enter the installation directory or press Enter to use the default:
+
+<Tabs>
+  <TabItem value="windows" label="Windows">
+
+**Default:** `C:\Program Files\TCAdmin3`
+
+  </TabItem>
+  <TabItem value="linux" label="Linux">
+
+**Default:** `/opt/tcadmin3`
+
+  </TabItem>
+</Tabs>
+
+### 3. Server Type
+
+Select **Remote (connects to existing master)**.
+
+### 4. Configuration Method
+
+Choose how to configure the remote server:
+
+- **Flash Token (recommended)** - Automatically configures from the master server
+- **Manual configuration** - Manually enter database connection details
+
+#### Using Flash Token (Recommended)
+
+1. Select **Flash Token (recommended - auto-configures from master)**
+2. Paste the deployment token you copied from the master server
+3. The installer will display:
+   - API URL (your master server's control panel URL)
+   - Server ID (assigned by the master)
+4. The installer will confirm: "Database configuration will be pulled from the master server on first start"
+
+#### Using Manual Configuration
+
+1. Select **Manual configuration (enter database details)**
+2. Enter the **Server ID** assigned to this server in the master's control panel
+3. Enter the MySQL connection details:
+   - **MySQL IP or hostname** - The master server's IP address
+   - **MySQL port** - Default `3306`
+   - **MySQL username** - Database user
+   - **MySQL password** - Database password
+   - **MySQL database** - Database name (e.g., `tcadmin3`)
+
+### 5. Add to PATH
+
+Choose whether to add the TCAdmin CLI (`tca`) to your system PATH.
+
+## After Installation
+
+Once the installation completes:
+
+1. The TCAdmin Monitor service will start automatically
+2. The remote server will connect to the master and appear as online
+3. You can now create and manage services on this remote server from the master control panel
+
+:::tip Verify Connection
+Check the server status in **Settings** > **Servers** on the master control panel. The remote server should show as **Online**.
+:::
+
+### Import Server IPs
+
+After the server is online, import its IP addresses:
+
+1. Go to **Settings** > **Servers**
+2. Select the remote server
+3. Click **IP Addresses** on the left menu
+4. Click **Import IPs**
+5. Disable or delete any IPs that you don't want to use with TCAdmin
