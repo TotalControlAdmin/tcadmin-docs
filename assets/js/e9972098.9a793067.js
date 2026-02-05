@@ -1,1 +1,0 @@
-"use strict";(globalThis.webpackChunktcadmin_docs=globalThis.webpackChunktcadmin_docs||[]).push([[8424],{2267(s){s.exports=JSON.parse('{"name":"docusaurus-theme-search-typesense","id":"default"}')}}]);
