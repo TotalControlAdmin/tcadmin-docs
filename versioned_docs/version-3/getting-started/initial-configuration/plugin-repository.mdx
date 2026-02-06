@@ -5,122 +5,122 @@ sidebar_label: Plugin Repository
 
 # Plugin Repository
 
-The Plugin Repository allows you to browse, install, and update game configurations, Docker blueprints, scripts, themes, and language packs from centralized repositories.
+The Plugin Repository is like an **app store for your TCAdmin panel**. It lets you browse, install, and update pre-built game configurations, Docker blueprints, scripts, themes, and language packs — so you don't have to set everything up from scratch.
 
-## Accessing the Plugin Repository
+:::tip This is the fastest way to start hosting games
+Instead of manually configuring every game server setting, just open the Plugin Repository, find the game you want (Minecraft, CS2, Rust, ARK, etc.), and click Install. TCAdmin will import all the settings automatically.
+:::
 
-1. Go to **Settings** > **Plugin Repositories**
-2. Click on a repository to browse its contents
+## How to Access the Plugin Repository
 
-## Default Repository
+1. Log in to your TCAdmin control panel
+2. Go to **Settings** > **Plugin Repositories**
+3. Click on a repository to browse what's available
 
-TCAdmin includes a default plugin repository maintained by TCAdmin that contains official game configurations and other plugins. This repository cannot be deleted or modified.
+## The Default Repository
+
+TCAdmin includes an **official plugin repository** maintained by the TCAdmin team. It comes pre-configured and contains game configurations, Docker blueprints, and other plugins for popular games. You can't delete or modify this repository, but you can add your own alongside it.
 
 ## Browsing Plugins
 
 When you open a repository, plugins are organized into tabs:
 
-| Tab | Description |
+| Tab | What's In It |
 |-----|-------------|
-| **Games** | Game server configurations (Minecraft, CS2, Rust, ARK, etc.) |
-| **Docker** | Docker blueprint configurations for containerized services |
-| **Scripts** | Game scripts, Docker scripts, and script modules |
-| **Themes** | UI themes to customize the control panel appearance |
-| **Languages** | Language packs for localization |
+| **Games** | Game server configurations — Minecraft, CS2, Rust, ARK, and many more |
+| **Docker** | Docker container blueprints for running services in containers |
+| **Scripts** | Automation scripts that run when game server events happen (start, stop, install, etc.) |
+| **Themes** | Visual themes to customize how the control panel looks |
+| **Languages** | Translation packs to display the control panel in different languages |
 
-Each plugin card displays:
-- Plugin name and author
-- Short description
-- Version number and available versions
-- Tags for categorization
-- Last update time
+Each plugin card shows the name, author, description, version, tags, and when it was last updated.
 
 ## Installing a Plugin
 
-1. Click **View Details** on a plugin card
-2. Select the **Version** you want to install
-3. Select the specific configuration file (some plugins include multiple configurations)
-4. Optionally select an existing item to update instead of creating a new one
+1. Find the plugin you want and click **View Details**
+2. Select the **Version** you want to install (latest is usually best)
+3. If the plugin includes multiple configuration files, select the one you want
+4. Optionally, select an existing item to **update** instead of creating a new one
 5. Click **Install**
 
-The installation runs as a background task. A dialog will show the progress and any messages.
+The installation runs in the background. A dialog shows progress and any messages.
 
-:::warning Updating Existing Items
-When installing a plugin, you can choose to update an existing game, Docker blueprint, script, theme, or language instead of creating a new one. If you made customizations to the existing item, they will be lost.
+:::warning About updating existing items
+When you choose to update an existing game, Docker blueprint, script, theme, or language, your **custom changes will be overwritten**. If you've made customizations you want to keep, either skip the update or back up your changes first.
 :::
 
 ## Adding Third-Party Repositories
 
-You can add additional plugin repositories from third-party sources:
+The community and third-party developers can create their own plugin repositories. To add one:
 
 1. Go to **Settings** > **Plugin Repositories**
 2. Click **Add**
-3. Enter the repository details:
-   - **Name** - A friendly name for the repository
-   - **Git URL** - The Git repository URL
-   - **Branch** - The branch to use (default: `master`)
-   - **Credential** - Select a saved credential for private repositories
+3. Fill in:
+   - **Name** — a name to identify this repository (e.g., "Community Plugins")
+   - **Git URL** — the repository's Git URL (provided by the repository author)
+   - **Branch** — usually `master` or `main` (check the repository's documentation)
+   - **Credential** — select a saved credential if the repository is private
 4. Click **Save**
 
-:::warning Security Notice
-Third-party plugin repositories are added at your own risk. Plugins can contain code that executes on your server. Only add repositories from sources you trust.
+:::warning Be careful with third-party repositories
+Plugins can contain scripts that **run on your server**. Only add repositories from sources you trust. Malicious plugins could potentially harm your server or steal data.
 :::
 
-## Repository Sync
+## Syncing Repositories
 
-Repositories sync automatically from their Git source. If a repository shows "Not Synced":
+Repositories automatically sync their content from the Git source. If a repository shows **"Not Synced"**:
 
 1. Open the repository
 2. Click **Sync Repository**
-3. Wait for the sync to complete
+3. Wait for it to finish
 
-The sync status shows:
-- **Synced** - Repository is up to date
-- **Not Synced** - Repository needs to sync (may show commits ahead/behind)
+Status meanings:
+- **Synced** — up to date, everything is good
+- **Not Synced** — needs to pull the latest changes (may show how many commits behind)
 
-## Credentials
+## Managing Credentials for Private Repositories
 
-For private Git repositories, you can save credentials:
+If a third-party repository is private (requires authentication):
 
 1. Go to **Settings** > **Plugin Repositories**
 2. Click **Credentials** in the left menu
 3. Click **Add** to create a new credential
-4. Enter the username and password/token
-5. Save the credential
+4. Enter the username and password/token (usually a Git personal access token)
+5. Save, then select this credential when adding or editing the private repository
 
-You can then select this credential when adding or editing a repository.
-
-## Plugin Types
+## What Each Plugin Type Does
 
 ### Game Configurations
 
-Game plugins contain complete server configurations including:
-- Executable paths and command lines
+These are complete, ready-to-use setups for specific game servers. They include:
+- The path to the game server executable and its startup command
 - Default ports and query settings
-- Steam integration (App ID, anonymous login settings)
-- File management templates
+- Steam integration (for games that use SteamCMD to install/update)
+- File manager templates (which files users can edit)
 - Default scripts and variables
+
+**Example:** Installing the "Minecraft Java" plugin gives you a fully configured Minecraft game that you can immediately use to create game servers for your users.
 
 ### Docker Blueprints
 
-Docker plugins contain container configurations including:
-- Image name and registry settings
-- Port mappings
-- Volume mounts
-- Environment variables
-- Resource limits
+Pre-configured Docker container setups including image name, port mappings, volume mounts, environment variables, and resource limits.
 
 ### Scripts
 
-Script plugins can be:
-- **Game Scripts** - Scripts that run for game server events
-- **Docker Scripts** - Scripts that run for Docker container events
-- **Script Modules** - Reusable script libraries
+Scripts automate things that happen during game server events:
+- **Game Scripts** — run when a game server starts, stops, installs, updates, etc.
+- **Docker Scripts** — run during Docker container lifecycle events
+- **Script Modules** — reusable code libraries that other scripts can call
 
 ### Themes
 
-Theme plugins customize the control panel appearance with custom CSS and styling.
+Custom visual designs for the control panel — different colors, layouts, and styling.
 
 ### Languages
 
-Language plugins add translations for the control panel interface.
+Translation packs that let you (and your users) view the control panel in different languages.
+
+## What's Next?
+
+- [Remote Server Configuration](remote-server-configuration.mdx) — add more machines to host game servers on
+- [Web Certificate](web-certificate.mdx) — set up HTTPS with a trusted certificate

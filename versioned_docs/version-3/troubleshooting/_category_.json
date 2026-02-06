@@ -1,5 +1,9 @@
 {
   "label": "Troubleshooting",
   "position": 10,
-  "collapsed": false
+  "collapsed": false,
+  "link": {
+    "type": "generated-index",
+    "description": "Something not working? These guides help you diagnose and fix common issues with TCAdmin."
+  }
 }

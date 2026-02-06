@@ -8,20 +8,24 @@ import TabItem from "@theme/TabItem";
 
 # Update TCAdmin
 
-TCAdmin can be updated using the TCAdmin CLI tool. The update process will download and install the latest version while preserving your configuration.
+When a new version of TCAdmin is released, you can update using a single command. The updater handles everything — downloading, installing, database changes, and restarting services.
 
-## Update Command
+:::tip How do I know if there's an update?
+Check the TCAdmin announcements or community channels for new releases. Running the update command will tell you if you're already on the latest version.
+:::
+
+## How to Update
 
 <Tabs>
   <TabItem value="windows" label="Windows">
 
-Open **PowerShell** or **Command Prompt** as Administrator and run:
+Open **PowerShell** or **Command Prompt** as **Administrator** and run:
 
 ```powershell
 tca update
 ```
 
-If `tca` is not in your PATH, navigate to the CLI directory first:
+If `tca` is not recognized (meaning it's not in your PATH), navigate to the CLI directory first:
 
 ```powershell
 cd "C:\Program Files\TCAdmin3\cli"
@@ -37,7 +41,7 @@ Open a terminal and run:
 ./tca update
 ```
 
-If `tca` is not in your PATH, navigate to the CLI directory first:
+If `tca` is not recognized, navigate to the CLI directory first:
 
 ```bash
 cd /opt/tcadmin3/cli
@@ -47,19 +51,23 @@ cd /opt/tcadmin3/cli
   </TabItem>
 </Tabs>
 
-## What Happens During Update
+## What Happens During the Update
 
-The update process will:
+The update process is automatic. Here's what it does behind the scenes:
 
-1. Stop the TCAdmin services (Monitor and Web)
-2. Download the latest version
-3. Extract and install the update files
-4. Apply any database migrations
-5. Restart the TCAdmin services
+1. **Stops** the TCAdmin services (Monitor and Web) — game servers keep running, but you can't manage them during the update
+2. **Downloads** the latest version
+3. **Installs** the updated files
+4. **Applies database migrations** — updates the database structure if the new version requires it
+5. **Restarts** the TCAdmin services
+
+:::info Game servers stay running
+The update only restarts the TCAdmin management services, not your actual game servers. Players won't be disconnected during the update.
+:::
 
 ## After Updating
 
-After the update completes, verify that the services are running:
+Verify that the services came back up successfully:
 
 <Tabs>
   <TabItem value="windows" label="Windows">
@@ -68,6 +76,8 @@ After the update completes, verify that the services are running:
 Get-Service TCA3Monitor, TCA3Web
 ```
 
+Both should show a status of **Running**.
+
   </TabItem>
   <TabItem value="linux" label="Linux">
 
@@ -75,5 +85,13 @@ Get-Service TCA3Monitor, TCA3Web
 sudo systemctl status tca3monitor tca3web
 ```
 
+Both should show **active (running)**.
+
   </TabItem>
 </Tabs>
+
+Then open your control panel in the browser to confirm everything is working. You can check the version number in the panel footer or settings page.
+
+:::tip Something went wrong?
+If a service doesn't start after updating, run it in [Console Mode](troubleshooting/console-mode.mdx) to see the error messages and figure out what happened.
+:::

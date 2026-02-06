@@ -5,29 +5,73 @@ sidebar_label: Linux Installation
 
 # Linux Installation
 
-### Automated TCAdmin installer for Linux
+This guide walks you through installing TCAdmin on a Linux server. The automated installer handles all dependencies for you and takes about 5-10 minutes.
 
-The automated installer will automatically install TCAdmin and all of the dependencies.
+## Before You Begin
 
-:::info
-Run the installer below as root
+Make sure you have:
+
+- A Linux server that meets the [System Requirements](../system-requirements.mdx)
+- **MariaDB or MySQL** installed and running (see [System Requirements](../system-requirements.mdx) for details)
+- Your MySQL **username, password, and database name** ready (you'll need these during setup)
+- **Root access** (or a user with `sudo` privileges)
+- An **SSH connection** to your server (using a tool like PuTTY, your hosting provider's web console, or a terminal)
+
+:::tip Don't have MySQL set up yet?
+Install MariaDB first. On Ubuntu/Debian: `sudo apt install mariadb-server`, then run `sudo mysql_secure_installation` to set a root password. On RHEL-based distros: `sudo dnf install mariadb-server` and `sudo systemctl start mariadb`.
 :::
+
+## Install TCAdmin
+
+Run the automated installer as **root**:
 
 ```bash
 bash <(curl -fsSL https://v3.tcafiles.com/linux-beta.sh)
 ```
 
-<br />
-
-:::tip
-
-If you want to run the command above with sudo:
+:::tip Using sudo instead of root?
+If you're not logged in as root, prefix the command with `sudo`:
 
 ```bash
 sudo bash <(curl -fsSL https://v3.tcafiles.com/linux-beta.sh)
 ```
-
 :::
 
-1. Make sure you have reviewed the [System Requirements](../system-requirements.mdx).
-2. Follow the [Initial Configuration](../initial-configuration/master-server-configuration.mdx) guide to configure TCAdmin.
+:::info What does this command do?
+It downloads the official TCAdmin installer script from `v3.tcafiles.com` and runs it. The script will:
+- Install any missing system dependencies automatically
+- Download the TCAdmin components
+- Set up systemd services so TCAdmin starts on boot
+- Walk you through configuration prompts (component selection, database setup, etc.)
+:::
+
+The installer will ask you a series of questions (component selection, database setup, etc.). For a detailed explanation of each step, see the [Master Server Configuration](../initial-configuration/master-server-configuration.mdx) guide.
+
+## After Installation
+
+Once the installer finishes:
+
+- The **TCAdmin Monitor** and **TCAdmin Web** services will start automatically
+- Your control panel will be available at **`https://YOUR-SERVER-IP:31001`** from your browser
+- Default login: **admin** / **Password!23**
+
+:::warning Browser Security Warning
+Your browser will show a security warning because TCAdmin uses a self-signed certificate by default. This is normal — click "Advanced" and then "Proceed" to continue. You can set up a proper certificate later using the [Web Certificate](../initial-configuration/web-certificate.mdx) guide.
+:::
+
+:::tip Can't connect?
+If you can't reach the panel in your browser, check that port **31001** is open in your firewall:
+
+```bash
+# Ubuntu/Debian (UFW)
+sudo ufw allow 31001
+
+# RHEL/CentOS/AlmaLinux (firewalld)
+sudo firewall-cmd --permanent --add-port=31001/tcp
+sudo firewall-cmd --reload
+```
+:::
+
+## What's Next?
+
+Follow the [Master Server Configuration](../initial-configuration/master-server-configuration.mdx) guide for a detailed walkthrough of the installer prompts and your first login.

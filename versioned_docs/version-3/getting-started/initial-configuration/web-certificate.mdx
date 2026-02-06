@@ -8,15 +8,27 @@ import TabItem from "@theme/TabItem";
 
 # Web Certificate
 
-TCAdmin can automatically generate and renew SSL certificates using [Let's Encrypt](https://letsencrypt.org/). This allows you to access your control panel securely without browser security warnings.
+By default, TCAdmin uses a self-signed certificate for HTTPS, which causes your browser to show a security warning every time you visit the panel. This guide shows you how to replace it with a free, trusted certificate from [Let's Encrypt](https://letsencrypt.org/) so the warning goes away.
 
-## Prerequisites
+:::info What is an SSL certificate?
+An SSL certificate encrypts the connection between your browser and the TCAdmin panel, keeping your login credentials and data safe. A **self-signed** certificate provides encryption but isn't trusted by browsers (hence the warning). A **Let's Encrypt** certificate is free, trusted by all browsers, and auto-renews.
+:::
 
-Before generating a certificate, you must configure the web service to use ports 80 and 443.
+## Before You Begin
 
-### 1. Update Web Ports
+You need **one** of the following:
+- A **domain name** pointing to your server (e.g., `panel.yourdomain.com`) — set up a DNS **A record** that points to your server's public IP address
+- **OR** you can use TCAdmin's built-in dynamic DNS (explained below) if you don't have a domain
 
-Edit the web configuration file to change the ports:
+You also need:
+- Ports **80** and **443** open and accessible from the internet (Let's Encrypt uses port 80 to verify you own the domain)
+- No other web server (like Apache or Nginx) running on ports 80/443
+
+## Step 1: Change TCAdmin to Use Ports 80 and 443
+
+By default, TCAdmin runs on ports 31000/31001. Let's Encrypt requires your site to be on the standard web ports (80 for HTTP, 443 for HTTPS).
+
+Edit the web configuration file:
 
 <Tabs>
   <TabItem value="windows" label="Windows">
@@ -57,7 +69,9 @@ Edit `/opt/tcadmin3/config/web/appsettings.Production.json`:
   </TabItem>
 </Tabs>
 
-### 2. Restart the Web Service
+### Restart the Web Service
+
+After editing the config, restart the web service for the changes to take effect:
 
 <Tabs>
   <TabItem value="windows" label="Windows">
@@ -76,56 +90,72 @@ sudo systemctl restart tca3web
   </TabItem>
 </Tabs>
 
-:::warning Firewall Configuration
-Make sure ports 80 and 443 are open in your firewall and accessible from the internet. Let's Encrypt needs to verify domain ownership by connecting to port 80.
+:::warning Don't forget the firewall
+Make sure ports **80** and **443** are open in your firewall. Let's Encrypt connects to port 80 to verify that you control the domain — if it can't reach your server, certificate generation will fail.
 :::
 
-## Generate Certificate
+:::tip After switching ports
+Your panel URL changes too! Instead of `https://YOUR-IP:31001`, you'll now access it at `https://YOUR-IP` (port 443 is the default HTTPS port, so you don't need to type it).
+:::
 
-1. Go to **Settings** > **Web Certificate**
-2. Enter your domain name(s) in the **Domains** field (one per line)
-3. Optionally enter your **Email** address to receive certificate expiry notices
-4. Check **Accept terms of service** after reviewing the [Let's Encrypt Terms of Service](https://letsencrypt.org/repository/)
-5. Click **Create**
+## Step 2: Generate the Certificate
+
+1. Log in to your control panel
+2. Go to **Settings** > **Web Certificate**
+3. In the **Domains** field, enter your domain name (one per line if you have multiple)
+4. Optionally enter your **Email** address — Let's Encrypt will send you a reminder if your certificate is about to expire
+5. Check **Accept terms of service** (after reviewing the [Let's Encrypt Terms of Service](https://letsencrypt.org/repository/))
+6. Click **Create**
 
 TCAdmin will:
-1. Create a test certificate to verify domain ownership
-2. If successful, create the final certificate
-3. Automatically configure the web service to use the new certificate
+1. Create a test certificate first to make sure everything works
+2. If the test passes, create the real certificate
+3. Automatically configure the web service to use it
 
-:::tip No Domain?
-If you don't have a domain name, you can use TCAdmin's dynamic DNS service:
+:::tip Don't have a domain name?
+TCAdmin offers a free dynamic DNS service. Use this as your domain:
 
 ```
 YOUR-PUBLIC-IP.dyn.tcadmin.net
 ```
 
-Replace `YOUR-PUBLIC-IP` with your server's public IP address (use dashes instead of dots). For example: `192-168-1-100.dyn.tcadmin.net`
+Replace dots in your IP with dashes. For example, if your IP is `192.168.1.100`, use:
+
+```
+192-168-1-100.dyn.tcadmin.net
+```
 :::
 
-## Current Certificate
+## Checking Your Certificate
 
-The Web Certificate page displays information about your current certificate:
+After generating a certificate, the **Web Certificate** page shows:
 
-| Field | Description |
-|-------|-------------|
-| Domain | The domain name the certificate was issued for |
-| Expires on | When the certificate expires |
-| Issued by | The certificate authority (Let's Encrypt or self-signed) |
+| Field | What It Shows |
+|-------|---------------|
+| **Domain** | The domain name the certificate was issued for |
+| **Expires on** | When the certificate expires (Let's Encrypt certs last 90 days) |
+| **Issued by** | Who issued the certificate (Let's Encrypt or self-signed) |
 
-## Certificate Renewal
+## Automatic Renewal
 
-Let's Encrypt certificates are valid for 90 days. TCAdmin will automatically attempt to renew certificates before they expire.
+Let's Encrypt certificates are valid for **90 days**. TCAdmin automatically renews them before they expire — you don't need to do anything.
 
 ## Troubleshooting
 
 ### "Website must be accessible over http on port 80"
 
-This error means the web service is not configured to listen on port 80. Follow the [Prerequisites](#prerequisites) section to update the configuration.
+The web service isn't listening on port 80. Go back to [Step 1](#step-1-change-tcadmin-to-use-ports-80-and-443) and make sure you updated the config file and restarted the service.
 
 ### Certificate generation fails
 
-Common causes:
-- **Port 80 not accessible** - Ensure your firewall allows incoming connections on port 80
-- **Domain doesn't resolve** - Verify your domain's DNS A record points to your server's IP
-- **Rate limiting** - Let's Encrypt has rate limits. If you've requested too many certificates, wait before trying again
+| Possible Cause | How to Fix |
+|----------------|-----------|
+| **Port 80 not accessible** | Open port 80 in your firewall. Test by visiting `http://YOUR-DOMAIN` — you should see the TCAdmin panel (without HTTPS). |
+| **Domain doesn't point to your server** | Make sure your domain's DNS A record points to your server's public IP. You can check with `nslookup YOUR-DOMAIN` or an online DNS checker. DNS changes can take up to 24 hours to propagate, but usually take 5-30 minutes. |
+| **Rate limiting** | Let's Encrypt limits how many certificates you can request per domain per week. If you've been testing repeatedly, wait an hour and try again. |
+| **Another service on port 80** | If Apache, Nginx, or another web server is using port 80, stop it first. Only one service can listen on a port at a time. |
+
+## What's Next?
+
+- [Plugin Repository](plugin-repository.mdx) — import game configurations to start hosting
+- [Remote Server Configuration](remote-server-configuration.mdx) — add more servers to your setup

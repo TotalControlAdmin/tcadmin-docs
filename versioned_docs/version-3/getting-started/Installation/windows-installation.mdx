@@ -5,12 +5,50 @@ sidebar_label: Windows Installation
 
 # Windows Installation
 
-1. Make sure you have reviewed the [System Requirements](../system-requirements.mdx).
-2. Open **PowerShell** as Administrator.
-3. Execute the following command:
+This guide walks you through installing TCAdmin on a Windows server. The process takes about 5-10 minutes.
+
+## Before You Begin
+
+Make sure you have:
+
+- A Windows server that meets the [System Requirements](../system-requirements.mdx)
+- **MariaDB or MySQL** installed and running (see [System Requirements](../system-requirements.mdx) for details)
+- Your MySQL **username, password, and database name** ready (you'll need these during setup)
+- **Administrator access** to the server
+
+:::tip Don't have MySQL set up yet?
+Install [MariaDB](https://mariadb.org/download) first. During the MariaDB installer, set a root password and remember it. You can use the root account for TCAdmin, or create a dedicated `tcadmin3` user for better security.
+:::
+
+## Install TCAdmin
+
+1. Open **PowerShell** as Administrator.
+   - Right-click the Start menu and select **Windows PowerShell (Admin)** or **Terminal (Admin)**
+
+2. Run the following command to download and start the installer:
 
 ```powershell
 & ([scriptblock]::Create((irm "https://v3.tcafiles.com/win-x64-beta.ps1")))
 ```
 
-4. Follow the [Initial Configuration](../initial-configuration/master-server-configuration.mdx) guide to configure TCAdmin.
+3. The installer will walk you through a series of prompts (component selection, database setup, etc.). For a detailed explanation of each step, see the [Master Server Configuration](../initial-configuration/master-server-configuration.mdx) guide.
+
+:::info What does this command do?
+It downloads the official TCAdmin installer script from `v3.tcafiles.com` and runs it. The script installs the TCAdmin components, sets up Windows Services, and configures the initial settings based on your answers to the prompts.
+:::
+
+## After Installation
+
+Once the installer finishes:
+
+- The **TCAdmin Monitor** and **TCAdmin Web** services will start automatically
+- Your control panel will be available at **`https://127.0.0.1:31001`** (or `https://YOUR-SERVER-IP:31001` from another computer)
+- Default login: **admin** / **Password!23**
+
+:::warning Browser Security Warning
+Your browser will show a security warning because TCAdmin uses a self-signed certificate by default. This is normal — click "Advanced" and then "Proceed" to continue. You can set up a proper certificate later using the [Web Certificate](../initial-configuration/web-certificate.mdx) guide.
+:::
+
+## What's Next?
+
+Follow the [Master Server Configuration](../initial-configuration/master-server-configuration.mdx) guide for a detailed walkthrough of the installer prompts and your first login.

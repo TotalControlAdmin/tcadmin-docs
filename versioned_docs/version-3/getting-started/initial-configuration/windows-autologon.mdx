@@ -5,15 +5,21 @@ sidebar_label: Windows Auto-Logon
 
 # Windows Auto-Logon
 
-Some game servers require the "Interact with Desktop" option to be enabled, which requires a user to be logged in to Windows. TCAdmin provides commands to configure Windows auto-logon securely.
+Some game servers need to interact with the Windows desktop to work properly. For these games, a Windows user must be logged in at all times — including after the server reboots. TCAdmin provides a built-in command to set this up securely.
 
 :::info Windows Only
-This feature is only available on Windows servers.
+This feature only applies to Windows servers. If you're running Linux, you can skip this page.
 :::
 
-## Why Auto-Logon?
+:::tip Do you actually need this?
+Most game servers work fine **without** auto-logon. You only need it if a specific game requires the "Interact with Desktop" option to be enabled in its TCAdmin configuration. If you're not sure, skip this for now — you can always set it up later.
+:::
 
-When a game server is configured with "Interact with Desktop" enabled, it needs access to the Windows desktop session. For these games to start automatically when the server boots, a user must be logged in. Auto-logon ensures a user session is available after every restart.
+## What Auto-Logon Does
+
+Normally, after a Windows server reboots, it sits at the login screen waiting for someone to type in a password. If a game server needs desktop access to run, it can't start until someone logs in.
+
+Auto-logon solves this by automatically logging in a Windows user account every time the server starts up. The game server can then start normally without anyone needing to manually log in.
 
 ## Enable Auto-Logon
 
@@ -23,45 +29,45 @@ Open **PowerShell** or **Command Prompt** as Administrator and run:
 tca enable-autologon
 ```
 
-You will be prompted to enter:
+You'll be asked for:
 
-1. **Username** - The Windows user account to log in automatically
-2. **Password** - The password for the account (entered securely, confirmed twice)
-3. **Domain** - The domain name (defaults to local computer name)
+1. **Username** — the Windows user account to log in automatically (e.g., `Administrator`)
+2. **Password** — the password for that account (you'll type it twice to confirm)
+3. **Domain** — the domain name (just press Enter to use the local computer name — this is correct for most setups)
 
-The command will verify the credentials before enabling auto-logon.
+The command verifies your credentials are correct before enabling auto-logon.
 
-### Command Options
+### One-Line Version
 
-You can also provide credentials directly:
+If you prefer, you can pass everything in a single command:
 
 ```powershell
 tca enable-autologon --username Administrator --password YourPassword --domain COMPUTERNAME
 ```
 
-| Option | Alias | Description |
-|--------|-------|-------------|
-| `--username` | `-u` | Username for auto-logon |
-| `--password` | `-p` | Password for auto-logon |
-| `--domain` | `-d` | Domain name (defaults to local computer) |
-| `--force` | `-f` | Force auto-logon (ignore Shift key bypass) |
+| Option | Short Form | What It Does |
+|--------|------------|-------------|
+| `--username` | `-u` | The Windows user account |
+| `--password` | `-p` | The password for the account |
+| `--domain` | `-d` | The domain (defaults to local computer name) |
+| `--force` | `-f` | Skip the Shift-key bypass check |
 
-:::tip Security
-The password is stored securely using Windows LSA Secrets (encrypted), similar to the Sysinternals Autologon tool. The password is not stored in plain text in the registry.
+:::tip Is this secure?
+Yes. The password is stored using **Windows LSA Secrets** (encrypted), the same method used by Microsoft's own Sysinternals Autologon tool. The password is **not** stored in plain text in the registry.
 :::
 
 ## Disable Auto-Logon
 
-To disable auto-logon and remove stored credentials:
+To turn off auto-logon and remove the stored credentials:
 
 ```powershell
 tca disable-autologon
 ```
 
-You will be asked to confirm before disabling. To skip the confirmation:
+You'll be asked to confirm. To skip the confirmation prompt:
 
 ```powershell
 tca disable-autologon --yes
 ```
 
-This removes all stored passwords and disables automatic login.
+This removes the stored password and disables automatic login.

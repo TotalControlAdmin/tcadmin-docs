@@ -1,5 +1,9 @@
 {
   "label": "Initial Configuration",
   "position": 3,
-  "collapsed": false
+  "collapsed": false,
+  "link": {
+    "type": "generated-index",
+    "description": "After installation, these guides walk you through setting up your master server, adding remote servers, configuring HTTPS, and importing game configurations."
+  }
 }
