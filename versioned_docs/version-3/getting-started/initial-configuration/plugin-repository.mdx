@@ -1,0 +1,126 @@
+---
+sidebar_position: 4
+sidebar_label: Plugin Repository
+---
+
+# Plugin Repository
+
+The Plugin Repository allows you to browse, install, and update game configurations, Docker blueprints, scripts, themes, and language packs from centralized repositories.
+
+## Accessing the Plugin Repository
+
+1. Go to **Settings** > **Plugin Repositories**
+2. Click on a repository to browse its contents
+
+## Default Repository
+
+TCAdmin includes a default plugin repository maintained by TCAdmin that contains official game configurations and other plugins. This repository cannot be deleted or modified.
+
+## Browsing Plugins
+
+When you open a repository, plugins are organized into tabs:
+
+| Tab | Description |
+|-----|-------------|
+| **Games** | Game server configurations (Minecraft, CS2, Rust, ARK, etc.) |
+| **Docker** | Docker blueprint configurations for containerized services |
+| **Scripts** | Game scripts, Docker scripts, and script modules |
+| **Themes** | UI themes to customize the control panel appearance |
+| **Languages** | Language packs for localization |
+
+Each plugin card displays:
+- Plugin name and author
+- Short description
+- Version number and available versions
+- Tags for categorization
+- Last update time
+
+## Installing a Plugin
+
+1. Click **View Details** on a plugin card
+2. Select the **Version** you want to install
+3. Select the specific configuration file (some plugins include multiple configurations)
+4. Optionally select an existing item to update instead of creating a new one
+5. Click **Install**
+
+The installation runs as a background task. A dialog will show the progress and any messages.
+
+:::warning Updating Existing Items
+When installing a plugin, you can choose to update an existing game, Docker blueprint, script, theme, or language instead of creating a new one. If you made customizations to the existing item, they will be lost.
+:::
+
+## Adding Third-Party Repositories
+
+You can add additional plugin repositories from third-party sources:
+
+1. Go to **Settings** > **Plugin Repositories**
+2. Click **Add**
+3. Enter the repository details:
+   - **Name** - A friendly name for the repository
+   - **Git URL** - The Git repository URL
+   - **Branch** - The branch to use (default: `master`)
+   - **Credential** - Select a saved credential for private repositories
+4. Click **Save**
+
+:::warning Security Notice
+Third-party plugin repositories are added at your own risk. Plugins can contain code that executes on your server. Only add repositories from sources you trust.
+:::
+
+## Repository Sync
+
+Repositories sync automatically from their Git source. If a repository shows "Not Synced":
+
+1. Open the repository
+2. Click **Sync Repository**
+3. Wait for the sync to complete
+
+The sync status shows:
+- **Synced** - Repository is up to date
+- **Not Synced** - Repository needs to sync (may show commits ahead/behind)
+
+## Credentials
+
+For private Git repositories, you can save credentials:
+
+1. Go to **Settings** > **Plugin Repositories**
+2. Click **Credentials** in the left menu
+3. Click **Add** to create a new credential
+4. Enter the username and password/token
+5. Save the credential
+
+You can then select this credential when adding or editing a repository.
+
+## Plugin Types
+
+### Game Configurations
+
+Game plugins contain complete server configurations including:
+- Executable paths and command lines
+- Default ports and query settings
+- Steam integration (App ID, anonymous login settings)
+- File management templates
+- Default scripts and variables
+
+### Docker Blueprints
+
+Docker plugins contain container configurations including:
+- Image name and registry settings
+- Port mappings
+- Volume mounts
+- Environment variables
+- Resource limits
+
+### Scripts
+
+Script plugins can be:
+- **Game Scripts** - Scripts that run for game server events
+- **Docker Scripts** - Scripts that run for Docker container events
+- **Script Modules** - Reusable script libraries
+
+### Themes
+
+Theme plugins customize the control panel appearance with custom CSS and styling.
+
+### Languages
+
+Language plugins add translations for the control panel interface.

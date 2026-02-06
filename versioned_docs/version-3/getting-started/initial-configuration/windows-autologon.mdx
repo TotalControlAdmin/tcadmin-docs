@@ -1,0 +1,67 @@
+---
+sidebar_position: 5
+sidebar_label: Windows Auto-Logon
+---
+
+# Windows Auto-Logon
+
+Some game servers require the "Interact with Desktop" option to be enabled, which requires a user to be logged in to Windows. TCAdmin provides commands to configure Windows auto-logon securely.
+
+:::info Windows Only
+This feature is only available on Windows servers.
+:::
+
+## Why Auto-Logon?
+
+When a game server is configured with "Interact with Desktop" enabled, it needs access to the Windows desktop session. For these games to start automatically when the server boots, a user must be logged in. Auto-logon ensures a user session is available after every restart.
+
+## Enable Auto-Logon
+
+Open **PowerShell** or **Command Prompt** as Administrator and run:
+
+```powershell
+tca enable-autologon
+```
+
+You will be prompted to enter:
+
+1. **Username** - The Windows user account to log in automatically
+2. **Password** - The password for the account (entered securely, confirmed twice)
+3. **Domain** - The domain name (defaults to local computer name)
+
+The command will verify the credentials before enabling auto-logon.
+
+### Command Options
+
+You can also provide credentials directly:
+
+```powershell
+tca enable-autologon --username Administrator --password YourPassword --domain COMPUTERNAME
+```
+
+| Option | Alias | Description |
+|--------|-------|-------------|
+| `--username` | `-u` | Username for auto-logon |
+| `--password` | `-p` | Password for auto-logon |
+| `--domain` | `-d` | Domain name (defaults to local computer) |
+| `--force` | `-f` | Force auto-logon (ignore Shift key bypass) |
+
+:::tip Security
+The password is stored securely using Windows LSA Secrets (encrypted), similar to the Sysinternals Autologon tool. The password is not stored in plain text in the registry.
+:::
+
+## Disable Auto-Logon
+
+To disable auto-logon and remove stored credentials:
+
+```powershell
+tca disable-autologon
+```
+
+You will be asked to confirm before disabling. To skip the confirmation:
+
+```powershell
+tca disable-autologon --yes
+```
+
+This removes all stored passwords and disables automatic login.

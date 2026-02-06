@@ -1,0 +1,79 @@
+---
+sidebar_position: 9
+sidebar_label: Update TCAdmin
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Update TCAdmin
+
+TCAdmin can be updated using the TCAdmin CLI tool. The update process will download and install the latest version while preserving your configuration.
+
+## Update Command
+
+<Tabs>
+  <TabItem value="windows" label="Windows">
+
+Open **PowerShell** or **Command Prompt** as Administrator and run:
+
+```powershell
+tca update
+```
+
+If `tca` is not in your PATH, navigate to the CLI directory first:
+
+```powershell
+cd "C:\Program Files\TCAdmin3\cli"
+.\tca update
+```
+
+  </TabItem>
+  <TabItem value="linux" label="Linux">
+
+Open a terminal and run:
+
+```bash
+./tca update
+```
+
+If `tca` is not in your PATH, navigate to the CLI directory first:
+
+```bash
+cd /opt/tcadmin3/cli
+./tca update
+```
+
+  </TabItem>
+</Tabs>
+
+## What Happens During Update
+
+The update process will:
+
+1. Stop the TCAdmin services (Monitor and Web)
+2. Download the latest version
+3. Extract and install the update files
+4. Apply any database migrations
+5. Restart the TCAdmin services
+
+## After Updating
+
+After the update completes, verify that the services are running:
+
+<Tabs>
+  <TabItem value="windows" label="Windows">
+
+```powershell
+Get-Service TCA3Monitor, TCA3Web
+```
+
+  </TabItem>
+  <TabItem value="linux" label="Linux">
+
+```bash
+sudo systemctl status tca3monitor tca3web
+```
+
+  </TabItem>
+</Tabs>
