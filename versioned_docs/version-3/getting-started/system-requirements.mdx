@@ -40,18 +40,23 @@ We recommend **[MariaDB](https://mariadb.org/download)** — it's free, open-sou
 During the MariaDB installer, you'll be asked to set a **root password** — remember this! You'll use it later when configuring TCAdmin. You can also create a dedicated `tcadmin3` database user during setup (recommended for security).
 :::
 
+#### Microsoft Visual C++ Redistributable (Required)
+
+TCAdmin requires the Visual C++ runtime for game server process management. Without it, game servers will fail to start.
+
+- [Microsoft Visual C++ **(x64)**](https://aka.ms/vc14/vc_redist.x64.exe) 2015 to 2022 — **required by TCAdmin** and most game servers
+
+:::tip Also install the x86 version
+While only the x64 runtime is required by TCAdmin, many game servers also need the x86 version. We recommend installing both:
+- [Microsoft Visual C++ **(x86)**](https://aka.ms/vs/17/release/vc_redist.x86.exe) 2015 to 2022
+:::
+
 #### Required by Some Games
 
-These are **not** needed for TCAdmin itself, but certain game servers won't run without them. Install these if you plan to host the types of games listed:
+These are **not** needed for TCAdmin itself, but certain game servers won't run without them:
 
-- [Microsoft Visual C++ **(x64)**](https://aka.ms/vs/17/release/vc_redist.x64.exe) 2015 to 2022 — needed by most Source engine and Unreal engine games
-- [Microsoft Visual C++ **(x86)**](https://aka.ms/vs/17/release/vc_redist.x86.exe) 2015 to 2022 — needed by some older 32-bit game servers
 - [DirectX](https://www.microsoft.com/en-us/download/details.aspx?id=35&6B49FDFB-8E5B-4B07-BC31-15695C5A2143=1) — needed by a handful of game servers
 - Java — **required for Minecraft.** We recommend the [Adoptium variant](https://adoptium.net/)
-
-:::tip Just install the Visual C++ runtimes
-Even if you're not sure which games you'll host, installing both Visual C++ runtimes (x64 and x86) is a good idea — they're needed by the majority of game servers and take seconds to install.
-:::
 
 #### Optional
 
