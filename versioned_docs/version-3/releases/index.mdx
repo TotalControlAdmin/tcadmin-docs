@@ -1,0 +1,45 @@
+---
+title: Release Notes
+sidebar_label: Release Notes
+---
+
+# Release Notes
+
+Release notes for TCAdmin v3 versions.
+
+:::tip Updating to the latest version
+See the [Update TCAdmin](../update-tcadmin.mdx) guide for step-by-step instructions on how to update your installation.
+:::
+
+export const ReleaseCard = ({version, date, summary, link}) => (
+  <a href={link} className="release-card">
+    <div className="release-card__version">{version}</div>
+    {date && <div className="release-card__date">{date}</div>}
+    <div className="release-card__summary">{summary}</div>
+  </a>
+);
+
+<div className="releases-grid">
+
+<ReleaseCard
+  version="3.0.891.56055"
+  date="February 24, 2026"
+  summary="Config file editors in service wizard, resource limits, service settings pages, update health check, and bug fixes."
+  link="./3.0.891.56055"
+/>
+
+<ReleaseCard
+  version="3.0.867.2669"
+  date="February 16, 2026"
+  summary="Encrypted credentials, private networks, remote desktop/shell, community plugin repository, and more."
+  link="./3.0.867.2669"
+/>
+
+<ReleaseCard
+  version="3.0.829.41981"
+  date="February 6, 2026"
+  summary="Initial preview release — redesigned Blazor interface and modular SDK architecture."
+  link="./3.0.829.41981"
+/>
+
+</div>

@@ -1,19 +1,9 @@
 ---
-sidebar_position: 8
-sidebar_label: Releases
+sidebar_position: 2
+sidebar_label: 3.0.867.2669
 ---
 
-# Release Notes
-
-This page lists all TCAdmin v3 releases with their changes. Newer versions appear first.
-
-:::tip Updating to the latest version
-See the [Update TCAdmin](update-tcadmin.mdx) guide for step-by-step instructions on how to update your installation.
-:::
-
----
-
-## Version 3.0.867.2669
+# Version 3.0.867.2669
 
 ### New Features
 
@@ -35,11 +25,3 @@ See the [Update TCAdmin](update-tcadmin.mdx) guide for step-by-step instructions
 - **Port allocation error** — Fixed a "could not find available port" error that occurred when the port was set to 0.
 - **Desktop interaction** — Fixed an issue where interacting with the desktop session failed when the Windows session was locked.
 - **Game servers killed on monitor stop (Linux)** — Fixed an issue where stopping the monitor service on Linux would also terminate running game servers. ServiceIO processes are now launched in a separate systemd scope so they are no longer affected by the monitor's service lifecycle.
-
----
-
-## Version 3.0.829.41981
-
-*Initial preview release.*
-
-This is the first public preview of TCAdmin v3, featuring a fully redesigned interface built on Blazor, a new modular SDK architecture, and the foundation for all future v3 development.

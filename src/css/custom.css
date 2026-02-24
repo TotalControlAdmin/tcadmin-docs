@@ -254,3 +254,58 @@ nav li a {
 [data-theme="dark"] .header-forum-link::before {
   background-image: url("/img/comments-solid-full-white.svg");
 }
+
+/* Release notes card grid */
+.releases-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .releases-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.release-card {
+  display: block;
+  padding: 1.25rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  text-decoration: none !important;
+  color: inherit !important;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.release-card:hover {
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 2px 12px rgba(9, 157, 255, 0.15);
+}
+
+.release-card__version {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.release-card__date {
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-600);
+  margin-bottom: 0.5rem;
+}
+
+.release-card__summary {
+  font-size: 0.9rem;
+  color: var(--ifm-color-emphasis-700);
+  line-height: 1.45;
+}
+
+[data-theme='dark'] .release-card {
+  border-color: var(--ifm-color-emphasis-200);
+}
+
+[data-theme='dark'] .release-card__summary {
+  color: var(--ifm-color-emphasis-600);
+}
