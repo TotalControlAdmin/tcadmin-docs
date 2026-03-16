@@ -8,23 +8,38 @@ import TabItem from "@theme/TabItem";
 
 # Web Certificate
 
-By default, TCAdmin uses a self-signed certificate for HTTPS, which causes your browser to show a security warning every time you visit the panel. This guide shows you how to replace it with a free, trusted certificate from [Let's Encrypt](https://letsencrypt.org/) so the warning goes away.
+By default, TCAdmin uses a self-signed certificate for HTTPS, which causes your browser to show a security warning every time you visit the panel. This guide shows you how to replace it with a trusted certificate so the warning goes away.
 
 :::info What is an SSL certificate?
 An SSL certificate encrypts the connection between your browser and the TCAdmin panel, keeping your login credentials and data safe. A **self-signed** certificate provides encryption but isn't trusted by browsers (hence the warning). A **Let's Encrypt** certificate is free, trusted by all browsers, and auto-renews.
 :::
 
+TCAdmin supports three ways to set up a trusted certificate:
+
+| Method | Best For | Requirements |
+|--------|----------|--------------|
+| [**HTTP Validation**](#method-1-http-validation) | Most setups — fully automatic | Domain name, ports 80 & 443 open |
+| [**DNS Validation**](#method-2-dns-validation) | Servers behind firewalls or NAT | Domain name, access to DNS records |
+| [**Custom Certificate**](#method-3-custom-certificate) | Using your own certificate (purchased or from another CA) | A `.pfx` or `.p12` certificate file |
+
 ## Before You Begin
 
-You need **one** of the following:
+For **HTTP Validation** or **DNS Validation**, you need:
 - A **domain name** pointing to your server (e.g., `panel.yourdomain.com`) — set up a DNS **A record** that points to your server's public IP address
-- **OR** you can use TCAdmin's built-in dynamic DNS (explained below) if you don't have a domain
+- **OR** you can use TCAdmin's built-in dynamic DNS if you don't have a domain (see [Dynamic DNS](#dynamic-dns) below)
 
-You also need:
-- Ports **80** and **443** open and accessible from the internet (Let's Encrypt uses port 80 to verify you own the domain)
+For **Custom Certificate**, you just need your certificate file in `.pfx` or `.p12` format with the private key included.
+
+## Method 1: HTTP Validation
+
+This is the simplest method. Let's Encrypt automatically verifies you own the domain by connecting to your server over HTTP.
+
+### Requirements
+
+- Ports **80** and **443** open and accessible from the internet
 - No other web server (like Apache or Nginx) running on ports 80/443
 
-## Step 1: Change TCAdmin to Use Ports 80 and 443
+### Step 1: Change TCAdmin to Use Ports 80 and 443
 
 By default, TCAdmin runs on ports 31000/31001. Let's Encrypt requires your site to be on the standard web ports (80 for HTTP, 443 for HTTPS).
 
@@ -98,55 +113,136 @@ Make sure ports **80** and **443** are open in your firewall. Let's Encrypt conn
 Your panel URL changes too! Instead of `https://YOUR-IP:31001`, you'll now access it at `https://YOUR-IP` (port 443 is the default HTTPS port, so you don't need to type it).
 :::
 
-## Step 2: Generate the Certificate
+### Step 2: Generate the Certificate
 
 1. Log in to your control panel
 2. Go to **Settings** > **Web Certificate**
-3. In the **Domains** field, enter your domain name (one per line if you have multiple)
-4. Optionally enter your **Email** address — Let's Encrypt will send you a reminder if your certificate is about to expire
-5. Check **Accept terms of service** (after reviewing the [Let's Encrypt Terms of Service](https://letsencrypt.org/repository/))
-6. Click **Create**
+3. Select the **HTTP Validation** tab
+4. In the **Domains** field, enter your domain name (one per line if you have multiple)
+5. Optionally enter your **Email** address — Let's Encrypt will send you a reminder if your certificate is about to expire
+6. Check **Accept terms of service** (after reviewing the [Let's Encrypt Terms of Service](https://letsencrypt.org/repository/))
+7. Click **Create**
 
 TCAdmin will:
-1. Create a test certificate first to make sure everything works
+1. Create a test certificate first (using Let's Encrypt staging) to make sure everything works
 2. If the test passes, create the real certificate
 3. Automatically configure the web service to use it
 
-:::tip Don't have a domain name?
-TCAdmin offers a free dynamic DNS service. Use this as your domain:
+### Automatic Renewal
+
+Let's Encrypt certificates are valid for **90 days**. TCAdmin automatically renews HTTP certificates **30 days** before they expire — you don't need to do anything.
+
+## Method 2: DNS Validation
+
+Use this method if your server is behind a firewall, NAT, or you can't open port 80. Instead of connecting to your server, Let's Encrypt verifies ownership by checking a DNS TXT record that you create.
+
+### Step 1: Initiate DNS Validation
+
+1. Log in to your control panel
+2. Go to **Settings** > **Web Certificate**
+3. Select the **DNS Validation** tab
+4. In the **Domains** field, enter your domain name (one per line if you have multiple)
+5. Optionally enter your **Email** address
+6. Check **Accept terms of service**
+7. Click **Initiate DNS Validation**
+
+TCAdmin will display one or more DNS TXT records that you need to create:
+
+| Field | Example |
+|-------|---------|
+| **Domain** | `yourdomain.com` |
+| **Record Name** | `_acme-challenge.yourdomain.com` |
+| **Record Value** | `a1b2c3d4e5f6...` (a long random string) |
+
+Use the copy button next to each record value to copy it to your clipboard.
+
+### Step 2: Create the DNS Records
+
+Log in to your DNS provider (e.g., Cloudflare, Namecheap, GoDaddy) and create a **TXT** record for each entry shown:
+
+- **Name/Host:** `_acme-challenge` (or the full record name shown)
+- **Type:** `TXT`
+- **Value:** The record value shown in TCAdmin
+
+:::warning DNS propagation
+DNS changes can take anywhere from a few minutes to several hours to propagate. Wait at least 5-10 minutes before proceeding to the next step. You can verify propagation using an online DNS checker or by running `nslookup -type=TXT _acme-challenge.yourdomain.com`.
+:::
+
+### Step 3: Complete Validation
+
+Once the DNS records are in place, click **Complete Validation** in TCAdmin. It will verify the DNS records and generate your certificate.
+
+:::info Starting over
+If you need to cancel the DNS validation process (e.g., you entered the wrong domain), click **Cancel and Start Over** to restart.
+:::
+
+:::note Renewal
+DNS validation certificates are **not** automatically renewed. You will need to repeat this process before the certificate expires (90 days). The system health indicator will warn you when your certificate is approaching expiry.
+:::
+
+## Method 3: Custom Certificate
+
+If you already have an SSL certificate (purchased from a CA or generated elsewhere), you can upload it directly.
+
+### Requirements
+
+- Certificate must be in `.pfx` or `.p12` format
+- Certificate must include the **private key**
+- Maximum file size: **10 MB**
+
+### Upload Your Certificate
+
+1. Log in to your control panel
+2. Go to **Settings** > **Web Certificate**
+3. Select the **Custom Certificate** tab
+4. Click **Browse** and select your `.pfx` or `.p12` file
+5. Enter the certificate **password** (if the certificate is password-protected)
+6. Click **Upload**
+
+TCAdmin will validate the certificate, check that it contains a private key, and apply it to the web service.
+
+:::note Renewal
+Custom certificates are **not** automatically renewed. You will need to upload a new certificate before the current one expires. The system health indicator will warn you when your certificate is approaching expiry.
+:::
+
+## Dynamic DNS {#dynamic-dns}
+
+If you don't have a domain name, TCAdmin offers a free dynamic DNS service. Use this as your domain:
 
 ```
 YOUR-PUBLIC-IP.dyn.tcadmin.net
 ```
 
-Replace dots in your IP with dashes. For example, if your IP is `192.168.1.100`, use:
+Replace dots in your IP with dashes. For example, if your IP is `203.0.113.50`, use:
 
 ```
-192-168-1-100.dyn.tcadmin.net
+203-0-113-50.dyn.tcadmin.net
 ```
-:::
+
+This works with both HTTP and DNS validation methods.
 
 ## Checking Your Certificate
 
-After generating a certificate, the **Web Certificate** page shows:
+After setting up a certificate (using any method), the **Web Certificate** page shows:
 
 | Field | What It Shows |
 |-------|---------------|
-| **Domain** | The domain name the certificate was issued for |
-| **Expires on** | When the certificate expires (Let's Encrypt certs last 90 days) |
-| **Issued by** | Who issued the certificate (Let's Encrypt or self-signed) |
+| **Domain(s)** | The domain name(s) the certificate was issued for |
+| **Expires on** | When the certificate expires |
+| **Issued by** | Who issued the certificate (e.g., Let's Encrypt, your CA) |
 
-## Automatic Renewal
-
-Let's Encrypt certificates are valid for **90 days**. TCAdmin automatically renews them before they expire — you don't need to do anything.
+The system health indicator in the bottom status bar also monitors your certificate:
+- **Healthy** — Certificate is valid with plenty of time remaining
+- **Degraded** — Certificate expires within 20 days
+- **Unhealthy** — Certificate has expired
 
 ## Troubleshooting
 
 ### "Website must be accessible over http on port 80"
 
-The web service isn't listening on port 80. Go back to [Step 1](#step-1-change-tcadmin-to-use-ports-80-and-443) and make sure you updated the config file and restarted the service.
+The web service isn't listening on port 80. Go back to [Step 1 of HTTP Validation](#step-1-change-tcadmin-to-use-ports-80-and-443) and make sure you updated the config file and restarted the service. This only applies to the HTTP Validation method.
 
-### Certificate generation fails
+### Certificate generation fails (HTTP Validation)
 
 | Possible Cause | How to Fix |
 |----------------|-----------|
@@ -154,6 +250,23 @@ The web service isn't listening on port 80. Go back to [Step 1](#step-1-change-t
 | **Domain doesn't point to your server** | Make sure your domain's DNS A record points to your server's public IP. You can check with `nslookup YOUR-DOMAIN` or an online DNS checker. DNS changes can take up to 24 hours to propagate, but usually take 5-30 minutes. |
 | **Rate limiting** | Let's Encrypt limits how many certificates you can request per domain per week. If you've been testing repeatedly, wait an hour and try again. |
 | **Another service on port 80** | If Apache, Nginx, or another web server is using port 80, stop it first. Only one service can listen on a port at a time. |
+
+### DNS validation fails
+
+| Possible Cause | How to Fix |
+|----------------|-----------|
+| **DNS records not propagated** | Wait longer (up to a few hours) and try again. Use an online DNS checker to verify the TXT record is visible. |
+| **Wrong record name or value** | Double-check the record name and value match exactly what TCAdmin showed. The record name should be `_acme-challenge.yourdomain.com`. |
+| **Multiple TXT records** | If you have old `_acme-challenge` TXT records from a previous attempt, delete them before creating new ones. |
+
+### Custom certificate upload fails
+
+| Possible Cause | How to Fix |
+|----------------|-----------|
+| **Wrong format** | The certificate must be in `.pfx` or `.p12` format. If you have `.pem` or `.crt` files, convert them first using `openssl pkcs12 -export -out cert.pfx -inkey key.pem -in cert.pem`. |
+| **Missing private key** | The `.pfx` file must include the private key. Re-export it with the key included. |
+| **Wrong password** | Make sure you're entering the correct password for the `.pfx` file. |
+| **File too large** | The certificate file must be under 10 MB. |
 
 ## What's Next?
 
