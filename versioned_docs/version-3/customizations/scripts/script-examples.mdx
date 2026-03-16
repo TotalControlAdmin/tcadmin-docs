@@ -1,0 +1,132 @@
+---
+sidebar_position: 2
+sidebar_label: Script Examples
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Script Examples
+
+## Toggle Service Power State
+
+This script checks the current status of the service from the service manager and toggles it — starting the service if it's stopped, or stopping it if it's running.
+
+:::info
+`ServiceManagerService` requires the **Run Impersonated** option to be unchecked on the script.
+:::
+
+<Tabs>
+  <TabItem value="csharp" label="C#">
+
+```csharp
+//refAssemblies: TCAdmin.SDK.dll, TCAdmin.GameHosting.SDK.dll, TCAdmin.Scripting.dll, TCAdmin.Monitor.dll
+using TCAdmin.Web.Shared.Models.Enums;
+
+var Globals = new TCAdmin.Scripting.Engines.Addons.CSharpGameGlobals(); // DO NOT MODIFY THIS LINE
+
+var console = Globals.ScriptConsole;
+var serviceManager = Globals.ServiceManagerService;
+var service = Globals.ThisService;
+var serviceManagerStatus = await serviceManager.GetServiceStatus(service.ServiceId);
+
+console.WriteLine($"Current service id is { service.ServiceId }");
+console.WriteLine($"Status in database: { service.Status }");
+console.WriteLine($"Status in service manager: { serviceManagerStatus.Status }");
+
+if(serviceManagerStatus.Status == EServiceStatus.Stopped)
+{
+    await serviceManager.StartService(service.ServiceId);
+    console.WriteLine("Service was started 🚀");
+}
+else if(serviceManagerStatus.Status == EServiceStatus.Started)
+{
+    await serviceManager.StopService(service.ServiceId);
+    console.WriteLine("Service was stopped 🛑");
+}
+```
+
+  </TabItem>
+  <TabItem value="python" label="Python 3">
+
+```python
+service = ThisService
+serviceManagerStatus = ServiceManagerService.GetServiceStatus(service.ServiceId).Result
+
+print("Current service id is " + str(service.ServiceId))
+print("Status in database: " + str(service.Status))
+print("Status in service manager: " + str(serviceManagerStatus.Status))
+
+if serviceManagerStatus.Status.ToString() == "Stopped":
+    ServiceManagerService.StartService(service.ServiceId).Wait()
+    print("Service was started 🚀")
+elif serviceManagerStatus.Status.ToString() == "Started":
+    ServiceManagerService.StopService(service.ServiceId).Wait()
+    print("Service was stopped 🛑")
+```
+
+  </TabItem>
+  <TabItem value="powershell" label="PowerShell">
+
+```powershell
+$service = $ThisService
+$serviceManagerStatus = $ServiceManagerService.GetServiceStatus($service.ServiceId).Result
+
+Write-Host "Current service id is $($service.ServiceId)"
+Write-Host "Status in database: $($service.Status)"
+Write-Host "Status in service manager: $($serviceManagerStatus.Status)"
+
+if ($serviceManagerStatus.Status.ToString() -eq "Stopped") {
+    $ServiceManagerService.StartService($service.ServiceId).Wait()
+    Write-Host "Service was started 🚀"
+} elseif ($serviceManagerStatus.Status.ToString() -eq "Started") {
+    $ServiceManagerService.StopService($service.ServiceId).Wait()
+    Write-Host "Service was stopped 🛑"
+}
+```
+
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+
+```javascript
+var service = ThisService;
+var serviceManagerStatus = ServiceManagerService.GetServiceStatus(service.ServiceId).Result;
+
+Console.log("Current service id is " + service.ServiceId);
+Console.log("Status in database: " + service.Status);
+Console.log("Status in service manager: " + serviceManagerStatus.Status);
+
+// EServiceStatus: Starting=0, Started=1, Stopping=2, Stopped=3
+if (serviceManagerStatus.Status == 3) {
+    ServiceManagerService.StartService(service.ServiceId).Wait();
+    Console.log("Service was started 🚀");
+} else if (serviceManagerStatus.Status == 1) {
+    ServiceManagerService.StopService(service.ServiceId).Wait();
+    Console.log("Service was stopped 🛑");
+}
+```
+
+  </TabItem>
+  <TabItem value="lua" label="Lua">
+
+```lua
+local service = ThisService
+local serviceManager = ServiceManagerService
+local serviceManagerStatus = serviceManager:GetServiceStatus(service.ServiceId).Result
+
+print("Current service id is {0}", service.ServiceId)
+print("Status in database: {0}", service.Status)
+print("Status in service manager: {0}", serviceManagerStatus.Status)
+
+-- EServiceStatus: Starting=0, Started=1, Stopping=2, Stopped=3
+if serviceManagerStatus.Status == 3 then
+    serviceManager:StartService(service.ServiceId):Wait()
+    print("Service was started 🚀")
+elseif serviceManagerStatus.Status == 1 then
+    serviceManager:StopService(service.ServiceId):Wait()
+    print("Service was stopped 🛑")
+end
+```
+
+  </TabItem>
+</Tabs>

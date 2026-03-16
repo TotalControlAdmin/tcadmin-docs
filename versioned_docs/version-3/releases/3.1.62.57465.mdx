@@ -1,0 +1,38 @@
+---
+sidebar_position: 1
+sidebar_label: 3.1.62.57465
+---
+
+# Version 3.1.62.57465
+
+### New Features
+
+- **Virtual servers** — Added support for virtual servers with ownership management. Server and virtual server owners can now be assigned, and service deletion is restricted to the owner.
+- **.NET 10 upgrade** — The entire platform has been upgraded from .NET 9 to .NET 10, bringing performance improvements and the latest framework features.
+- **Billing integration** — Added billing ID and billing status fields to users, servers, and virtual servers. Includes billing API functions for external billing system integration.
+- **S3 file provider** — Added support for Amazon S3-compatible storage as a file provider for game server files.
+- **File servers** — Introduced file server support, allowing centralized management of file storage locations. Supported file providers: FTP, SFTP, and S3.
+- **Automatic server selection** — New game services can now be automatically assigned to the best available server based on configured criteria.
+- **Datacenter regions** — Datacenters can now have multiple regions, providing more granular location-based server grouping.
+- **Server allowed games** — You can now configure which games are allowed on each server directly from the server and game settings pages.
+- **API settings page** — Added a dedicated settings page for configuring API options. Currently used for billing API configuration.
+- **Login page customization** — Added login theme settings with customization options for branding the login page.
+- **Root permission for API keys** — Administrators can now create API keys with Root access, granting full unrestricted control over all API endpoints.
+- **Disk space limits in service creation** — Disk space limits can now be configured when creating a new service.
+- **Service settings permissions** — Added granular permissions for controlling access to service settings.
+- **DNS-01 certificate validation** — Added DNS-01 challenge support for Let's Encrypt certificates. This allows certificate creation by proving domain ownership via DNS TXT records, removing the requirement for port 80 to be accessible. Useful for servers behind firewalls or NATs.
+- **Custom certificate upload** — You can now upload your own .pfx certificate file with password directly from the web certificate settings page. Supports certificates from any Certificate Authority.
+- **HTTP-01 automatic renewal** — Let's Encrypt certificates obtained via HTTP-01 validation are now automatically renewed before expiration.
+
+### Bug Fixes
+
+- **Linux resource limits** — Fixed resource limit enforcement on Linux servers.
+- **Game script execute permissions** — Fixed an error when viewing game script execute permissions caused by the page incorrectly querying the Docker Blueprint API.
+- **Certificate password handling** — Fixed the web certificate page failing to load when the configured certificate has a non-empty password.
+- **HTTP-01 certificate validation** — Fixed silent failures during HTTP-01 certificate validation. Invalid challenges now fail fast with error details, and timed-out challenges now throw an explicit error instead of silently continuing.
+- **Numeric textbox JSON error** — Fixed a JSON serialization error with the numeric textbox component.
+- **Duplicate console output** — Fixed a race condition where navigating away from a service page and returning could cause console output lines to appear twice. The issue affected the text console, screen capture console, Docker terminal, and log file viewer components.
+- **Console border color** — Fixed a black border appearing around the text console and screen capture console. The border now matches the theme's console background color.
+- **Console page reload error** — Fixed an error that occurred when reloading the web console page via browser navigation.
+- **Docker console error** — Fixed an error in the Docker console when the container service handler encountered an unexpected state.
+- **Live stats showing zeros** — Fixed service resource stats (CPU, memory, network) displaying zero values for running services.

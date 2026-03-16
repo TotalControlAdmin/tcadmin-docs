@@ -1,0 +1,8 @@
+{
+  "label": "Customizations",
+  "position": 5,
+  "link": {
+    "type": "generated-index",
+    "description": "Customize TCAdmin with scripts, themes, and more."
+  }
+}

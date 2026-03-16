@@ -134,7 +134,7 @@ const config = {
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
-      additionalLanguages: ["php", "cshtml", "csharp"],
+      additionalLanguages: ["php", "cshtml", "csharp", "lua"],
     },
     colorMode: {
       respectPrefersColorScheme: true,

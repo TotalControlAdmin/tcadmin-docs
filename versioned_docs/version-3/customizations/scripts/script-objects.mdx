@@ -1,0 +1,267 @@
+---
+sidebar_position: 1
+sidebar_label: Script Objects
+---
+
+# Script Objects
+
+TCAdmin scripts have access to a set of built-in objects that provide information about the current context (server, service, task, etc.) and allow you to interact with TCAdmin's APIs.
+
+## Scripting Engines
+
+TCAdmin supports the following scripting engines:
+
+- **C#**
+- **JavaScript** (Jint)
+- **Python 3** (IronPython)
+- **PowerShell**
+- **Batch** (shell commands)
+
+## Accessing Script Objects
+
+### C# Scripts
+
+In C# scripts, all objects are available through the `Globals` variable. Depending on the script type, `Globals` is an instance of:
+
+- **Game scripts** — `CSharpGameGlobals`
+- **Docker scripts** — `CSharpDockerGlobals`
+
+You can access properties directly since `Globals` is the implicit scope:
+
+```csharp
+var Globals = new TCAdmin.Scripting.Engines.Addons.CSharpGameGlobals();
+
+// Access the current server
+var server = Globals.ThisServer;
+
+// Access the current service
+var service = Globals.ThisService;
+
+Globals.ScriptConsole.WriteLine($"Service: {service.Name}");
+```
+
+### JavaScript and Python Scripts
+
+The same objects listed below are available as global variables in JavaScript and Python scripts. To see which objects are available, refer to the properties of `CSharpGameGlobals` and `CSharpDockerGlobals` below — the same properties are exposed in all scripting engines.
+
+```javascript
+// JavaScript example
+ScriptConsole.WriteLine("Server: " + ThisServer.Name);
+```
+
+```python
+# Python example
+ScriptConsole.WriteLine("Server: " + ThisServer.Name)
+```
+
+---
+
+## Common Objects
+
+These objects are available in **all** script types (game and Docker).
+
+### Context Objects
+
+| Object | Type | Description |
+|--------|------|-------------|
+| `Globals` | `CSharpGameGlobals` / `CSharpDockerGlobals` | Self-reference to the globals object (C# scripts only). |
+| `ThisServer` | `Server` | The server where the script is running. |
+| `ThisService` | `Service` | The current service. In game scripts this is a `GameService`, in Docker scripts a `DockerService`. |
+| `ThisDatacenter` | `Datacenter` | The datacenter the server belongs to. |
+| `ThisTask` | `TCATask` | The current task being executed. |
+| `ThisTaskStep` | `TCATaskStep` | The current step within the task. |
+| `ThisTaskStepHandler` | `TCATaskStepHandler` | The handler processing the current task step. |
+| `ThisScript` | `IScriptEngine` | The scripting engine executing the current script. |
+| `ThisCancellationToken` | `CancellationToken` | Token to check if the script execution has been cancelled. |
+| `RootDirectory` | `string` | The root directory path of the current service. |
+
+### Managers
+
+Managers provide database access to query and manage TCAdmin entities.
+
+| Object | Type | Description |
+|--------|------|-------------|
+| `DatacenterManager` | `DatacenterManager` | Query and manage datacenters. |
+| `ServerManager` | `ServerManager` | Query and manage servers. |
+| `GameManager` | `GameManager` | Query and manage game configurations. |
+| `ServiceManager` | `ServiceManager` | Query and manage services. |
+| `ServiceManagerService` | `IServiceManagerService` | Service management operations (start, stop, restart, etc.). |
+| `RecurringTaskManager` | `RecurringTaskManager` | Query and manage recurring/scheduled tasks. |
+| `TCATaskManager` | `TCATaskManager` | Query and manage tasks. |
+
+### Utility Objects
+
+| Object | Type | Description |
+|--------|------|-------------|
+| `ScriptConsole` | `CSharpConsole` | Write output and read input from the script console. |
+| `Variables` | `TCAdminVars` | Dictionary of all variables passed to the script. |
+| `Dynamic` | `ExpandoObject` | Dynamic object with all script variables as properties. |
+| `OperatingSystem` | `IOperatingSystem` | Operating system utilities (CPU, memory, user management, file permissions). |
+| `TCAdminConfig` | `TCAdminConfig` | The TCAdmin configuration (server ID, database config, paths, etc.). |
+| `EncryptionService` | `EncryptionService` | Encrypt and decrypt sensitive data. |
+| `ScriptingEnvironment` | `IScriptingEnvironment` | Execute other scripts from within a script. |
+| `ReturnValue` | `object` | Set this to return a value from the script. |
+
+---
+
+## Game Script Objects
+
+These additional objects are available when the script runs in a **game service** context (`CSharpGameGlobals`).
+
+| Object | Type | Description |
+|--------|------|-------------|
+| `ThisGame` | `Game` | The game configuration for the current service. |
+| `ThisService` | `GameService` | The current game service (overrides the base `Service` type). |
+| `GameServiceManager` | `GameServiceManager` | Query and manage game services. |
+
+### Game Entity
+
+The `Game` entity (accessed via `ThisGame`) contains game configuration properties:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `GameId` | `long` | The game's unique ID. |
+| `Name` | `string` | Game name. |
+| `ShortName` | `string` | Short name (e.g., `cs2`). |
+| `Description` | `string` | Game description. |
+| `OperatingSystem` | `EOperatingSystem` | Target operating system. |
+| `MinSlots` | `int` | Minimum player slots. |
+| `MaxSlots` | `int` | Maximum player slots. |
+| `DefaultSlots` | `int` | Default player slots. |
+| `CategoryId` | `long` | Category ID. |
+
+### GameService Entity
+
+The `GameService` entity (accessed via `ThisService` in game scripts) extends `Service` with:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `Game` | `Game` | The game configuration. |
+| `GameId` | `long` | The game ID. |
+| `Slots` | `int` | Number of player slots. |
+| `GamePort` | `int` | The game port. |
+| `QueryPort` | `int` | The query port. |
+| `RconPort` | `int` | The RCON port. |
+| `ProcessId` | `int?` | OS process ID when the service is running. |
+| `Affinity` | `long?` | CPU core affinity mask. |
+| `Priority` | `ProcessPriorityClass` | Process priority. |
+| `CPULimit` | `double?` | CPU usage limit. |
+| `MemoryLimit` | `long?` | Memory limit in bytes. |
+
+---
+
+## Docker Script Objects
+
+These additional objects are available when the script runs in a **Docker service** context (`CSharpDockerGlobals`).
+
+| Object | Type | Description |
+|--------|------|-------------|
+| `ThisDockerBlueprint` | `DockerBlueprint` | The Docker blueprint configuration. |
+| `ThisService` | `DockerService` | The current Docker service (overrides the base `Service` type). |
+| `DockerServiceManager` | `DockerServiceManager` | Query and manage Docker services. |
+| `ThisContainerStartParameters` | `CreateContainerParameters` | The Docker container creation parameters. Available in container creation scripts. |
+
+### DockerService Entity
+
+The `DockerService` entity (accessed via `ThisService` in Docker scripts) extends `Service` with:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `Image` | `string` | Docker image name. |
+| `Tag` | `string` | Docker image tag. |
+| `Limits` | `DockerServiceLimits` | Resource limits for the container. |
+
+### DockerBlueprint Entity
+
+The `DockerBlueprint` entity (accessed via `ThisDockerBlueprint`) contains:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `Name` | `string` | Blueprint name. |
+| `ShortName` | `string` | Short name. |
+| `Description` | `string` | Blueprint description. |
+| `Images` | `ICollection<DockerBlueprintImage>` | Available Docker images. |
+| `VolumeBinds` | `ICollection<DockerBlueprintVolumeBind>` | Volume mount configurations. |
+| `Limits` | `DockerBlueprintLimits` | Default resource limits. |
+| `ExecConsoleType` | `EExecConsoleType` | Console type (Command or Shell). |
+| `ExecCommand` | `string` | Command used for exec console (default: `/bin/sh`). |
+
+---
+
+## Service Entity (Base)
+
+Both `GameService` and `DockerService` inherit from the `Service` entity, which provides these common properties:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `ServiceId` | `long` | Unique service ID. |
+| `Name` | `string` | Service display name. |
+| `Status` | `EServiceStatus` | Current status (Stopped, Starting, Running, etc.). |
+| `RootDirectory` | `string` | Root directory path. |
+| `WorkingDirectory` | `string` | Working directory path. |
+| `Executable` | `string?` | Executable file name. |
+| `Commandline` | `string?` | Command-line arguments. |
+| `Startup` | `EServiceStartup` | Startup type (Automatic, Manual, Disabled). |
+| `Variables` | `TCAdminVars` | Custom variables dictionary. |
+| `ServerId` | `long` | ID of the server this service runs on. |
+| `Server` | `Server` | The server entity. |
+| `OwnerId` | `long?` | Owner user ID. |
+| `Owner` | `User` | The owner user entity. |
+| `IPAddress` | `string` | IP address of the service. |
+| `HostnameOrIP` | `string` | Hostname if available, otherwise IP address. |
+| `Ports` | `Ports` | Port assignments dictionary. |
+| `DiskSpace` | `long?` | Allocated disk space in bytes. |
+| `DiskUsage` | `long?` | Current disk usage in bytes. |
+| `BillingId` | `string?` | External billing system ID. |
+| `BillingStatus` | `EBillingStatus` | Billing status. |
+| `CreatedDate` | `DateTime` | When the service was created. |
+
+## Server Entity
+
+The `Server` entity (accessed via `ThisServer`) provides:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `ServerId` | `long` | Unique server ID. |
+| `Name` | `string` | Server name. |
+| `PrimaryIPAddress` | `string` | Primary IP address. |
+| `FirewallIPAddress` | `string?` | Public/firewall IP address. |
+| `PrivateNetworkIPAddress` | `string?` | Private network IP address. |
+| `OperatingSystem` | `EOperatingSystem` | Operating system type. |
+| `IsMaster` | `bool` | Whether this is the master server. |
+| `Enabled` | `bool` | Whether the server is enabled. |
+| `DatacenterId` | `long` | Datacenter ID. |
+| `Datacenter` | `Datacenter` | The datacenter entity. |
+
+## Datacenter Entity
+
+The `Datacenter` entity (accessed via `ThisDatacenter`) provides:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `DatacenterId` | `long` | Unique datacenter ID. |
+| `Name` | `string` | Datacenter name. |
+| `Address` | `string?` | Physical address. |
+| `Notes` | `string?` | Additional notes. |
+| `Servers` | `ICollection<Server>` | Servers in this datacenter. |
+
+## ScriptConsole
+
+The `ScriptConsole` object provides console I/O for scripts:
+
+| Method | Description |
+|--------|-------------|
+| `WriteLine()` | Write an empty line. |
+| `WriteLine(object)` | Write a value to the console. |
+| `WriteLine(string, params object[])` | Write a formatted string to the console. |
+| `ReadLine()` | Read a line of input from the user. |
+
+```csharp
+// Example: Console output
+ScriptConsole.WriteLine("Installing mod...");
+ScriptConsole.WriteLine("Service {0} on server {1}", ThisService.Name, ThisServer.Name);
+
+// Example: Read user input
+ScriptConsole.WriteLine("Enter the map name:");
+var mapName = ScriptConsole.ReadLine();
+```
