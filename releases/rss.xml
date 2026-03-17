@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>TCAdmin v3 Releases</title>
+    <link>https://docs.tcadmin.com/3/releases</link>
+    <description>Latest TCAdmin v3 release notes</description>
+    <language>en</language>
+    <lastBuildDate>Mon, 16 Mar 2026 00:00:00 GMT</lastBuildDate>
+    <atom:link href="https://docs.tcadmin.com/releases/rss.xml" rel="self" type="application/rss+xml"/>
+    <copyright>Copyright © 2026 TCADMIN.COM</copyright>
+    <item>
+      <title>3.1.62.57465</title>
+      <link>https://docs.tcadmin.com/3/releases/3.1.62.57465</link>
+      <guid isPermaLink="true">https://docs.tcadmin.com/3/releases/3.1.62.57465</guid>
+      <description>Virtual servers, .NET 10 upgrade, Billing integration, S3 file provider, File servers, and more.</description>
+      <pubDate>Mon, 16 Mar 2026 00:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>3.0.891.56055</title>
+      <link>https://docs.tcadmin.com/3/releases/3.0.891.56055</link>
+      <guid isPermaLink="true">https://docs.tcadmin.com/3/releases/3.0.891.56055</guid>
+      <description>Config file editors in service creation wizard, Resource limits in service creation, Service settings pages, Service limits in server settings, Update availability health check, and more.</description>
+      <pubDate>Tue, 24 Feb 2026 00:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>3.0.867.2669</title>
+      <link>https://docs.tcadmin.com/3/releases/3.0.867.2669</link>
+      <guid isPermaLink="true">https://docs.tcadmin.com/3/releases/3.0.867.2669</guid>
+      <description>Encrypted credentials, Private networks, Restart services from panel, Monitor &amp; Web log viewer, Desktop &amp; shell sessions, and more.</description>
+      <pubDate>Mon, 16 Feb 2026 00:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>3.0.829.41981</title>
+      <link>https://docs.tcadmin.com/3/releases/3.0.829.41981</link>
+      <guid isPermaLink="true">https://docs.tcadmin.com/3/releases/3.0.829.41981</guid>
+      <description></description>
+      <pubDate>Fri, 06 Feb 2026 00:00:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>

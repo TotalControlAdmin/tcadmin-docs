@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>TCAdmin v3 Releases</title>
+  <link href="https://docs.tcadmin.com/3/releases"/>
+  <link rel="self" href="https://docs.tcadmin.com/releases/atom.xml"/>
+  <id>https://docs.tcadmin.com/releases/atom.xml</id>
+  <updated>2026-03-16T00:00:00.000Z</updated>
+  <rights>Copyright © 2026 TCADMIN.COM</rights>
+  <entry>
+    <title>3.1.62.57465</title>
+    <link href="https://docs.tcadmin.com/3/releases/3.1.62.57465"/>
+    <id>https://docs.tcadmin.com/3/releases/3.1.62.57465</id>
+    <updated>2026-03-16T00:00:00.000Z</updated>
+    <summary>Virtual servers, .NET 10 upgrade, Billing integration, S3 file provider, File servers, and more.</summary>
+  </entry>
+  <entry>
+    <title>3.0.891.56055</title>
+    <link href="https://docs.tcadmin.com/3/releases/3.0.891.56055"/>
+    <id>https://docs.tcadmin.com/3/releases/3.0.891.56055</id>
+    <updated>2026-02-24T00:00:00.000Z</updated>
+    <summary>Config file editors in service creation wizard, Resource limits in service creation, Service settings pages, Service limits in server settings, Update availability health check, and more.</summary>
+  </entry>
+  <entry>
+    <title>3.0.867.2669</title>
+    <link href="https://docs.tcadmin.com/3/releases/3.0.867.2669"/>
+    <id>https://docs.tcadmin.com/3/releases/3.0.867.2669</id>
+    <updated>2026-02-16T00:00:00.000Z</updated>
+    <summary>Encrypted credentials, Private networks, Restart services from panel, Monitor &amp; Web log viewer, Desktop &amp; shell sessions, and more.</summary>
+  </entry>
+  <entry>
+    <title>3.0.829.41981</title>
+    <link href="https://docs.tcadmin.com/3/releases/3.0.829.41981"/>
+    <id>https://docs.tcadmin.com/3/releases/3.0.829.41981</id>
+    <updated>2026-02-06T00:00:00.000Z</updated>
+    <summary></summary>
+  </entry>
+</feed>
