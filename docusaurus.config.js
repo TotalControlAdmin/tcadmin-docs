@@ -43,7 +43,7 @@ const config = {
               return items.map((/** @type {any} */ item) => {
                 if (item.type === "category") {
                   const sorted = /** @type {any[]} */ (sortItems(item.items));
-                  if (item.label === "Release Notes") {
+                  if (item.label === "Releases") {
                     sorted.sort((/** @type {any} */ a, /** @type {any} */ b) => {
                       const la = a.label ?? "";
                       const lb = b.label ?? "";
