@@ -1,0 +1,104 @@
+name: Discord Release Notification
+
+"on":
+  push:
+    branches:
+      - master
+    paths:
+      - "versioned_docs/version-3/releases/**.mdx"
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect new release files
+        id: detect
+        run: |
+          NEW_FILES=$(git diff --name-status HEAD~1 HEAD -- 'versioned_docs/version-3/releases/*.mdx' | grep '^A' | awk '{print $2}' | grep -v 'index.mdx' || true)
+          echo "files=$NEW_FILES" >> $GITHUB_OUTPUT
+
+      - name: Set up Node.js
+        if: steps.detect.outputs.files != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install gray-matter
+        if: steps.detect.outputs.files != ''
+        run: npm install gray-matter
+
+      - name: Send Discord notification
+        if: steps.detect.outputs.files != ''
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_RELEASE_WEBHOOK }}
+          DISCORD_ROLE_ID: ${{ secrets.DISCORD_RELEASE_ROLE_ID }}
+          NEW_FILES: ${{ steps.detect.outputs.files }}
+          SITE_URL: https://docs.tcadmin.com
+        run: |
+          node << 'EOF'
+          const fs = require('fs');
+          const matter = require('gray-matter');
+
+          const files = process.env.NEW_FILES.trim().split('\n').filter(Boolean);
+          const webhookUrl = process.env.DISCORD_WEBHOOK;
+          const roleId = process.env.DISCORD_ROLE_ID;
+          const siteUrl = process.env.SITE_URL;
+
+          for (const file of files) {
+            const raw = fs.readFileSync(file, 'utf8');
+            const { data, content } = matter(raw);
+
+            const version = data.sidebar_label ?? file.replace(/.*\//, '').replace(/\.mdx?$/, '');
+            const date = data.date ? new Date(data.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : null;
+            const slug = file.replace(/.*\//, '').replace(/\.mdx?$/, '');
+            const url = `${siteUrl}/3/releases/${slug}`;
+
+            // Auto-generate description from New Features bold items
+            let description = data.description || '';
+            if (!description) {
+              const featuresMatch = content.match(/###\s+New Features([\s\S]*?)(?:###|$)/);
+              if (featuresMatch) {
+                const names = [];
+                const re = /\*\*([^*]+)\*\*/g;
+                let m;
+                while ((m = re.exec(featuresMatch[1])) !== null) {
+                  names.push(m[1]);
+                  if (names.length === 5) break;
+                }
+                if (names.length) description = names.join(', ') + (names.length === 5 ? ', and more.' : '.');
+              }
+            }
+
+            const embed = {
+              title: `TCAdmin v3 — Version ${version}`,
+              url,
+              color: 0x57F287,
+              description: description || 'A new version of TCAdmin v3 has been released.',
+              fields: date ? [{ name: 'Release Date', value: date, inline: true }] : [],
+              footer: { text: 'TCAdmin Documentation' },
+              timestamp: data.date ? new Date(data.date).toISOString() : new Date().toISOString(),
+            };
+
+            const body = {
+              content: roleId ? `<@&${roleId}>` : undefined,
+              embeds: [embed],
+            };
+
+            const res = await fetch(webhookUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(body),
+            });
+
+            if (!res.ok) {
+              console.error(`Discord webhook failed: ${res.status} ${await res.text()}`);
+              process.exit(1);
+            }
+
+            console.log(`Notified Discord for ${version}`);
+          }
+          EOF
