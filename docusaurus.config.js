@@ -35,6 +35,28 @@ const config = {
           routeBasePath: "/",
           sidebarPath: "./sidebars.js",
           showLastUpdateTime: true,
+          // @ts-ignore
+          async sidebarItemsGenerator({ defaultSidebarItemsGenerator, ...args }) {
+            const items = await defaultSidebarItemsGenerator(args);
+            /** @param {any[]} items */
+            function sortItems(items) {
+              return items.map((/** @type {any} */ item) => {
+                if (item.type === "category") {
+                  const sorted = /** @type {any[]} */ (sortItems(item.items));
+                  if (item.label === "Release Notes") {
+                    sorted.sort((/** @type {any} */ a, /** @type {any} */ b) => {
+                      const la = a.label ?? "";
+                      const lb = b.label ?? "";
+                      return lb < la ? -1 : lb > la ? 1 : 0;
+                    });
+                  }
+                  return { ...item, items: sorted };
+                }
+                return item;
+              });
+            }
+            return sortItems(items);
+          },
           editUrl:
             "https://github.com/TotalControlAdmin/tcadmin-docs/blob/master/",
           lastVersion: "2",
@@ -56,6 +78,10 @@ const config = {
         },
       },
     ],
+  ],
+
+  plugins: [
+    "./plugins/releases-data-plugin",
   ],
 
   themes: ["docusaurus-theme-search-typesense"],
