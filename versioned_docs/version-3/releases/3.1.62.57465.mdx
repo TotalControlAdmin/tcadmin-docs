@@ -23,6 +23,7 @@ authors: [tcadmin]
 - **Service settings permissions** — Added granular permissions for controlling access to service settings.
 - **DNS-01 certificate validation** — Added DNS-01 challenge support for Let's Encrypt certificates. This allows certificate creation by proving domain ownership via DNS TXT records, removing the requirement for port 80 to be accessible. Useful for servers behind firewalls or NATs.
 - **Custom certificate upload** — You can now upload your own .pfx certificate file with password directly from the web certificate settings page. Supports certificates from any Certificate Authority.
+- **Custom links for services** — You can now add custom links to game and Docker services. Links appear in the service sidebar and support URL variable substitution (e.g., `${HostnameOrIP}`, `${GamePort}`, `${QueryPort}`, `${RconPort}`, `${ServiceId}`, and custom variables). Links can be scoped to specific games or Docker blueprints, or set as global. Role-based permissions control which users can see each link.
 - **HTTP-01 automatic renewal** — Let's Encrypt certificates obtained via HTTP-01 validation are now automatically renewed before expiration.
 
 ### Bug Fixes
