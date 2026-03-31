@@ -1,0 +1,29 @@
+---
+sidebar_label: 3.2.34.21134
+date: 2026-03-30
+authors: [tcadmin]
+---
+
+# Version 3.2.34.21134
+
+### New Features
+
+- **Service backup and restore** — Added a full backup and restore system for game and Docker services. Supports multiple storage providers including local, FTP, SFTP, and S3. Backup configuration can be set per game or Docker blueprint, with configurable backup limits and retention. Includes a file browser for restoring individual files from backups.
+- **Announcements** — Admins can create targeted announcements (banner, snackbar, or dialog) with flexible scoping (global, per-user, per-role, per-service, per-blueprint, per-region, per-datacenter). Announcements support severity levels, custom icons, Markdown body, acknowledgment tracking, and real-time delivery. Includes a "Show at login page" behavior for pre-authentication announcements. An `AnnouncementManager` script object is also available for creating and managing announcements programmatically via scripts.
+- **File manager upload/download persistence** — File uploads and downloads now persist when leaving the file manager, so transfers continue in the background.
+- **Scripting improvements** — The script editor now provides autocomplete suggestions and real-time syntax checking for all supported languages.
+- **Billing API wait parameters** — Added `waitUntilComplete` and `waitSeconds` parameters to billing API functions, allowing external billing systems to wait for task completion before returning a response.
+- **Role and permission improvements** — Added a game developer role with appropriate access to game service and Docker service endpoints. Expanded API key permissions to cover game service and Docker service blueprint features. Users with the appropriate role can now access service settings, with a warning that the user must also own the server.
+- **Automatic timezone detection** — User timezone is now set automatically if not specified during creation.
+- **Monitor console timestamps** — Added timestamps to monitor console log output for easier debugging.
+- **Reorganized server settings page** — The server settings page has been reorganized for improved usability.
+
+### Bug Fixes
+
+- **User validation** — Users can no longer be created with duplicate usernames or email addresses. Fixed timezone validation when creating or updating users.
+- **File manager context menu** — Fixed the context menu not working correctly in the service file manager.
+- **Task status dialog** — Fixed the task status dialog not updating correctly during task execution.
+- **Database updates failing** — Fixed a bug that caused database updates to fail.
+- **ServerHardwareInfo permissions** — Fixed missing permissions for accessing server hardware information on game service and Docker service endpoints.
+- **Service port in grid mode** — Fixed the port column displaying incorrect values in the service list grid and card views. The port now correctly shows the service's designated display port instead of the first entry from the ports dictionary.
+- **System health page** — Fixed version mismatch warning in the footer caused by inconsistent version format comparison, improved license information display, and updated version number formatting for consistency.

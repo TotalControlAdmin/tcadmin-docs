@@ -14,6 +14,7 @@ TCAdmin supports the following scripting engines:
 - **C#**
 - **JavaScript** (Jint)
 - **Python 3** (IronPython)
+- **Lua**
 - **PowerShell**
 - **Batch** (shell commands)
 
@@ -40,9 +41,9 @@ var service = Globals.ThisService;
 Globals.ScriptConsole.WriteLine($"Service: {service.Name}");
 ```
 
-### JavaScript and Python Scripts
+### JavaScript, Python, Lua, and PowerShell Scripts
 
-The same objects listed below are available as global variables in JavaScript and Python scripts. To see which objects are available, refer to the properties of `CSharpGameGlobals` and `CSharpDockerGlobals` below — the same properties are exposed in all scripting engines.
+The same objects listed below are available as global variables in all scripting engines. To see which objects are available, refer to the properties of `CSharpGameGlobals` and `CSharpDockerGlobals` below — the same properties are exposed in all scripting engines.
 
 ```javascript
 // JavaScript example
@@ -52,6 +53,16 @@ ScriptConsole.WriteLine("Server: " + ThisServer.Name);
 ```python
 # Python example
 ScriptConsole.WriteLine("Server: " + ThisServer.Name)
+```
+
+```lua
+-- Lua example
+ScriptConsole:WriteLine("Server: " .. ThisServer.Name)
+```
+
+```powershell
+# PowerShell example
+$ScriptConsole.WriteLine("Server: " + $ThisServer.Name)
 ```
 
 ---
@@ -88,6 +99,7 @@ Managers provide database access to query and manage TCAdmin entities.
 | `ServiceManagerService` | `IServiceManagerService` | Service management operations (start, stop, restart, etc.). |
 | `RecurringTaskManager` | `RecurringTaskManager` | Query and manage recurring/scheduled tasks. |
 | `TCATaskManager` | `TCATaskManager` | Query and manage tasks. |
+| `AnnouncementManager` | `AnnouncementManager` | Query and manage announcements. |
 
 ### Utility Objects
 
