@@ -5,9 +5,16 @@
     <link>https://docs.tcadmin.com/3/releases</link>
     <description>Latest TCAdmin v3 release notes</description>
     <language>en</language>
-    <lastBuildDate>Mon, 16 Mar 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 30 Mar 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://docs.tcadmin.com/releases/rss.xml" rel="self" type="application/rss+xml"/>
     <copyright>Copyright © 2026 TCADMIN.COM</copyright>
+    <item>
+      <title>3.2.34.21134</title>
+      <link>https://docs.tcadmin.com/3/releases/3.2.34.21134</link>
+      <guid isPermaLink="true">https://docs.tcadmin.com/3/releases/3.2.34.21134</guid>
+      <description>Service backup and restore, Announcements, File manager upload/download persistence, Scripting improvements, Billing API wait parameters, and more.</description>
+      <pubDate>Mon, 30 Mar 2026 00:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>3.1.62.57465</title>
       <link>https://docs.tcadmin.com/3/releases/3.1.62.57465</link>
