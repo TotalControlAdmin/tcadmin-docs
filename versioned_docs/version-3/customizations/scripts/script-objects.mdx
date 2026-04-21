@@ -20,6 +20,10 @@ TCAdmin supports the following scripting engines:
 
 ## Accessing Script Objects
 
+:::tip
+To quickly browse all available TCAdmin objects, type `Globals.` in the code editor or press `Ctrl+Space` to trigger IntelliSense autocompletion.
+:::
+
 ### C# Scripts
 
 In C# scripts, all objects are available through the `Globals` variable. Depending on the script type, `Globals` is an instance of:
@@ -27,18 +31,20 @@ In C# scripts, all objects are available through the `Globals` variable. Dependi
 - **Game scripts** — `CSharpGameGlobals`
 - **Docker scripts** — `CSharpDockerGlobals`
 
-You can access properties directly since `Globals` is the implicit scope:
+Since `Globals` is the implicit scope, the `Globals.` prefix is **optional** — you can access any property directly by name. Both styles below are equivalent:
 
 ```csharp
 var Globals = new TCAdmin.Scripting.Engines.Addons.CSharpGameGlobals();
 
-// Access the current server
+// With the Globals prefix
 var server = Globals.ThisServer;
-
-// Access the current service
 var service = Globals.ThisService;
-
 Globals.ScriptConsole.WriteLine($"Service: {service.Name}");
+
+// Without the prefix (equivalent)
+var server = ThisServer;
+var service = ThisService;
+ScriptConsole.WriteLine($"Service: {service.Name}");
 ```
 
 ### JavaScript, Python, Lua, and PowerShell Scripts

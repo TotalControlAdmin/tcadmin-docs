@@ -1,0 +1,60 @@
+---
+sidebar_label: 3.3.88.44401
+date: 2026-04-20
+authors: [tcadmin]
+---
+
+# Version 3.3.88.44401
+
+### New Features
+
+- **Memory and performance improvements** — Significantly reduced memory usage on the web application and monitor service, and C# scripts now run faster on repeat executions.
+- **V2 game config import improvements** — Most V2 configs now import correctly. Configs containing scripts are the exception and will need to be rewritten, since V2 and V3 scripting classes differ.
+- **Configurable query and RCON protocols** — Query and RCON protocols can now be configured per game in game settings, with multiple built-in protocol implementations to choose from.
+- **Query and RCON tools** — Added admin-facing Query and RCON testing tools under server settings, with a `PrintRconResponse` helper for debugging.
+- **Custom query and RCON script events** — Added scripting events for implementing custom game server query parsing and custom RCON handling, useful for games not covered out of the box. The **Script Examples** game config in the plugin repository has been updated with examples.
+- **Scripting dialog and input improvements** — `ThisScript.Input()` is now async with configurable parameters (title, label, default value, dialog mode, and more) and supports cancellation. Added `ThisScript.Alert()` and `ThisScript.ShowMessageBox()`, plus a new `IsInteractive` variable so scripts can detect whether they are running from the web browser. The **Script Examples** game config in the plugin repository has been updated with examples.
+- **Steam update from scripts** — Moved the Steam update workflow into `GameServiceManager` so it can be invoked directly from scripts. Also improved Steam logging.
+- **Steam branch variable** — Added support for a Steam branch variable, allowing services to install and update from different SteamCMD branches.
+- **Preview start command** — Service settings now show a preview of the resolved start command so admins can verify arguments before starting the service.
+- **Additional run as options** — Implemented the previously missing run-as options when starting services.
+- **Slider control** — Added a slider control type for config editor variables.
+- **Blueprint link and backup config export/import** — Blueprint links and backup configuration are now included when exporting and importing game and Docker blueprints.
+- **Configurable game environment variables** — Game blueprints now support environment variables (Static, Template, Expression, Variable types), matching the existing Docker blueprint feature. These are automatically applied to the game process on start, with support for dynamic values using service variables, templates, and expressions.
+- **Faster blueprint editing** — The modify game and Docker blueprint pages now load significantly faster.
+- **Faster game and Docker service home pages** — Improved load time for game service and Docker service home pages.
+- **Config files collapsed by default** — When creating a new service, config files are now collapsed by default for a cleaner creation flow.
+- **Game service details — all ports** — Game service details now include every configured port, not just the primary one.
+- **Auto-generated RCON password** — RCON passwords are now generated automatically when one is not specified.
+- **Clear Steam account when sharing to GitHub** — The plugin share dialog now has an option (checked by default) to clear the configured Steam account and Steam Workshop API key from a game blueprint before sharing it to GitHub, so credentials are not leaked.
+- **Variables in config file paths** — Config file paths can now contain service variables that are resolved at runtime.
+- **Config file variable sync** — Added a service that keeps variables in config files and the database in sync, and blocks value changes when the user does not have permission to edit the variable.
+- **Clickable port URIs and Markdown tooltips** — Port URIs on game and Docker blueprints are now clickable, and port, script, and link descriptions appear as tooltips with Markdown support.
+- **Console output filter** — Added an output filter for console output when the target is a log file, memory wrapper, or console wrapper.
+- **Recent download log on failure** — When a SteamCMD or DepotDownloader download fails, the most recent log output is shown to help diagnose the failure.
+- **Larger config file upload timeout** — Increased the upload timeout for V2 and V3 config file imports so larger files no longer time out.
+
+### Bug Fixes
+
+- **Task restart re-running completed steps** — Restarting a task no longer re-executes steps that already completed successfully; only failed/pending steps run again.
+- **Redis timeouts failing task progress updates** — Task progress updates now tolerate Redis timeouts instead of failing the task.
+- **Linux terminal control characters** — Fixed terminal control characters showing up in the Linux terminal output.
+- **Log file dates** — Fixed incorrect dates in monitor and web log file names.
+- **Service start in virtual server / service mode** — Fixed an error when starting a service while running in a virtual server in service mode.
+- **Terminal ID JavaScript error** — Fixed the `Terminal with ID ... not found` JavaScript error.
+- **Script editor JavaScript errors** — Fixed JavaScript errors when leaving or navigating away from the script editor page.
+- **Config file editor direct URL** — Fixed an error when loading the config file editor directly from a URL.
+- **Combobox after .NET 10 upgrade** — Fixed a combobox rendering issue after updating to .NET 10.
+- **Multiple blueprint export** — Fixed exporting multiple game and Docker blueprints at once.
+- **Avoid querying stopped servers** — The monitor no longer queries game servers that are stopped.
+- **Category id in `tc_services`** — Fixed handling of the category id column in `tc_services`.
+- **Blueprint import object reference error** — Fixed an object reference error when importing blueprints.
+- **Service backup icon shown when backups disabled** — The Backups menu item in the service sidebar is now hidden when backups are disabled on the blueprint.
+- **FTP login and error messages** — Fixed an error at FTP login and added friendlier error messages for FTP failures.
+- **File system permissions page** — Fixed handling of multiple permissions on the file system permissions page.
+- **Null error on direct service page navigation** — Fixed a null reference error when navigating directly via URL to the command line, scheduled task, and Docker scheduled task service pages.
+- **Duplicate variable template on apply command line** — Fixed a duplicate variable template being created when applying a command line.
+- **`.tca` folder not copied** — Fixed the `.tca` folder not being copied on some configurations.
+- **DepotDownloader folder names with spaces** — Fixed DepotDownloader failing when the setup folder name contained spaces.
+- **New task type default** — New tasks now default to the Power type when a type is not specified.
+- **Steam Workshop browser without a Steam API key** — Fixed the Steam Workshop browser returning no results when a Steam API key is not configured.
