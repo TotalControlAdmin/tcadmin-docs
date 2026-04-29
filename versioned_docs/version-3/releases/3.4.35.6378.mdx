@@ -1,0 +1,34 @@
+---
+sidebar_label: 3.4.35.6378
+date: 2026-04-29
+authors: [tcadmin]
+---
+
+# Version 3.4.35.6378
+
+### New Features
+
+- **Windows game servers on Linux hosts (Wine)** — Windows game blueprints can now run on Linux servers through Wine. Each service runs in its own isolated environment and works with Virtual Servers and per-service resource limits. See [Windows Games on Linux (Wine)](../cross-os-game-servers/wine-support.mdx).
+- **Linux game servers on Windows hosts (WSL)** — TCAdmin can now run Linux game blueprints on Windows servers through Windows Subsystem for Linux. Linux-only games can be hosted on existing Windows infrastructure with full web console support. See [Linux Games on Windows (WSL)](../cross-os-game-servers/wsl-support.mdx).
+- **Kill service command** — Added a Kill action that immediately stops a stuck or unresponsive service, with a matching permission so admins can control who's allowed to use it.
+- **Workshop downloads via SteamCMD** — Workshop content can now also be downloaded through SteamCMD.
+- **Manual update with multiple files** — The TCA CLI's manual update command now accepts multiple files in a single run.
+- **Improved RCON client page** — Reworked the admin RCON client page for a cleaner, faster experience.
+- **Better V2-to-V3 event mappings** — Updated how V2 event names map to V3 events during legacy config imports, so more imported scripts and event hooks work without manual fix-up.
+- **Faster loading screen** — The web loading screen appears and resolves noticeably faster.
+- **Faster service folder operations** — Operations that run over large service folders (ownership changes, disk-usage calculation) are now significantly faster, reducing the time spent on service create, reinstall, and disk-usage refreshes.
+- **More consistent task progress** — All task handlers now report progress through a single shared mechanism, making the task UI more accurate and reducing noise in monitor logs.
+
+### Bug Fixes
+
+- **Config-file values ending with `;`** — Variables whose template line ends with a semicolon (e.g. `sv_region ${sv_region};`) no longer capture the trailing `;` as part of the value, and rewrites preserve the semicolon correctly.
+- **Certificate auto-renewal for older certificates** — Certificates created before auto-renewal was implemented now renew automatically.
+- **Silent TCA installation** — Fixed an issue that prevented silent (unattended) installation from completing.
+- **Database concurrency errors** — Fixed multiple occurrences of "A second operation was started on this context instance", including a separate one that occurred during SteamCMD and DepotDownloader downloads.
+- **Workshop script variables not added** — Fixed a bug where workshop-related script variables weren't being registered for services that needed them.
+- **Workshop filters** — Fixed Workshop browser filters not applying correctly.
+- **Workshop custom mod without Steam API key** — Fixed downloading a workshop custom mod when no Steam API key is configured.
+- **TCA CLI install on Windows Server 2012** — Fixed the CLI installer failing on Windows Server 2012.
+- **Variables in default command line not resolved** — Fixed variables in the default command line not being processed through the template engine.
+- **Blank console with console/memory wrapper** — Fixed the service console showing blank on startup when the blueprint used the console wrapper or memory wrapper output mode.
+- **Source RCON "operation was canceled"** — Fixed the Source RCON client throwing an "operation was canceled" error during normal use.
