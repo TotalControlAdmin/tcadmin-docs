@@ -1,0 +1,33 @@
+---
+sidebar_position: 2
+sidebar_label: Troubleshoot Game Services
+---
+
+# Troubleshoot Game Services
+
+When a service won't start (or starts and exits immediately), the fastest way to see what's actually wrong is to **run it manually from a terminal**. The **Preview Start Command** button on the service's settings page shows you the exact commands to run.
+
+This works the same way for native Windows, native Linux, [Wine](../cross-os-game-servers/wine-support.mdx), and [WSL](../cross-os-game-servers/wsl-support.mdx) services.
+
+## How to Use It
+
+1. **Stop the service** in TCAdmin so it doesn't conflict.
+2. Open the service's **Settings** page and click **Preview Start Command** (visible to admins and top-level subadmins).
+3. Open a command prompt or shell on the host where the service runs, switch to the service's run-as user, and paste in the commands shown.
+
+For example, troubleshooting a Garry's Mod service on a Windows host:
+
+```bat
+runas /user:YOURSERVER\TCA3Game cmd.exe
+Password: tF6nCLzqFa
+cd /d C:\TCAFiles\Users\DemoUser\7
+srcds.exe -norestart -console -game garrysmod -nohltv +tv_port 27016 -condebug +maxplayers 32 +ip 1.2.3.4 -port 27015 +exec "server.cfg" +map "gm_flatgrass"
+```
+
+Running the executable this way prints the real error to your terminal — missing DLLs, missing libraries, EULA prompts, port conflicts, etc.
+
+:::tip Use the service's run-as user
+Running as Administrator (Windows) or `root` (Linux) can hide the permission and environment problems the service would actually hit. Use the same user TCAdmin would.
+:::
+
+When you're done, stop the game server, then start the service from TCAdmin again.

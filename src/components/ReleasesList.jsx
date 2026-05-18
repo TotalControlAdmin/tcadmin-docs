@@ -15,6 +15,7 @@ export default function ReleasesList() {
                 year: "numeric",
                 month: "long",
                 day: "numeric",
+                timeZone: "UTC",
               })}
             </div>
           )}

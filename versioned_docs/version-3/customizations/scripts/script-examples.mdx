@@ -130,3 +130,128 @@ end
 
   </TabItem>
 </Tabs>
+
+## Create Global Announcement
+
+This script creates a global banner announcement that auto-expires after 30 minutes.
+
+<Tabs>
+  <TabItem value="csharp" label="C#">
+
+```csharp
+//refAssemblies: TCAdmin.SDK.dll, TCAdmin.GameHosting.SDK.dll, TCAdmin.Scripting.dll, TCAdmin.Monitor.dll
+using System;
+using System.Collections.Generic;
+using TCAdmin.Web.Shared.Models.Enums;
+using TCAdmin.SDK.Database.Entities;
+
+var Globals = new TCAdmin.Scripting.Engines.Addons.CSharpGameGlobals(); // DO NOT MODIFY THIS LINE
+
+var scopes = new List<AnnouncementScope> { new() { ScopeType = EAnnouncementScopeType.Global } };
+var announcement = new Announcement
+{
+    Subject = "Maintenance",
+    Body = "Server restart in 30 minutes",
+    Severity = EAnnouncementSeverity.Warning,
+    DisplayType = EAnnouncementDisplayType.Banner,
+    DisplayBehavior = EAnnouncementDisplayBehavior.AutoExpire,
+    IsActive = true,
+    ExpiresAt = DateTime.UtcNow.AddMinutes(30)
+};
+await Globals.AnnouncementManager.CreateAnnouncementAsync(announcement, scopes);
+```
+
+  </TabItem>
+  <TabItem value="python" label="Python 3">
+
+```python
+from System import DateTime
+from System.Collections.Generic import List
+from TCAdmin.Web.Shared.Models.Enums import EAnnouncementScopeType, EAnnouncementSeverity, EAnnouncementDisplayType, EAnnouncementDisplayBehavior
+from TCAdmin.SDK.Database.Entities import Announcement, AnnouncementScope
+
+scopes = List[AnnouncementScope]()
+scope = AnnouncementScope()
+scope.ScopeType = EAnnouncementScopeType.Global
+scopes.Add(scope)
+
+announcement = Announcement()
+announcement.Subject = "Maintenance"
+announcement.Body = "Server restart in 30 minutes"
+announcement.Severity = EAnnouncementSeverity.Warning
+announcement.DisplayType = EAnnouncementDisplayType.Banner
+announcement.DisplayBehavior = EAnnouncementDisplayBehavior.AutoExpire
+announcement.IsActive = True
+announcement.ExpiresAt = DateTime.UtcNow.AddMinutes(30)
+
+AnnouncementManager.CreateAnnouncementAsync(announcement, scopes).Wait()
+```
+
+  </TabItem>
+  <TabItem value="powershell" label="PowerShell">
+
+```powershell
+$scope = New-Object TCAdmin.SDK.Database.Entities.AnnouncementScope
+$scope.ScopeType = [TCAdmin.Web.Shared.Models.Enums.EAnnouncementScopeType]::Global
+
+$scopes = New-Object "System.Collections.Generic.List[TCAdmin.SDK.Database.Entities.AnnouncementScope]"
+$scopes.Add($scope)
+
+$announcement = New-Object TCAdmin.SDK.Database.Entities.Announcement
+$announcement.Subject = "Maintenance"
+$announcement.Body = "Server restart in 30 minutes"
+$announcement.Severity = [TCAdmin.Web.Shared.Models.Enums.EAnnouncementSeverity]::Warning
+$announcement.DisplayType = [TCAdmin.Web.Shared.Models.Enums.EAnnouncementDisplayType]::Banner
+$announcement.DisplayBehavior = [TCAdmin.Web.Shared.Models.Enums.EAnnouncementDisplayBehavior]::AutoExpire
+$announcement.IsActive = $true
+$announcement.ExpiresAt = [DateTime]::UtcNow.AddMinutes(30)
+
+$AnnouncementManager.CreateAnnouncementAsync($announcement, $scopes).Wait()
+```
+
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+
+```javascript
+var scope = new TCAdmin.SDK.Database.Entities.AnnouncementScope();
+scope.ScopeType = 0; // EAnnouncementScopeType.Global
+
+var scopes = new System.Collections.Generic.List(TCAdmin.SDK.Database.Entities.AnnouncementScope)();
+scopes.Add(scope);
+
+var announcement = new TCAdmin.SDK.Database.Entities.Announcement();
+announcement.Subject = "Maintenance";
+announcement.Body = "Server restart in 30 minutes";
+announcement.Severity = 2; // EAnnouncementSeverity.Warning
+announcement.DisplayType = 1; // EAnnouncementDisplayType.Banner
+announcement.DisplayBehavior = 1; // EAnnouncementDisplayBehavior.AutoExpire
+announcement.IsActive = true;
+announcement.ExpiresAt = System.DateTime.UtcNow.AddMinutes(30);
+
+AnnouncementManager.CreateAnnouncementAsync(announcement, scopes).Wait();
+```
+
+  </TabItem>
+  <TabItem value="lua" label="Lua">
+
+```lua
+local scope = TCAdmin.SDK.Database.Entities.AnnouncementScope()
+scope.ScopeType = 0 -- EAnnouncementScopeType.Global
+
+local scopes = System.Collections.Generic.List(TCAdmin.SDK.Database.Entities.AnnouncementScope)()
+scopes:Add(scope)
+
+local announcement = TCAdmin.SDK.Database.Entities.Announcement()
+announcement.Subject = "Maintenance"
+announcement.Body = "Server restart in 30 minutes"
+announcement.Severity = 2 -- EAnnouncementSeverity.Warning
+announcement.DisplayType = 1 -- EAnnouncementDisplayType.Banner
+announcement.DisplayBehavior = 1 -- EAnnouncementDisplayBehavior.AutoExpire
+announcement.IsActive = true
+announcement.ExpiresAt = System.DateTime.UtcNow:AddMinutes(30)
+
+AnnouncementManager:CreateAnnouncementAsync(announcement, scopes):Wait()
+```
+
+  </TabItem>
+</Tabs>

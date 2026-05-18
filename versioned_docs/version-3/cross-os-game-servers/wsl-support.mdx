@@ -1,0 +1,226 @@
+---
+sidebar_position: 1
+sidebar_label: Linux Games on Windows (WSL)
+---
+
+# Running Linux Game Servers on Windows (WSL)
+
+TCAdmin v3 can run **Linux game servers on a Windows host** by transparently launching them inside [Windows Subsystem for Linux 2 (WSL2)](https://learn.microsoft.com/en-us/windows/wsl/about). You install a Linux distro once, and from then on any blueprint marked **Linux** runs natively in that distro — no extra config per game.
+
+:::info When to use this
+You're hosting on a Windows server (or want to keep your existing Windows infrastructure) but the game only ships a Linux server build.
+:::
+
+## Before You Begin
+
+You'll need:
+
+- **Windows 10 21H1 or newer**, or **Windows Server 2022/2025**. Windows 11 22H2+ is recommended — it unlocks **mirrored networking** (see [Networking](#networking-lan-reachability) below).
+- **Administrator access** to install WSL.
+- A few minutes of downtime — installing WSL requires a reboot.
+
+:::tip Already have WSL?
+If `wsl --status` runs without error and shows a default distro, you can skip to [Install Required Packages](#step-2-install-required-packages-in-the-distro).
+:::
+
+## Step 1: Install WSL2 and a Linux Distro
+
+Open **PowerShell as Administrator** and run:
+
+```powershell
+wsl --install -d Ubuntu
+```
+
+This installs WSL2, sets it as the default version, and downloads Ubuntu. **Reboot when prompted.** After the reboot, Ubuntu launches automatically and asks you to create a Linux user — pick any username and password, this is the distro's default user (TCAdmin uses it internally).
+
+:::note Prefer a different distro?
+Run `wsl --list --online` to see what's available. Debian, Alma, and Rocky also work. The instructions below assume Ubuntu — adjust the package manager commands if you pick something else.
+:::
+
+### Confirm WSL2 (not WSL1)
+
+WSL1 lacks the kernel features TCAdmin needs (cgroups, full `/proc`, systemd). Make sure your distro is on WSL2:
+
+```powershell
+wsl --list --verbose
+```
+
+If the **VERSION** column shows `1`, convert it:
+
+```powershell
+wsl --set-version Ubuntu 2
+```
+
+## Step 2: Install Required Packages in the Distro
+
+TCAdmin needs a handful of standard Linux tools inside the distro. Open the distro shell (run `wsl` in PowerShell, or click "Ubuntu" in your Start menu) and run:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y screen procps coreutils gawk passwd bash
+```
+
+:::tip Source-engine games (CS2, Garry's Mod, TF2, etc.)
+Most Source dedicated server binaries are 32-bit. A fresh 64-bit Ubuntu can't load them until you add the i386 multiarch:
+
+```bash
+sudo dpkg --add-architecture i386
+sudo apt-get update
+sudo apt-get install -y libc6:i386 libstdc++6:i386 zlib1g:i386
+```
+
+If you skip this and try to start a 32-bit Linux game, you'll see a confusing `exec: ./srcds_linux: not found` error — even though the file is right there. TCAdmin detects this case during install/reinstall and shows you the exact command to run.
+:::
+
+## Step 3: Enable systemd (for Resource Limits)
+
+TCAdmin uses `systemd-run` inside the distro to enforce per-service **CPU**, **RAM**, and **CPU affinity** limits. Without systemd, services still run — but resource limits are silently ignored.
+
+Recent Ubuntu (22.04+) enables systemd by default. To make sure, edit `/etc/wsl.conf` inside the distro:
+
+```bash
+sudo nano /etc/wsl.conf
+```
+
+Add (or confirm) these lines:
+
+```ini
+[boot]
+systemd=true
+```
+
+Save and exit, then from **PowerShell** (not the distro shell):
+
+```powershell
+wsl --shutdown
+```
+
+The next time the distro starts, systemd is PID 1 and per-service limits will apply.
+
+## Step 4: Networking (LAN Reachability)
+
+By default, WSL2 puts your distro on a **private NAT subnet** (typically `172.x.x.x`). A game server bound to that interface is **only reachable from the host itself** — players on your LAN or the internet can't connect.
+
+You have two options:
+
+### Option A: Mirrored Networking (Windows 11 22H2+ only)
+
+This is the cleanest fix. WSL shares the host's network interface directly, so a Linux-side `bind(<host LAN IP>, <port>)` reaches the LAN with no port-forward dance.
+
+Create or edit `C:\Users\<your-user>\.wslconfig`:
+
+```ini
+[wsl2]
+networkingMode=mirrored
+```
+
+Then in **PowerShell**:
+
+```powershell
+wsl --shutdown
+```
+
+The next distro launch uses mirrored mode. Verify with `wsl -- ip a` — `eth0` should show your host's LAN IP, not `172.x.x.x`.
+
+:::warning Windows 10 silently ignores `mirrored`
+On Windows 10, the `mirrored` setting is **parsed but not applied** — the distro keeps coming up on the NAT subnet with no error or warning. Mirrored networking is a Windows 11 22H2+ feature regardless of which WSL version is installed.
+:::
+
+### Option B: Port Forwarding (Windows 10)
+
+If you can't upgrade to Windows 11, you'll need to forward each game port from the Windows host to the WSL distro. This is **manual** and the WSL NAT IP changes on every distro restart, so you'll need to redo the rules:
+
+```powershell
+# Get the current WSL distro IP
+$wslIp = (wsl -- hostname -I).Trim().Split()[0]
+
+# Forward port 27015 (example — replace with your game's port)
+netsh interface portproxy add v4tov4 listenport=27015 connectaddress=$wslIp connectport=27015
+
+# Don't forget to open the Windows firewall too
+New-NetFirewallRule -DisplayName "WSL Game 27015" -Direction Inbound -Protocol TCP -LocalPort 27015 -Action Allow
+New-NetFirewallRule -DisplayName "WSL Game 27015 UDP" -Direction Inbound -Protocol UDP -LocalPort 27015 -Action Allow
+```
+
+:::tip The cleanest fix is upgrading to Windows 11
+Mirrored networking eliminates the entire forwarding problem. If your hardware supports Windows 11 22H2+, that's the recommended path.
+:::
+
+## Step 5: Install Linux Game Blueprints
+
+You're done configuring WSL. Open the TCAdmin web panel and go to **Plugin Repository → Games** to import any Linux blueprint just like you would on a native Linux server. When the service is created on a Windows host, TCAdmin automatically runs it through WSL — no extra setting required.
+
+Each new service gets its own folder inside the distro at:
+
+```
+/usr/local/tcadmin-v3/users/<owner>/<service-id>
+```
+
+The Windows side (`C:\TCAdminV3\Services\<owner>\<id>`) is a symlink that points there, so file managers, FTP, and scripts work the same way as native services.
+
+## Output and the Web Console
+
+When you open a Linux game's web console, you'll see one of two views:
+
+| Mode | What you see | When it's used |
+|------|-------------|----------------|
+| **Log File** | A live tail of the game's log file | The blueprint's "Log File (for Wine/WSL)" field is set |
+| **Terminal** | An xterm-style live console | The "Log File (for Wine/WSL)" field is blank |
+
+In the blueprint's **Console Configuration**, the **Log File** field is renamed **"Log File (for Wine/WSL)"** when the blueprint's Output Source isn't directly compatible with cross-OS hosting (e.g. a Linux blueprint with `LinuxScreen` output running on Windows). Setting that field tells TCAdmin which file to tail; leaving it blank falls back to the live terminal.
+
+:::tip Blank console?
+If the service shows **Started** but the console is empty:
+- **Log File mode:** the path doesn't match what the game actually writes. Update the field to point at the game's real log (e.g. `garrysmod/logs/console.log`).
+- **Terminal mode:** the game doesn't write to stdout. Set the "Log File (for Wine/WSL)" field to switch to log-file mode and tail the right file.
+:::
+
+## Preview Start Command
+
+On the service's settings page, **admins** and **top-level subadmins** see a **Preview Start Command** button. It shows the exact bash script TCAdmin will run inside the distro — the working directory, all environment variables, and the final executable line.
+
+If a service won't start and you want to see the real error, copy the commands and run them yourself from a terminal — see [Troubleshoot a Service with Preview Start Command](../troubleshooting/preview-start-command.mdx) for the step-by-step.
+
+## Common Issues
+
+### "There is no distribution with the supplied name"
+
+WSL distros are stored per-Windows-user. TCAdmin runs as the monitor's Windows account, so the distro must be installed under that account. If you installed WSL as a different user (e.g. your personal account during setup), reinstall the distro while logged in as the TCAdmin service account, or move the distro using `wsl --export` / `wsl --import`.
+
+### Service is "Starting" forever
+
+Usually a stale process from a previous crash holding files busy. TCAdmin tries to clean these up automatically on each start, but if it persists:
+
+```powershell
+wsl -d Ubuntu -- ps -ef | grep <service-id>
+```
+
+Kill anything that shouldn't be there, then restart the service.
+
+### Resource Limits Are Ignored
+
+Check your monitor log for a warning like:
+
+> WSL distro 'Ubuntu' has no active systemd; per-service CPU/RAM/affinity limits cannot be enforced inside the distro.
+
+That means systemd isn't running as PID 1. Revisit [Step 3](#step-3-enable-systemd-for-resource-limits) and confirm `/etc/wsl.conf` has `[boot] systemd=true`, then `wsl --shutdown`.
+
+### WSL Cold-Start Delay
+
+The first command after `wsl --shutdown` (or after ~60 seconds of inactivity) takes around **30 seconds** while the WSL2 lightweight VM starts. This is expected — subsequent commands hit a warm VM and finish in milliseconds. TCAdmin's preflight checks have a 60-second timeout to absorb this.
+
+### Service Starts but Players Can't Connect
+
+Almost always default WSL2 NAT networking. Verify with:
+
+```powershell
+wsl -- ip a
+```
+
+If `eth0` is on `172.x.x.x` and you're on Windows 11 22H2+, switch to mirrored networking — see [Networking](#step-4-networking-lan-reachability). On Windows 10, you'll need [port forwarding](#option-b-port-forwarding-windows-10) or a Windows 11 upgrade.
+
+## Limitations
+
+- **Virtual Servers (VS) don't apply to WSL services.** VS limits are enforced on the Windows side and don't reach into the WSL distro where the service actually runs. Use **per-service limits** instead — they apply correctly inside the distro and cap CPU, RAM, and CPU affinity the same way VS limits do on a native service.
+- **Interactive desktop is forced on for WSL services.** TCAdmin overrides the blueprint's `InteractWithDesktop` flag to `true` because `wsl.exe` cannot be launched from session 0. You don't need to do anything — it just works — but the service will run in the interactive session rather than as a session-0 service.
+- **WSL1 is not supported.** Convert any WSL1 distro to WSL2 with `wsl --set-version <distro> 2`.

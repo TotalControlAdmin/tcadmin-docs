@@ -1,0 +1,8 @@
+{
+  "label": "Cross-OS Game Servers",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "Run Linux game servers on Windows hosts (via WSL) or Windows game servers on Linux hosts (via Wine). TCAdmin v3 ships with built-in support for both — you just need a few prerequisites on the host."
+  }
+}
