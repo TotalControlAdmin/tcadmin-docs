@@ -5,9 +5,23 @@
     <link>https://docs.tcadmin.com/3/releases</link>
     <description>Latest TCAdmin v3 release notes</description>
     <language>en</language>
-    <lastBuildDate>Mon, 30 Mar 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 29 Apr 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://docs.tcadmin.com/releases/rss.xml" rel="self" type="application/rss+xml"/>
     <copyright>Copyright © 2026 TCADMIN.COM</copyright>
+    <item>
+      <title>3.4.35.6378</title>
+      <link>https://docs.tcadmin.com/3/releases/3.4.35.6378</link>
+      <guid isPermaLink="true">https://docs.tcadmin.com/3/releases/3.4.35.6378</guid>
+      <description>Windows game servers on Linux hosts (Wine), Linux game servers on Windows hosts (WSL), Kill service command, Workshop downloads via SteamCMD, Manual update with multiple files, and more.</description>
+      <pubDate>Wed, 29 Apr 2026 00:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>3.3.88.44401</title>
+      <link>https://docs.tcadmin.com/3/releases/3.3.88.44401</link>
+      <guid isPermaLink="true">https://docs.tcadmin.com/3/releases/3.3.88.44401</guid>
+      <description>Memory and performance improvements, V2 game config import improvements, Configurable query and RCON protocols, Query and RCON tools, Custom query and RCON script events, and more.</description>
+      <pubDate>Mon, 20 Apr 2026 00:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>3.2.34.21134</title>
       <link>https://docs.tcadmin.com/3/releases/3.2.34.21134</link>

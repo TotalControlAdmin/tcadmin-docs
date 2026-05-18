@@ -4,8 +4,22 @@
   <link href="https://docs.tcadmin.com/3/releases"/>
   <link rel="self" href="https://docs.tcadmin.com/releases/atom.xml"/>
   <id>https://docs.tcadmin.com/releases/atom.xml</id>
-  <updated>2026-03-30T00:00:00.000Z</updated>
+  <updated>2026-04-29T00:00:00.000Z</updated>
   <rights>Copyright © 2026 TCADMIN.COM</rights>
+  <entry>
+    <title>3.4.35.6378</title>
+    <link href="https://docs.tcadmin.com/3/releases/3.4.35.6378"/>
+    <id>https://docs.tcadmin.com/3/releases/3.4.35.6378</id>
+    <updated>2026-04-29T00:00:00.000Z</updated>
+    <summary>Windows game servers on Linux hosts (Wine), Linux game servers on Windows hosts (WSL), Kill service command, Workshop downloads via SteamCMD, Manual update with multiple files, and more.</summary>
+  </entry>
+  <entry>
+    <title>3.3.88.44401</title>
+    <link href="https://docs.tcadmin.com/3/releases/3.3.88.44401"/>
+    <id>https://docs.tcadmin.com/3/releases/3.3.88.44401</id>
+    <updated>2026-04-20T00:00:00.000Z</updated>
+    <summary>Memory and performance improvements, V2 game config import improvements, Configurable query and RCON protocols, Query and RCON tools, Custom query and RCON script events, and more.</summary>
+  </entry>
   <entry>
     <title>3.2.34.21134</title>
     <link href="https://docs.tcadmin.com/3/releases/3.2.34.21134"/>
