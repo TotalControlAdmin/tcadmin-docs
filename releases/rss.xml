@@ -5,9 +5,16 @@
     <link>https://docs.tcadmin.com/3/releases</link>
     <description>Latest TCAdmin v3 release notes</description>
     <language>en</language>
-    <lastBuildDate>Wed, 29 Apr 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 22 May 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://docs.tcadmin.com/releases/rss.xml" rel="self" type="application/rss+xml"/>
     <copyright>Copyright © 2026 TCADMIN.COM</copyright>
+    <item>
+      <title>3.5.30.16065</title>
+      <link>https://docs.tcadmin.com/3/releases/3.5.30.16065</link>
+      <guid isPermaLink="true">https://docs.tcadmin.com/3/releases/3.5.30.16065</guid>
+      <description>Game updates, Service mods on Game and Docker blueprints, Fast Downloads (FastDL), Query monitoring, V2 service import tool, and more.</description>
+      <pubDate>Fri, 22 May 2026 00:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>3.4.35.6378</title>
       <link>https://docs.tcadmin.com/3/releases/3.4.35.6378</link>
