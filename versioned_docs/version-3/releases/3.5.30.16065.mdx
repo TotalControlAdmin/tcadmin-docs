@@ -1,0 +1,36 @@
+---
+sidebar_label: 3.5.30.16065
+date: 2026-05-22
+authors: [tcadmin]
+---
+
+import ReleaseDate from '@site/src/components/ReleaseDate';
+
+# Version 3.5.30.16065
+
+<ReleaseDate />
+
+### New Features
+
+- **Game updates** — Game blueprints can now offer alternative builds or branches (for example, Vanilla / Paper / Spigot for Minecraft, or different Steam betas). Each update can run its own install scripts and be restricted to specific roles, and services keep track of which update is installed.
+- **Service mods on Game and Docker blueprints** — Admins can now curate a list of mods on a game or Docker blueprint, and users can install or uninstall them on their services with a single click. Each mod can have its own install scripts and role restrictions.
+- **Fast Downloads (FastDL)** — Mirror service files to an HTTP origin so game clients can fetch downloads much faster than through the game server. Configurable per blueprint with support for local, FTP, SFTP, and S3 storage and several compression formats. Includes a manual sync action plus automatic sync when files change in the web file manager or over FTP. FastDL settings from V2 game configurations are imported automatically.
+- **Query monitoring** — Service health checks via game-server queries. The monitor can detect when a service is offline, when slot counts are reported incorrectly, when a service is set to private, and when the server brand doesn't match. Configurable rules let you log activity, run scripts, or restart the service when a detection occurs.
+- **V2 service import tool** — Import existing services from a V2 installation into V3. Maps users, virtual servers, games, and per-service settings. Sub-admins can now be granted access to the tool through a new permission.
+- **uMod and Nexus Mods** — Two new custom mod providers added alongside Steam Workshop, Curse Forge, and Minecraft Modpacks. Users can browse and install mods from uMod and Nexus directly from the service mods page.
+- **V2 plugin repository** — A new built-in plugin repository that lets you browse and install legacy game configurations from the V2 forum without leaving V3. The repository auto-syncs hourly and announces new and updated plugins, just like the existing GitHub-backed repositories.
+- **Service dashboard widget** — A new dashboard widget shows the live status, player count, CPU, and memory of one of your services, with power controls right on the card. Add one for each service you want to keep an eye on, and arrange your dashboard however you like — each user's layout is saved in their own browser.
+- **Login page dark/light toggle** — The login page now has a light / dark / auto theme switch, so you can choose your preferred appearance before signing in.
+
+### Bug Fixes
+
+- **Workshop search with no results** — Fixed an error when a Steam Workshop search returned no mods.
+- **Domain name comparison on Windows** — Windows domain names are now compared case-insensitively.
+- **Selecting plugin versions higher than 1.0.9** — Fixed a version sorting issue that prevented selecting plugin versions newer than 1.0.9 in the plugin repository.
+- **Getting Started import dialogs** — The game and Docker import dialogs in Getting Started now show all available blueprints.
+- **Custom mod configuration import** — Fixed an error when importing custom mod configuration as part of a blueprint import.
+- **Changing user password** — Fixed an error that could occur when changing a user's password.
+- **Modpack version selection** — Fixed an error selecting the version to install in the Minecraft Modpack install dialog.
+- **Curse mod folder not saved** — Fixed Curse mods not saving the configured mod folder value.
+- **Loading screen ignored the theme** — The loading screen was always shown in dark mode; it now follows the selected light or dark theme.
+- **Login page logo color** — The theme color is now applied correctly to the logo on the login page.

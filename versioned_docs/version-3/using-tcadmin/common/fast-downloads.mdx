@@ -1,0 +1,175 @@
+---
+sidebar_label: Fast Downloads
+sidebar_position: 1
+---
+
+# Fast Downloads
+
+Fast Downloads (FastDL) mirrors a chosen set of a service's files to a public web location, so game clients can pull large assets — maps, custom content — directly over HTTP instead of through the slower in-game transfer. Source-engine games (CS, Garry's Mod, TF2, HL2DM, …) support this natively and will even decompress `.bz2` files automatically.
+
+Fast Downloads works for both **game and Docker** blueprints.
+
+## How it works
+
+There are three pieces to set up:
+
+1. **Storage** (on the server) — where the mirrored files are kept and the public web address they're served from.
+2. **What to sync** (on the blueprint) — which files to mirror, plus compression and quota options.
+3. **Per-service** — each service can override whether Fast Downloads is on, and trigger a sync.
+
+A sync is **incremental**: only new or changed files are uploaded, and files removed from the service are removed from the mirror.
+
+## 1. Storage (server)
+
+On the server's settings page, under **File Paths & Providers → FastDL Storage**:
+
+| Setting | What it does |
+|---|---|
+| **Enabled** | Master switch for this server. If off, no service on the server can sync. |
+| **Storage location** | Either a local path on the server, or a **File Server** (for storing the files on a separate box). |
+| **Base URL** | The public web address the files are served from, e.g. `https://fastdl.example.com/`. |
+| **Folder template** | The per-service subfolder under the base URL. Default: `${UserName}/${ServiceId}/`. |
+
+To store the mirror on a separate machine, create a **File Server** with the **FastDL** category — it can use Local, FTP, SFTP, or S3 storage.
+
+## 2. What to sync (blueprint)
+
+On the blueprint's **Fast Downloads** page:
+
+| Setting | What it does |
+|---|---|
+| **Enabled** | Turns Fast Downloads on for services using this blueprint. |
+| **Include patterns** | Which files to mirror, as glob patterns (e.g. `maps/**/*.bsp`). Use `**/` for "any depth". |
+| **Exclude patterns** | Files to skip, same pattern style. |
+| **Relative root** | A subfolder of the service to scan. Leave empty to scan from the service root. |
+| **Compression** | How files are compressed before upload — see [Compression](#compression). |
+| **Max compress size** | Files larger than this are uploaded uncompressed (compressing already-compressed assets wastes CPU). |
+| **Disk quota** | A per-service ceiling on how much can be mirrored. |
+| **Strip paths** | Path prefixes removed from the public URL — for Source games this is usually `addons/` so the client sees `maps/…` directly. |
+| **Requires HTTPS** | Forces `https://` on the generated download URLs. |
+| **Auto-sync on file change** | Re-sync automatically whenever the service's files change. |
+
+:::note
+Auto-sync picks up changes made through the **web file manager** and **FTP**. Changes from other sources (scripts, SteamCMD, mod installs) are mirrored on the next manual or scheduled sync.
+:::
+
+## 3. Per-service
+
+The blueprint's **Enabled** setting (above) applies to every service that uses the blueprint. To change it for a single service, an administrator can override it on that service's **Settings** page, in the **Fast Downloads** section. The override is a three-state checkbox:
+
+| Override | Effect |
+|---|---|
+| **On** (checked) | Force Fast Downloads on for this service. |
+| **Off** (unchecked) | Force Fast Downloads off for this service. |
+| **Inherit** (indeterminate — the default) | Use the blueprint's **Enabled** setting. |
+
+The service's own **Fast Downloads** page then shows the current status and lets you run a sync:
+
+- The current usage, file count, and last sync time.
+- The public download URL.
+- A **Sync now** button to run a sync immediately.
+
+:::note
+The service's **Fast Downloads** page only appears while Fast Downloads is enabled for that service — by the blueprint default or by the per-service override. If you turn it off for a service, re-enable it from the service's **Settings** page.
+:::
+
+## Compression
+
+| Format | Notes |
+|---|---|
+| **None** | Files are uploaded as-is. |
+| **BZip2** | Required for Source-engine clients — they decompress `.bz2` automatically. |
+| **Zip** | Used by some Garry's Mod content launchers. |
+| **Tar** / **TarBz2** | Available for customers who group content this way. |
+
+## Config file variables
+
+When you reference these variables in a config file or command line, TCAdmin fills them in automatically:
+
+| Variable | Value |
+|---|---|
+| `${FastDownloadUrl}` | The service's public Fast Downloads URL. |
+| `${FastDownloadEnabled}` | `1` when Fast Downloads is enabled for the service, otherwise `0`. |
+
+For a Source-engine `server.cfg`, that typically looks like:
+
+```
+sv_downloadurl "${FastDownloadUrl}"
+sv_allowdownload ${FastDownloadEnabled}
+sv_allowupload ${FastDownloadEnabled}
+```
+
+## Scripting
+
+You can run scripts around a sync — for example to prepare content beforehand or notify an external service afterward.
+
+### Events
+
+| Event | Fires |
+|---|---|
+| `BeforeFastDLSync` | At the start of the sync, before files are scanned. If the script throws an error, the sync is **aborted**. |
+| `AfterFastDLSync` | At the end of the sync. The result is provided to the script as the `FastDLSyncResult` variable. |
+
+### Available variables
+
+Sync scripts run with the standard service objects (`ThisService`, `ThisServer`, `ScriptConsole`, the managers). The `AfterFastDLSync` event additionally provides:
+
+| Variable | Type | Description |
+|---|---|---|
+| `FastDLSyncResult` | `FastDLSyncResult` | The outcome of the sync (see properties below). |
+
+`FastDLSyncResult` has these properties:
+
+| Property | Type | Description |
+|---|---|---|
+| `ServiceId` | `long` | The service that was synced. |
+| `FilesUploaded` | `int` | Files added or re-uploaded this sync. |
+| `FilesDeleted` | `int` | Files removed from the destination this sync. |
+| `FilesUnchanged` | `int` | Files that already matched and were skipped. |
+| `BytesUploaded` | `long` | Source bytes uploaded this sync (before compression). |
+| `BytesDeleted` | `long` | Destination bytes freed by deletes this sync. |
+| `TotalUsage` | `long` | Total destination bytes after the sync. |
+| `FileCount` | `int` | Total files on the destination after the sync. |
+| `Duration` | `TimeSpan` | How long the sync took. |
+| `Errors` | `List<string>` | Non-fatal per-file errors. A non-empty list does **not** mean the sync failed. |
+
+### Example: report what a sync did
+
+This `AfterFastDLSync` script reads the `FastDLSyncResult` and prints its properties. Attach it to the blueprint and add the `AfterFastDLSync` event to it.
+
+```csharp
+//refAssemblies: TCAdmin.SDK.dll, TCAdmin.GameHosting.SDK.dll, TCAdmin.Scripting.dll, TCAdmin.Monitor.dll
+using TCAdmin.SDK.Models;
+
+var Globals = new TCAdmin.Scripting.Engines.Addons.CSharpGameGlobals(); // DO NOT MODIFY THIS LINE
+
+var result = (FastDLSyncResult)Variables["FastDLSyncResult"];
+
+ScriptConsole.WriteLine($"Fast Downloads sync finished for '{ThisService.Name}':");
+ScriptConsole.WriteLine($"  Files uploaded:  {result.FilesUploaded}");
+ScriptConsole.WriteLine($"  Files deleted:   {result.FilesDeleted}");
+ScriptConsole.WriteLine($"  Files unchanged: {result.FilesUnchanged}");
+ScriptConsole.WriteLine($"  Bytes uploaded:  {result.BytesUploaded}");
+ScriptConsole.WriteLine($"  Total usage:     {result.TotalUsage} bytes across {result.FileCount} file(s)");
+ScriptConsole.WriteLine($"  Duration:        {result.Duration}");
+
+if (result.Errors.Count > 0)
+{
+    ScriptConsole.WriteLine($"  {result.Errors.Count} non-fatal error(s):");
+    foreach (var error in result.Errors)
+    {
+        ScriptConsole.WriteLine($"    - {error}");
+    }
+}
+```
+
+### Example: start a sync from a script
+
+```csharp
+//refAssemblies: TCAdmin.SDK.dll, TCAdmin.GameHosting.SDK.dll, TCAdmin.Scripting.dll, TCAdmin.Monitor.dll
+var Globals = new TCAdmin.Scripting.Engines.Addons.CSharpGameGlobals(); // DO NOT MODIFY THIS LINE
+
+// Queue a Fast Downloads sync for the current service
+await ServiceManager.SyncFastDL(ThisService.ServiceId, ThisService.OwnerId);
+ScriptConsole.WriteLine("Fast Downloads sync queued.");
+```

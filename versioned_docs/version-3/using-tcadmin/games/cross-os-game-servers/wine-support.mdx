@@ -125,7 +125,7 @@ Apps that read stdin and write to stdout/stderr work great in Terminal mode. You
 
 On the service's settings page, **admins** and **top-level subadmins** see a **Preview Start Command** button. It shows the exact bash command TCAdmin will run — the full Wine environment, all `export` lines, and the final `wine "<exe>" <args>` invocation.
 
-If a service won't start and you want to see the real error, copy the commands and run them yourself from a terminal — see [Troubleshoot a Service with Preview Start Command](../troubleshooting/preview-start-command.mdx) for the step-by-step.
+If a service won't start and you want to see the real error, copy the commands and run them yourself from a terminal — see [Troubleshoot a Service with Preview Start Command](../../../troubleshooting/preview-start-command.mdx) for the step-by-step.
 
 :::note WINEARCH in the preview defaults to win64
 The runtime auto-detects 32-bit vs 64-bit by inspecting the service executable's PE header. The preview hard-codes `win64` since the web tier doesn't have file-system access to the executable. If your service runs a 32-bit Windows binary, change `WINEARCH=win64` to `WINEARCH=win32` when copy/pasting the preview.
@@ -143,7 +143,7 @@ The task log will name exactly what's missing — usually one of `wine`, `winese
 
 ### Service Starts Then Exits Immediately
 
-Run the service manually from a terminal — see [Troubleshoot a Service with Preview Start Command](../troubleshooting/preview-start-command.mdx). Wine will print the real error to your terminal (missing DLLs, ntdll exceptions, EULA prompts, etc.) instead of swallowing it inside the start pipeline.
+Run the service manually from a terminal — see [Troubleshoot a Service with Preview Start Command](../../../troubleshooting/preview-start-command.mdx). Wine will print the real error to your terminal (missing DLLs, ntdll exceptions, EULA prompts, etc.) instead of swallowing it inside the start pipeline.
 
 A silent exit is almost always a missing Windows runtime — install the relevant winetricks verbs from an `AfterServiceCreated` script (see [Step 3](#step-3-when-needed-install-windows-runtimes-with-winetricks)). For Source-engine games, the usual missing pieces are `vcrun2019` and `d3dcompiler_47`.
 

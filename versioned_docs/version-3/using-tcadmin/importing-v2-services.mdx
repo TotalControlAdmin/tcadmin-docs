@@ -1,0 +1,84 @@
+---
+sidebar_label: Importing V2 Services
+sidebar_position: 3
+---
+
+# Importing V2 Services
+
+The **Import V2 Services** tool migrates your existing game services from a TCAdmin V2 installation into V3 — the services, their owners, command lines, variables, and billing details — by connecting directly to your V2 database.
+
+:::info Administrators only
+The tool is in **System Settings → Import V2 Services**. It requires the **V2 Service Import** permission, which can only be granted to administrators.
+:::
+
+## Before you start
+
+:::warning Game files are adopted, not copied
+The import does **not** copy or move any game files. The new V3 service points at the **same folders on disk** that the V2 service used. Two things follow from this:
+
+- **Do not use V2's "Delete service" action on a service you've imported** — in V2 that also deletes the files on disk, which V3 now relies on. To tidy up V2's database safely, use V2's **"Detach"** action instead, which removes the V2 record but leaves the files alone.
+- Re-importing a service doesn't start it fresh — it re-adopts whatever state the files are in now. The wizard marks services you've already imported so you don't do this by accident.
+:::
+
+A few things to prepare in V3 first:
+
+- **Same operating system only.** Windows services migrate to Windows servers and Linux services to Linux servers.
+- **Create the V3 destinations**: the servers, game blueprints, and virtual servers you'll be importing into.
+- **Tell V3 which V2 records map to which V3 records**:
+  - **Game blueprint** — set the **V2 Game ID** on the blueprint's *Modify Game → General* page.
+  - **Virtual server** — set the V2 ID on the virtual server's *Migration* section.
+  - **Servers** are matched automatically by IP address.
+
+## What is and isn't imported
+
+| Imported | Not imported |
+|---|---|
+| Game services | Sub-users |
+| The users that own them (created if needed) | Reseller packages |
+| Per-service custom command lines | Scheduled / recurring tasks |
+| Service variables | Support tickets |
+| Billing ID and billing status | TeamSpeak services |
+| | Virtual-server limits (CPU/memory/disk — set these up in V3 yourself) |
+| | V2 per-user/per-role permissions (only the role *type* carries over) |
+
+## Running the import
+
+The tool is a four-step wizard:
+
+1. **Before you start** — the warnings above.
+2. **V2 database** — enter your V2 database connection and test it. The wizard then loads your V2 servers and games and auto-matches them to V3 (servers by IP, games by the V2 Game ID you set).
+3. **Mapping** — for each V2 server, the wizard lists its services and shows which are ready to import and which have already been imported.
+4. **Services** — pick the services to import and press **Start import**. Progress is shown in the standard task dialog, so you can leave the page and come back.
+
+### Service status
+
+By default the Services step shows only services that are **Ready** to import. Turn on **Show all** to also see services that can't be imported yet, each with the reason:
+
+| Status | Meaning |
+|---|---|
+| **Ready** | Everything is mapped — this service can be imported. |
+| **Already imported** | This V2 service has already been imported (it shows the V3 service number). |
+| **No server** | The V2 server isn't matched to a V3 server. |
+| **No game** | The V2 game isn't matched to a V3 game blueprint (set its V2 Game ID). |
+| **Not a game service** | The V2 record isn't a game service, so it can't be imported. |
+
+There's also a **Try to keep V2 service IDs** option. When enabled, imported services keep their original V2 ID numbers in V3 where those numbers are still free; otherwise V3 assigns new ones.
+
+## What happens to each service
+
+For every service you import, the tool:
+
+1. **Stops it in V2** (if it was running) and **disables it** there, so the V2 monitor can't relaunch it later.
+2. **Creates the V3 service**, pointing at the same files and carrying over its variables, command lines, ports, and owner.
+3. **Re-applies file permissions** so the V3 service account can read and run the files (V2 and V3 use different system accounts).
+4. **Starts it on V3** if it was running in V2 — so live services stay up across the migration.
+
+A service that was **disabled in V2** is imported as **Suspended** in V3, so it won't start automatically.
+
+## Passwords
+
+You don't need to reset anyone's password. Imported users keep their existing V2 password, and it's upgraded to V3's format automatically the first time they log in.
+
+## After the import
+
+The original V2 record stays in your V2 database, now disabled — that's harmless and expected. When you're ready to clean up V2, remember to use **Detach** (not Delete) so the game files V3 now uses are left in place.

@@ -1,0 +1,107 @@
+---
+sidebar_label: Updates
+sidebar_position: 3
+---
+
+# Game Updates
+
+Game Updates let you offer alternative builds or branches of a game that users can switch between on their service — for example Vanilla / Paper / Spigot for Minecraft, or different Steam betas. Installing an update replaces the game files, and **only one update can be installed per service at a time**.
+
+:::info Updates vs. Mods
+An **update** swaps the whole game build (one at a time). **[Mods](../common/mods.mdx)** are optional add-ons that can be installed alongside each other. Use Updates for "which build of the game", and Mods for "extra content on top of the build".
+:::
+
+## Creating an update
+
+Updates are managed per game from the game blueprint's **Updates** page. Each update has:
+
+- **Name**, **group**, **icon**, **comments**, and **display order** — how it appears to users.
+- **Source** — where the files come from (see below).
+- **Extract path** — where the files are placed inside the service, relative to the service root. Leave empty for the service root.
+- **Reinstallable** — whether a user can re-install the update they already have.
+- **Default install** — only one update per game can be the default.
+- **Roles** — which roles can see and install this update.
+- **Scripts** — optional scripts that run during install (see [Scripting](#scripting)).
+
+## Source: where the update files come from
+
+The **Source** field decides what happens on install:
+
+| Source | What happens |
+|---|---|
+| Empty (or `none`) | No files are placed — only the update's scripts run. |
+| A URL (`http://…` / `https://…`) | TCAdmin downloads the file from that URL. |
+| A file name | TCAdmin pulls the file from your **update files folder** (see below). |
+
+If a download URL doesn't end in a real file name (for example an API link), set **Save as filename** so TCAdmin knows what to call the downloaded file and whether it should be extracted.
+
+When the file is an archive (`.zip`, `.tar.gz`, etc.) it is extracted into the extract path. Anything else (a single `.jar`, `.exe`, etc.) is copied as-is.
+
+### Where to place update files
+
+When the **Source** is a file name (not a URL), TCAdmin looks for the file in a folder named **`TCA.Updates`** inside the game's setup folder, on whatever storage your servers use for game files.
+
+The path is always **relative to your game-files storage**, so it works the same whether your servers keep game files on the local disk or on a remote file provider:
+
+- **Local game files** — place the file on the server (or master) under:
+  `…/GameFiles/<game setup folder>/TCA.Updates/<your file>`
+- **FTP, SFTP, S3, or a File Server** — upload the file to the same relative location on that provider:
+  `<game setup folder>/TCA.Updates/<your file>`
+
+The `<game setup folder>` is the game's auto-setup folder name. For example, for an update with Source `paper-1.21.jar`, you'd place `paper-1.21.jar` in `…/<game setup folder>/TCA.Updates/`, and TCAdmin copies it onto the service when the update is installed.
+
+:::tip
+Sub-folders work too — a Source of `builds/paper-1.21.jar` looks for `TCA.Updates/builds/paper-1.21.jar`.
+:::
+
+## Who can install updates
+
+Two things must be true for a user to install an update:
+
+1. The user's role has the **Updates** feature enabled for the service.
+2. The specific update is assigned to one of the user's roles.
+
+An update with **no roles assigned is admin-only**. This lets you offer (for example) a beta build to beta-tester roles while everyone else only sees the stable builds.
+
+## Scripting
+
+You can attach scripts to an update that run before and after the files are installed — useful for stopping a server cleanly, migrating config, or running post-install setup.
+
+### Events
+
+| Event | Fires |
+|---|---|
+| `BeforeUpdateInstall` | Before the update files are placed. |
+| `AfterUpdateInstall` | After the update files are placed and the service is marked as having that update. |
+
+:::note Attaching scripts is a two-step process
+Adding `BeforeUpdateInstall` / `AfterUpdateInstall` to a script's events only makes it **eligible**. The script doesn't run until you also **attach** it to a specific update in the update editor's **Update scripts** list. A script that isn't attached to an update never runs for that update.
+:::
+
+### Available variables
+
+Update scripts run with the standard service objects — `ThisService`, `ThisServer`, `ThisGame`, `ScriptConsole`, and the managers (`ServiceManager`, `GameServiceManager`, …). See [Script Objects](../../customizations/scripts/script-objects.mdx) for the full list.
+
+### Example: announce after an update installs
+
+This script runs on `AfterUpdateInstall` and writes a message. Attach it to the update from the **Update scripts** list.
+
+```csharp
+//refAssemblies: TCAdmin.SDK.dll, TCAdmin.GameHosting.SDK.dll, TCAdmin.Scripting.dll, TCAdmin.Monitor.dll
+var Globals = new TCAdmin.Scripting.Engines.Addons.CSharpGameGlobals(); // DO NOT MODIFY THIS LINE
+
+ScriptConsole.WriteLine($"Update finished installing on '{ThisService.Name}'.");
+```
+
+### Example: install an update from a script
+
+You can also trigger an install from any script using `GameServiceManager`:
+
+```csharp
+//refAssemblies: TCAdmin.SDK.dll, TCAdmin.GameHosting.SDK.dll, TCAdmin.Scripting.dll, TCAdmin.Monitor.dll
+var Globals = new TCAdmin.Scripting.Engines.Addons.CSharpGameGlobals(); // DO NOT MODIFY THIS LINE
+
+// Queue the install of update #42 on the current service
+await GameServiceManager.InstallUpdate(ThisService.ServiceId, updateId: 42);
+ScriptConsole.WriteLine("Update install queued.");
+```
