@@ -1,0 +1,122 @@
+---
+sidebar_label: Mods
+sidebar_position: 2
+---
+
+# Mods
+
+Mods are optional add-ons that you curate on a blueprint and that users can install on their services with one click — typically a server-side plugin or extension. Examples are AMX Mod X for Counter-Strike or Geyser for Minecraft. Unlike updates, **several mods can be installed on the same service at once**.
+
+Mods work for both **game and Docker** blueprints.
+
+:::info How Mods differ from similar features
+- **Mods** (this page) — add-ons *you* curate on the blueprint; users toggle them on and off.
+- **Custom Mods** — content the *user* picks from an external catalog (Steam Workshop, CurseForge, Nexus, uMod, Modpacks).
+- **[Updates](../games/updates.mdx)** — swap the whole game build; only one at a time.
+:::
+
+## Creating a mod
+
+Mods are managed per blueprint from the blueprint's **Mods** page. Each mod has:
+
+- **Name**, **group**, **icon**, **comments**, **version**, and **display order**.
+- **Source** — where the files come from (see below).
+- **Install type** — *Silent* (installs with no prompts) or *Config Editor* (opens the linked config files after install so the user can edit them).
+- **Behavior** — **Uninstallable** (can users remove it), **Default install** (install automatically when a service is created), **Disable restart** (leave the service running during install).
+- **Dependencies** — **Required mods**, **Incompatible mods**, and **Required updates** (games only).
+- **File rules** — lines to add to or remove from config files during install/uninstall.
+- **Config files**, **Roles**, and **Scripts**.
+
+## Source: where the mod files come from
+
+The **Source** field works exactly like it does for [Updates](../games/updates.mdx):
+
+| Source | What happens |
+|---|---|
+| Empty (or `none`) | No files are placed — only the mod's scripts run. |
+| A URL (`http://…` / `https://…`) | TCAdmin downloads the file. Set **Save as filename** if the URL doesn't end in a real file name. |
+| A file name | TCAdmin pulls the file from your **mod files folder** (see below). |
+
+Archives (`.zip`, `.tar.gz`, …) are extracted; a single file (a `.jar`, `.dll`, …) is copied as-is.
+
+### Where to place mod files
+
+When the **Source** is a file name (not a URL), TCAdmin looks for the file in a folder named **`TCA.Mods`** inside the blueprint's setup folder, on whatever storage your servers use for game files.
+
+The path is **relative to your game-files storage**, so it works the same way for local or remote storage:
+
+- **Local game files** — place the file under:
+  `…/GameFiles/<blueprint setup folder>/TCA.Mods/<your file>`
+- **FTP, SFTP, S3, or a File Server** — upload the file to the same relative location:
+  `<blueprint setup folder>/TCA.Mods/<your file>`
+
+For a game blueprint, `<blueprint setup folder>` is the game's auto-setup folder name. For a Docker blueprint it's the blueprint's auto-setup folder name (or its short name if that isn't set).
+
+:::tip
+Sub-folders work too — a Source of `plugins/geyser.jar` looks for `TCA.Mods/plugins/geyser.jar`.
+:::
+
+## Installing mods and dependencies
+
+Users install, update, and uninstall mods from the service's **Mods** page.
+
+- **Dependencies** — if a mod requires other mods, TCAdmin lists the missing ones and offers to install them at the same time. Mods marked **incompatible** with each other can't both be installed.
+- **Clean uninstall** — TCAdmin tracks the files a mod added, so uninstalling removes exactly those files and leaves the rest of the service untouched.
+- **Updates** — if you raise a mod's version, users see an "Update available" note and can update in place.
+
+## Who can install mods
+
+Two things must be true for a user to install a mod:
+
+1. The user's role has the **Mods** feature enabled for the service.
+2. The specific mod is assigned to one of the user's roles (a mod with no roles assigned is admin-only).
+
+## Scripting
+
+You can attach scripts to a mod that run around install, update, and uninstall.
+
+### Events
+
+| Event | Fires |
+|---|---|
+| `BeforeModInstall` / `AfterModInstall` | Around a mod being installed. |
+| `BeforeModUpdate` / `AfterModUpdate` | Around a mod being updated in place. |
+| `BeforeModUninstall` / `AfterModUninstall` | Around a mod being removed. |
+
+:::note Attaching scripts is a two-step process
+Adding one of these events to a script only makes it **eligible**. The script doesn't run until you also **attach** it to a specific mod in the mod editor's **Scripts** list.
+:::
+
+### Available variables
+
+Mod scripts run with the standard service objects (`ThisService`, `ThisServer`, `ScriptConsole`, the managers, …). They also provide details about the mod being installed:
+
+| Variable | Type | Description |
+|---|---|---|
+| `ModName` | string | The mod's name. |
+| `ModId` | long | The mod's ID. |
+| `BlueprintMod` | `BlueprintMod` | The full mod definition. |
+
+### Example: announce after a mod installs
+
+Attach this script to the mod and add the `AfterModInstall` event to it.
+
+```csharp
+//refAssemblies: TCAdmin.SDK.dll, TCAdmin.GameHosting.SDK.dll, TCAdmin.Scripting.dll, TCAdmin.Monitor.dll
+var Globals = new TCAdmin.Scripting.Engines.Addons.CSharpGameGlobals(); // DO NOT MODIFY THIS LINE
+
+ScriptConsole.WriteLine($"Mod '{Variables["ModName"]}' installed on '{ThisService.Name}'.");
+```
+
+### Example: install a mod from a script
+
+You can also install a mod from any script using `ServiceManager`:
+
+```csharp
+//refAssemblies: TCAdmin.SDK.dll, TCAdmin.GameHosting.SDK.dll, TCAdmin.Scripting.dll, TCAdmin.Monitor.dll
+var Globals = new TCAdmin.Scripting.Engines.Addons.CSharpGameGlobals(); // DO NOT MODIFY THIS LINE
+
+// Queue the install of mod #7 on the current service
+await ServiceManager.InstallMod(ThisService.ServiceId, modId: 7);
+ScriptConsole.WriteLine("Mod install queued.");
+```

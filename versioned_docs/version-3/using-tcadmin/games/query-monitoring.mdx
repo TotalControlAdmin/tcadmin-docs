@@ -1,0 +1,127 @@
+---
+sidebar_label: Query Monitoring
+sidebar_position: 2
+---
+
+# Query Monitoring
+
+Query Monitoring lets TCAdmin automatically watch your running game servers and take action when something looks wrong — the server stops responding, reports more players than it should, goes public when it's meant to be private, loses your branding, or breaks a custom rule you define.
+
+:::info
+Query Monitoring applies to **game blueprints only** — it is not available for Docker blueprints.
+:::
+
+## How it works
+
+TCAdmin queries each running game service on a schedule. When a check fails, TCAdmin can **restart**, **stop**, or **disable** the service automatically, and (optionally) write an entry to the activity log so the owner has a record of what happened.
+
+Monitoring is **off by default**. You turn it on per game from the game blueprint's **Query Monitoring** page.
+
+## What it can detect
+
+| Detection | Triggers when… |
+|---|---|
+| **Query failure** | The server stops responding to queries (crashed, hung, or offline). |
+| **Slot overage** | The server reports more players or slots than the service is allowed. |
+| **Went public** | A service marked private is reporting as public. |
+| **Branding removed** | Your required brand text (or pattern) is no longer in the server's hostname. |
+| **Custom rule** | A comparison you define against a query field fails. |
+
+Each detection has its own on/off switch and its own action, so you can (for example) restart on a crash but only log a slot overage.
+
+## Settings
+
+On the game blueprint's **Query Monitoring** page:
+
+| Setting | What it does |
+|---|---|
+| **Enabled** | Master switch for the whole blueprint. |
+| **Check interval** | How often each running service is checked. Default: 5 minutes. |
+| **Startup grace period** | Checks are paused for this long after a service starts or restarts, so a slow-starting server isn't flagged. Default: 10 minutes. |
+| **Retry delay** | After a failed query, TCAdmin waits this long and re-checks once before counting the failure — this avoids acting on a brief network blip. Default: 30 seconds. |
+| **Failure threshold** | How many failures in a row before escalating to the stronger action. Default: 3. |
+| **Failure action** | The action taken below the threshold. Default: Restart. |
+| **Max failure action** | The action taken once the threshold is reached, so a server that keeps failing isn't restart-looped forever. Default: Disable. |
+| **Log activity on failure** | Write an activity-log entry each time a detection fires. Default: on. |
+
+Actions are always one of **None**, **Restart**, **Stop**, or **Disable**.
+
+### Per-service settings
+
+Some options live on the individual service's settings page, in the **Query Monitoring** section:
+
+- **Disable monitoring** — exclude this one service from monitoring.
+- **Private** — opt this service in to *Went public* detection.
+- **Branded** — opt this service in to *Branding removed* detection.
+- **Slots** — the allowed slot count that *Slot overage* detection compares against.
+
+:::note
+These per-service options require the **Service Settings** permission, so customers can't change them on their own services.
+:::
+
+## Activity log
+
+When **Log activity on failure** is enabled, every confirmed detection adds an entry to the service owner's activity log describing what was detected and which action was taken. These entries are attributed to "System" since TCAdmin (not a person) took the action.
+
+## Scripting
+
+You can run your own scripts whenever a detection fires — for example, to post an announcement, notify an external service, or run extra cleanup before the server is restarted.
+
+### Events
+
+| Event | Fires |
+|---|---|
+| `BeforeServiceMonitoringDetection` | After **any** confirmed detection, before the action runs. |
+| `AfterServiceMonitoringDetection` | After the action has completed. |
+| `BeforeServiceQueryFailed` | Same point as the "before" event above, but **only** for query-failure detections. |
+| `AfterServiceQueryFailed` | Same point as the "after" event above, but **only** for query-failure detections. |
+
+:::tip
+Prefer the generic `BeforeServiceMonitoringDetection` / `AfterServiceMonitoringDetection` pair and check the `DetectionType` variable to decide what to do. The `*ServiceQueryFailed` events are kept for older scripts — don't bind a script to both pairs, or it will run twice on a query failure.
+:::
+
+### Available variables
+
+Alongside the standard service objects (`ThisService`, `ThisServer`, `ThisGame`, …), these variables describe the detection:
+
+| Variable | Type | Description |
+|---|---|---|
+| `DetectionType` | `EMonitoringDetectionType` | Which detection fired: `QueryFailure`, `SlotsExceeded`, `WentPublic`, `BrandingRemoved`, or `RuleViolation`. |
+| `MonitoringAction` | `EQueryMonitoringAction` | The action TCAdmin chose: `None`, `Restart`, `Stop`, or `Disable`. |
+| `ConsecutiveFailures` | int | The consecutive failure count (always `1` for detections other than query failure). |
+| `FailureThreshold` | int | The configured failure threshold. |
+| `ThresholdReached` | bool | `true` once the failure threshold has been reached. |
+| `QueryStatus` | string | The query status that triggered the check (e.g. `offline`, `online`). |
+
+Depending on the detection type, extra variables are also provided:
+
+| Detection | Extra variables (with type) |
+|---|---|
+| Slot overage | `MaxAllowedSlots` (int), `ObservedNumPlayers` (int), `ObservedMaxPlayers` (int) |
+| Went public | `ExpectedPrivateRule` (string), `ExpectedPrivateRuleValue` (string), `ObservedPrivateRuleValue` (string) |
+| Branding removed | `UnbrandedHostname` (string), `ExpectedBrandedText` (string), `ExpectedBrandRegex` (string) |
+| Custom rule | `RuleDescription` (string), `ObservedValue` (string), `RuleValueExpanded` (string), `RuleOperator` (string), `RuleId` (long) |
+
+:::note
+In a C# script the enum variables read as their name when you call `.ToString()` (for example `Variables["MonitoringAction"].ToString()` returns `"Restart"`).
+:::
+
+### Example: announce when a detection fires
+
+This script runs on `BeforeServiceMonitoringDetection` and writes a message describing the detection. Attach it to the game blueprint and add the event to the script.
+
+```csharp
+//refAssemblies: TCAdmin.SDK.dll, TCAdmin.GameHosting.SDK.dll, TCAdmin.Scripting.dll, TCAdmin.Monitor.dll
+var Globals = new TCAdmin.Scripting.Engines.Addons.CSharpGameGlobals(); // DO NOT MODIFY THIS LINE
+
+var detection = Variables["DetectionType"].ToString();
+var action = Variables["MonitoringAction"].ToString();
+
+ScriptConsole.WriteLine($"Query monitoring: {detection} detected on '{ThisService.Name}'. Action: {action}.");
+
+// Only react to the server going offline
+if (detection == "QueryFailure")
+{
+    ScriptConsole.WriteLine($"'{ThisService.Name}' has failed {Variables["ConsecutiveFailures"]} time(s) in a row.");
+}
+```
