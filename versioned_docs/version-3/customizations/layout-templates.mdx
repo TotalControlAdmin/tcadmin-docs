@@ -1,0 +1,408 @@
+---
+sidebar_position: 2
+sidebar_label: Layout Templates
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Layout Templates
+
+:::info Themes and templates
+A **theme** sets colors, the logo, and other visual options. A **layout template** changes page structure. A theme can use one layout template (chosen on the theme's **Advanced** tab), and several themes can share the same template. With no template assigned, the panel uses its built-in layout.
+:::
+
+## Creating a template
+
+1. Go to **Settings → Layout Templates** and create a template.
+2. Add one or more **surfaces** (for example `LoginPage` or `Shell`) and edit each surface's markup and CSS. Use **Validate / Preview** to check a surface as you work.
+3. Save the template, then open a theme's **Advanced** tab and choose it. Select that theme to see it in action.
+
+:::tip Locked out by a template?
+Add `?safeMode=1` to the panel's address to temporarily ignore the template's markup and CSS and fall back to the built-in layout — handy if a custom login or shell ever renders incorrectly.
+:::
+
+## How a surface is written
+
+A template is organized into **surfaces** — named regions you can take over (the login page, the whole shell, or individual parts of the shell). In a surface you write ordinary HTML with three special tags:
+
+- `{{ Variable }}` — inserts a value, such as the application name or the signed-in user.
+- `{% component "name" %}` — drops in a live, interactive piece of the panel (the login form, the navigation menu, the dark-mode toggle, and so on).
+- `{% surface "Key" %}` — places one of the customizable regions inside your shell.
+
+Each surface also has its own **CSS** box, and the template has a **base stylesheet** that applies whenever the template is active. The editor's **Reference** tab lists every available variable, component, and surface key.
+
+:::note
+Templates imported from others run in a safe mode that strips scripts, so a shared template can't run code. Some advanced CSS (for example blur or animations) is also filtered unless an administrator marks the theme as **trusted**.
+:::
+
+### Variables
+
+Insert a variable with `{{ AppName }}`, or the dotted form for nested values such as `{{ Branding.Title }}`. Output is automatically HTML-encoded.
+
+| Variable | Type | Description |
+|---|---|---|
+| `AppName` | string | The application name. |
+| `AppVersion` | string | The running version. |
+| `Culture` | string | The current language code. |
+| `IsAuthenticated` | boolean | Whether the visitor is signed in. |
+| `UserName` | string | The signed-in user's name. |
+| `Branding.Title` | string | The branding title. |
+| `Branding.Subtitle` | string | The branding subtitle. |
+| `Branding.LogoUrl` | string | The branding logo image URL. |
+
+### Components
+
+Add a component with `{% component "name" %}`. The most useful ones:
+
+| Component | What it adds |
+|---|---|
+| `login-form` | The sign-in form (required somewhere on the login page). |
+| `brand` | The logo and branding block. |
+| `shell` | The entire built-in shell — a quick base when you only want to restyle with CSS. |
+| `body` | The current page's content (required somewhere in a custom shell). |
+| `menu` | The navigation drawer and menu. |
+| `menu-toggle` | The button that opens and collapses the drawer. |
+| `topbar` | The complete built-in top bar. |
+| `breadcrumbs` | The breadcrumb trail. |
+| `dark-mode-toggle` | The light / dark switch. |
+| `language-selector` | The language picker. |
+| `connection-status` | A warning shown only when the live connection drops. |
+| `connection-indicator` | An always-on connection dot (green / amber / red). |
+| `health-indicator` | A system-health indicator (shown only to permitted users). |
+| `announcements` | The customer announcements control. |
+| `footer-resources` | The current page's live stats — a game or Docker server's disk, CPU, memory, network and players. |
+
+## The surfaces
+
+### Login page
+
+The `LoginPage` surface replaces the entire login page. It **must** include the `login-form` component, or no one could sign in.
+
+<Tabs>
+<TabItem value="html" label="HTML">
+
+```html
+<div class="login-glass-card">
+    <h2>🎨 My Custom Login Template</h2>
+    <p>{{ Branding.Title }} — v{{ AppVersion }}</p>
+    {% component "brand" %}
+    {% component "login-form" %}
+    {% component "language-selector" %}
+</div>
+```
+
+</TabItem>
+<TabItem value="css" label="CSS">
+
+```css
+.login-glass-card {
+    text-align: center;
+}
+.login-glass-card h2 {
+    color: var(--mud-palette-primary);
+}
+```
+
+</TabItem>
+</Tabs>
+
+### App shell
+
+The `Shell` surface replaces the shell that wraps every page. It **must** include either the `body` component (the page content) or the `shell` component (the entire built-in shell). The example below rebuilds the shell from individual pieces — a custom top bar, the menu, the page body, and the footer region — and places the top-bar and footer surfaces inside it.
+
+When you hand-build the shell like this, one CSS rule is required so the navigation drawer sits correctly below your top bar — it's the first rule in the **CSS** tab below.
+
+<Tabs>
+<TabItem value="html" label="HTML">
+
+```html
+<div class="tca-shell-header">
+   {% component "menu-toggle" %}{% surface "Shell.TopBarStart" %}
+   <span class="tca-shell-title">{{ AppName }}</span>
+   {% component "breadcrumbs" %}
+   <span class="tca-shell-spacer"></span>
+   {% component "connection-status" %}{% component "dark-mode-toggle" %}{% surface "Shell.TopBarEnd" %}
+</div>
+{% component "menu" %}
+<div class="tca-shell-body">
+   {% component "body" %}
+</div>
+{% surface "Shell.Footer" %}
+```
+
+</TabItem>
+<TabItem value="css" label="CSS">
+
+```css
+/* Required: keeps the navigation drawer below the 64px top bar */
+.mud-drawer.mud-drawer-fixed.mud-drawer-pos-left {
+    top: 64px !important;
+    bottom: 0 !important;
+    height: auto !important;
+}
+
+.tca-shell-header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 64px;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 16px;
+    background: linear-gradient(90deg, #1a1f3a, #2d1b4e);
+    color: #fff;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+.tca-shell-title { font-weight: 800; letter-spacing: 0.5px; }
+.tca-shell-spacer { flex: 1; }
+.tca-shell-body { margin-top: 64px; margin-bottom: 40px; padding: 24px; }
+```
+
+</TabItem>
+</Tabs>
+
+:::tip Just restyling?
+If you only want to recolor or restyle the panel without rebuilding it, make your `Shell` simply `{% component "shell" %}` and put everything in the stylesheet — you won't need the drawer rule above.
+
+And if you don't need to change the shell's markup or CSS at all, just disable the `Shell` surface (or leave it out) — the built-in shell is used, and the other surfaces (top bar, drawer, footer and content slots) still appear on their own.
+:::
+
+### Top bar slots
+
+The `Shell.TopBarStart` and `Shell.TopBarEnd` surfaces add extra content at the start (left) or end (right) of the top app bar, alongside the built-in toggles. Both appear automatically in the built-in top bar; in a hand-built `Shell` you position them with `{% surface "Shell.TopBarStart" %}` / `{% surface "Shell.TopBarEnd" %}`, as shown in the shell example above.
+
+<Tabs>
+<TabItem value="html" label="HTML">
+
+```html
+<!-- Shell.TopBarStart -->
+<div class="tca-topbar-start">
+    <span class="tca-topbar-start-icon">&#9889;</span>
+    <span>Status: Online</span>
+</div>
+```
+
+```html
+<!-- Shell.TopBarEnd -->
+<div class="tca-topbar-end">
+    <span class="tca-topbar-end-icon">&#9733;</span>
+    <span>Pro Plan</span>
+</div>
+```
+
+</TabItem>
+<TabItem value="css" label="CSS">
+
+```css
+.tca-topbar-start {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 10px;
+    padding: 3px 12px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #7c4dff 0%, #00b0ff 100%);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.78rem;
+}
+.tca-topbar-end {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: 8px;
+    padding: 3px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.78rem;
+}
+```
+
+</TabItem>
+</Tabs>
+
+### Drawer header and footer
+
+`Shell.DrawerHeader` and `Shell.DrawerFooter` add content above or below the navigation menu inside the drawer — for example a brand zone at the top, or an account and sign-out block at the bottom.
+
+<Tabs>
+<TabItem value="html" label="HTML">
+
+```html
+<!-- Shell.DrawerHeader -->
+<div class="tca-drawer-header">
+    <div class="tca-drawer-header-logo">&#9889;</div>
+    <div>
+        <div class="tca-drawer-header-name">{{ AppName }}</div>
+        <div class="tca-drawer-header-sub">{{ Branding.Subtitle }}</div>
+    </div>
+</div>
+```
+
+```html
+<!-- Shell.DrawerFooter -->
+<div class="tca-drawer-footer">
+    <span class="tca-drawer-footer-dot"></span>
+    <span class="tca-drawer-footer-text">Signed in as <strong>{{ UserName }}</strong></span>
+</div>
+```
+
+</TabItem>
+<TabItem value="css" label="CSS">
+
+```css
+.tca-drawer-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px;
+    background: linear-gradient(135deg, #1a1f3a, #2d1b4e);
+    color: #fff;
+}
+.tca-drawer-header-name { font-weight: 800; letter-spacing: 0.5px; }
+.tca-drawer-header-sub { font-size: 0.72rem; opacity: 0.7; text-transform: uppercase; }
+
+.tca-drawer-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid rgba(124, 77, 255, 0.35);
+    font-size: 0.8rem;
+}
+.tca-drawer-footer-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #4caf50;
+    box-shadow: 0 0 6px #4caf50;
+}
+```
+
+</TabItem>
+</Tabs>
+
+### Before and after content
+
+`Shell.BeforeContent` and `Shell.AfterContent` are banner strips shown immediately above or below the page content, on every page.
+
+<Tabs>
+<TabItem value="html" label="HTML">
+
+```html
+<!-- Shell.BeforeContent -->
+<div class="tca-before-content">
+    <span class="tca-before-content-icon">&#8505;</span>
+    <span>Scheduled maintenance this Sunday at 02:00 UTC.</span>
+</div>
+```
+
+```html
+<!-- Shell.AfterContent -->
+<div class="tca-after-content">
+    &copy; {{ AppName }} — all rights reserved.
+</div>
+```
+
+</TabItem>
+<TabItem value="css" label="CSS">
+
+```css
+.tca-before-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #536dfe, #7c4dff);
+    color: #fff;
+    font-size: 0.9rem;
+}
+.tca-after-content {
+    margin-top: 16px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: rgba(124, 77, 255, 0.12);
+    border: 1px dashed rgba(124, 77, 255, 0.5);
+    font-size: 0.82rem;
+    text-align: center;
+}
+```
+
+</TabItem>
+</Tabs>
+
+### Footer
+
+The `Shell.Footer` surface replaces the contents of the footer bar. If you don't define it, the built-in footer is shown.
+
+<Tabs>
+<TabItem value="html" label="HTML">
+
+```html
+<div class="tcf">
+    {% component "health-indicator" %}
+    <a class="tcf-link" href="/support">Support</a>
+    <a class="tcf-link" href="https://status.example.com" target="_blank" rel="noopener">Status</a>
+    <span class="tcf-grow"></span>
+    <span class="tcf-brand">&copy; 2026 {{ Branding.Title }}</span>
+    <span class="tcf-ver">v{{ AppVersion }}</span>
+    {% component "connection-indicator" %}
+</div>
+```
+
+</TabItem>
+<TabItem value="css" label="CSS">
+
+```css
+.tcf {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding-inline: 12px;
+    font-size: 0.78rem;
+}
+.tcf-grow { flex: 1; }
+.tcf-brand { font-weight: 600; }
+.tcf-ver { opacity: 0.6; }
+.tcf-link { color: inherit; text-decoration: none; opacity: 0.85; }
+.tcf-link:hover { opacity: 1; text-decoration: underline; }
+```
+
+</TabItem>
+</Tabs>
+
+:::tip
+Add `{% component "footer-resources" %}` to a custom footer to show the current page's live stats — a game or Docker server's disk, CPU, memory, network and players.
+:::
+
+### Menu links
+
+The `Shell.MenuLinks` surface adds your own links to the **end of the navigation menu**, styled to match the built-in items. To look native, each link uses the same markup as the built-in items: an `<a class="mud-nav-link">` containing a Font Awesome icon and a text label.
+
+```html
+<a href="https://docs.tcadmin.com" target="_blank" rel="noopener noreferrer" class="mud-nav-link mud-ripple">
+  <i class="fa-solid fa-book mud-icon-root mud-nav-link-icon mud-nav-link-icon-default" style="font-size:24px;width:24px;text-align:center;"></i>
+  <div class="mud-nav-link-text">Documentation</div>
+</a>
+<a href="https://help.tcadmin.com" target="_blank" rel="noopener noreferrer" class="mud-nav-link mud-ripple">
+  <i class="fa-solid fa-life-ring mud-icon-root mud-nav-link-icon mud-nav-link-icon-default" style="font-size:24px;width:24px;text-align:center;"></i>
+  <div class="mud-nav-link-text">Support</div>
+</a>
+```
+
+:::note
+Use **Font Awesome** icons (`<i class="fa-solid ...">`). Keep the `mud-icon-root` class so the label collapses to an icon-only button when the drawer is minimized.
+:::
+
+## Sharing templates
+
+A finished template can move between installations:
+
+- **Export / Import** — from a template's editor, **Export** downloads it as a file; **Import** on the Layout Templates list loads one back in.
+- **Plugin Repository** — **Share** publishes a template to a connected plugin repository, where other installations can browse and install it. You can also share a theme together with its template as a single **bundle**, so the colors and the layout travel together.

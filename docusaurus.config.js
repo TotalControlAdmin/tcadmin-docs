@@ -42,13 +42,28 @@ const config = {
             function sortItems(items) {
               return items.map((/** @type {any} */ item) => {
                 if (item.type === "category") {
-                  const sorted = /** @type {any[]} */ (sortItems(item.items));
+                  let sorted = /** @type {any[]} */ (sortItems(item.items));
                   if (item.label === "Releases") {
                     sorted.sort((/** @type {any} */ a, /** @type {any} */ b) => {
                       const la = a.label ?? "";
                       const lb = b.label ?? "";
                       return lb < la ? -1 : lb > la ? 1 : 0;
                     });
+                    // Keep the sidebar short: show only the newest few releases, then a
+                    // "More…" link to the full Release Notes index — the same page the
+                    // "Releases" category header opens. (Newest-first from the sort above.)
+                    // Use a "link" item, NOT a "doc": a doc item's label is overridden by the
+                    // target page's own sidebar_label ("Release Notes"), whereas a link keeps the
+                    // label we set here. The index is at this version's "/releases/" route; V3 is
+                    // served under "/3/" today (lastVersion is "2"). onBrokenLinks:"throw" guards it.
+                    const MAX_VISIBLE_RELEASES = 4;
+                    if (sorted.length > MAX_VISIBLE_RELEASES) {
+                      const versionName = args.version && args.version.versionName;
+                      const versionBase =
+                        versionName && versionName !== "2" ? `/${versionName}` : "";
+                      sorted = sorted.slice(0, MAX_VISIBLE_RELEASES);
+                      sorted.push({ type: "link", label: "More…", href: `${versionBase}/releases/` });
+                    }
                   }
                   return { ...item, items: sorted };
                 }

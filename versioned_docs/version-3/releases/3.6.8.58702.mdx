@@ -1,0 +1,17 @@
+---
+sidebar_label: 3.6.8.58702
+date: 2026-05-27
+authors: [tcadmin]
+---
+
+import ReleaseDate from '@site/src/components/ReleaseDate';
+
+# Version 3.6.8.58702
+
+<ReleaseDate />
+
+### New Features
+
+- **Layout templates** — A theme controls your panel's colors; a layout template now controls its structure too. Redesign the login page and main shell — top bar, navigation drawer, footer, and the areas around your content — using editable building blocks and your own CSS, and share your design through the Plugin Repository on its own or bundled with a theme. The startup loading screen follows the selected theme too, and a safe-mode link restores the default layout if needed. Several ready-made designs are included.
+- **Minimum version requirements for plugins** — When sharing a plugin to a Plugin Repository, you can now set an optional minimum TCAdmin version. Installations running an older version still see the plugin while browsing, but its card shows the required version and the Install button is disabled with an explanation — so incompatible content can't be installed by mistake. Leave it blank to allow any version.
+- **More reliable license validation** — If the primary license server can't be reached, the monitor now automatically tries alternate license servers.
