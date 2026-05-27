@@ -5,9 +5,16 @@
     <link>https://docs.tcadmin.com/3/releases</link>
     <description>Latest TCAdmin v3 release notes</description>
     <language>en</language>
-    <lastBuildDate>Fri, 22 May 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 27 May 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://docs.tcadmin.com/releases/rss.xml" rel="self" type="application/rss+xml"/>
     <copyright>Copyright © 2026 TCADMIN.COM</copyright>
+    <item>
+      <title>3.6.8.58702</title>
+      <link>https://docs.tcadmin.com/3/releases/3.6.8.58702</link>
+      <guid isPermaLink="true">https://docs.tcadmin.com/3/releases/3.6.8.58702</guid>
+      <description>Layout templates, Minimum version requirements for plugins, More reliable license validation.</description>
+      <pubDate>Wed, 27 May 2026 00:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>3.5.31.47874</title>
       <link>https://docs.tcadmin.com/3/releases/3.5.31.47874</link>
