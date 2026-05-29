@@ -4,8 +4,15 @@
   <link href="https://docs.tcadmin.com/3/releases"/>
   <link rel="self" href="https://docs.tcadmin.com/releases/atom.xml"/>
   <id>https://docs.tcadmin.com/releases/atom.xml</id>
-  <updated>2026-05-27T00:00:00.000Z</updated>
+  <updated>2026-05-29T00:00:00.000Z</updated>
   <rights>Copyright © 2026 TCADMIN.COM</rights>
+  <entry>
+    <title>3.7.10.58004</title>
+    <link href="https://docs.tcadmin.com/3/releases/3.7.10.58004"/>
+    <id>https://docs.tcadmin.com/3/releases/3.7.10.58004</id>
+    <updated>2026-05-29T00:00:00.000Z</updated>
+    <summary>Filter the Plugin Repository by install state.</summary>
+  </entry>
   <entry>
     <title>3.6.8.58702</title>
     <link href="https://docs.tcadmin.com/3/releases/3.6.8.58702"/>
