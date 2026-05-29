@@ -1,0 +1,23 @@
+---
+sidebar_label: 3.7.10.58004
+date: 2026-05-29
+authors: [tcadmin]
+---
+
+import ReleaseDate from '@site/src/components/ReleaseDate';
+
+# Version 3.7.10.58004
+
+<ReleaseDate />
+
+### New Features
+
+- **Filter the Plugin Repository by install state** — When browsing a plugin repository you can now filter the list to show everything, only the plugins you already have installed, or only the ones with an update available. The filter applies across every category, making it easy to find and update the plugins you already use.
+
+### Bug Fixes
+
+- **Steam Workshop without an API key** — Fixed browsing and installing Steam Workshop content when no Steam Web API key is configured.
+- **Monitor crash while tailing files** — Fixed a crash in the monitor that could occur when viewing live file output (such as a log or console tail) and the view was closed.
+- **Importing a configuration duplicated mods and updates** — Mods and game updates now carry a stable identifier, so re-importing or updating a game configuration updates the existing entries in place instead of creating duplicates.
+- **"Starting" command line on a running service** — Fixed the command line applied when "Show 'Starting' until service responds to query" is enabled and the service was already running.
+- **Task popup Continue button** — The Continue button on the task progress popup now closes the dialog before redirecting, instead of leaving it open.
