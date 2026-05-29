@@ -43,6 +43,7 @@ jobs:
           const fs = require('fs');
           const matter = require('gray-matter');
 
+          (async () => {
           const files = process.env.NEW_FILES.trim().split('\n').filter(Boolean);
           const webhookUrl = process.env.DISCORD_WEBHOOK;
           const roleId = process.env.DISCORD_ROLE_ID;
@@ -101,4 +102,5 @@ jobs:
 
             console.log(`Notified Discord for ${version}`);
           }
+          })();
           EOF
