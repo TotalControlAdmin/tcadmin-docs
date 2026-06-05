@@ -1,0 +1,28 @@
+---
+sidebar_label: 3.8.26.32481
+date: 2026-06-05
+authors: [tcadmin]
+---
+
+import ReleaseDate from '@site/src/components/ReleaseDate';
+
+# Version 3.8.26.32481
+
+<ReleaseDate />
+
+### New Features
+
+- **Visual script editor** — Build automation without writing code. The new no-code editor lets you create a script by dragging blocks onto a canvas and connecting them — start from an event, then chain together actions, conditions and loops. Blocks cover the everyday tasks: send a console command, start, stop or restart the service, create, delete, compress or extract files, upload over FTP, call a web address, post to Discord, ask the user for input with a form, or run one of your other scripts. It runs through the same scripting system as the code languages, so a visual script reacts to the same events.
+- **Custom scripts on individual services** — Service owners can now build their own automation scripts on a single service with the new visual editor — no code or admin access required. Admins turn this on per game or Docker template and choose which blocks each customer is allowed to use — so you decide both who can add their own scripts and what those scripts can do.
+- **Update your servers from the web** — A new System Update page updates all your servers. Click *Update Now* and the master server updates and migrates first, then your remaining servers roll out automatically to the same version, with live progress and per-server retry. You can also reinstall the current version, or update a single server on its own.
+- **Update channels** — Choose which update stream your installation follows. Stay on the built-in Beta or Stable channel, or point at your own custom channel, from the new Update Channel setting — or with the `tca channel` command. Your choice applies across the whole installation.
+- **DNS certificate wizard** — Get an SSL certificate for your panel by proving you own the domain through a DNS record. The step-by-step wizard requests the certificate, shows the exact TXT record(s) to add at your DNS provider, then verifies and installs it for you — useful when your panel isn't reachable over the web for the usual automatic validation.
+- **Extract 7-Zip archives** — The web file manager can now extract `.7z` (7-Zip) archives, in addition to the formats it already handled.
+- **Improved services list** — The services overview's grid view has been reworked to be easier to scan, with clearer status at a glance.
+- **Better on small screens** — Many pages — including the file manager, file editor, service creation, game updates and the dashboard — now lay out properly on phones and tablets.
+
+### Bug Fixes
+
+- **Theme by hostname** — Fixed the panel selecting the correct theme based on the address used to reach it.
+- **File manager menu icons** — Fixed small icons in the file manager's right-click menu appearing greyed out.
+- **Getting Started: Import Games** — Fixed the Import Games step in the Getting Started guide.
