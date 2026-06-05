@@ -5,9 +5,16 @@
     <link>https://docs.tcadmin.com/3/releases</link>
     <description>Latest TCAdmin v3 release notes</description>
     <language>en</language>
-    <lastBuildDate>Fri, 29 May 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 05 Jun 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://docs.tcadmin.com/releases/rss.xml" rel="self" type="application/rss+xml"/>
     <copyright>Copyright © 2026 TCADMIN.COM</copyright>
+    <item>
+      <title>3.8.26.32481</title>
+      <link>https://docs.tcadmin.com/3/releases/3.8.26.32481</link>
+      <guid isPermaLink="true">https://docs.tcadmin.com/3/releases/3.8.26.32481</guid>
+      <description>Visual script editor, Custom scripts on individual services, Update your servers from the web, Update channels, DNS certificate wizard, and more.</description>
+      <pubDate>Fri, 05 Jun 2026 00:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>3.7.10.58004</title>
       <link>https://docs.tcadmin.com/3/releases/3.7.10.58004</link>
