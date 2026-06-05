@@ -58,10 +58,15 @@ jobs:
             const slug = file.replace(/.*\//, '').replace(/\.mdx?$/, '');
             const url = `${siteUrl}/3/releases/${slug}`;
 
+            // Count new features and bug fixes
+            const featuresMatch = content.match(/###\s+New Features([\s\S]*?)(?:###|$)/);
+            const fixesMatch = content.match(/###\s+Bug Fixes([\s\S]*?)(?:###|$)/);
+            const featureCount = featuresMatch ? (featuresMatch[1].match(/^- /gm) || []).length : 0;
+            const fixCount = fixesMatch ? (fixesMatch[1].match(/^- /gm) || []).length : 0;
+
             // Auto-generate description from New Features bold items
             let description = data.description || '';
             if (!description) {
-              const featuresMatch = content.match(/###\s+New Features([\s\S]*?)(?:###|$)/);
               if (featuresMatch) {
                 const names = [];
                 const re = /\*\*([^*]+)\*\*/g;
@@ -74,12 +79,18 @@ jobs:
               }
             }
 
+            const fields = [];
+            if (date) fields.push({ name: 'Release Date', value: date, inline: true });
+            if (featureCount > 0) fields.push({ name: 'New Features', value: String(featureCount), inline: true });
+            if (fixCount > 0) fields.push({ name: 'Bug Fixes', value: String(fixCount), inline: true });
+            fields.push({ name: 'Release Notes', value: `[View full release notes](${url})`, inline: false });
+
             const embed = {
-              title: `TCAdmin v3 — Version ${version}`,
+              title: `TCAdmin v3 — New Release: ${version}`,
               url,
               color: 0x57F287,
-              description: description || 'A new version of TCAdmin v3 has been released.',
-              fields: date ? [{ name: 'Release Date', value: date, inline: true }] : [],
+              description: `A new version of TCAdmin v3 has been released!\n\n${description || 'Check the release notes for details.'}`,
+              fields,
               footer: { text: 'TCAdmin Documentation' },
               timestamp: data.date ? new Date(data.date).toISOString() : new Date().toISOString(),
             };
