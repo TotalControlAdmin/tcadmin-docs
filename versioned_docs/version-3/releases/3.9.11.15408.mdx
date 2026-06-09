@@ -1,0 +1,24 @@
+---
+sidebar_label: 3.9.11.15408
+date: 2026-06-09
+authors: [tcadmin]
+---
+
+import ReleaseDate from '@site/src/components/ReleaseDate';
+
+# Version 3.9.11.15408
+
+<ReleaseDate />
+
+### New Features
+
+- **Two-factor authentication** — Add a second step to your sign-in for extra security. Turn it on from the Security page in your profile using any authenticator app, such as Google Authenticator, Authy or 1Password. You also get a set of one-time recovery codes to store somewhere safe in case you lose your phone, and you can choose to remember a computer you trust so you aren't asked for a code every time. Administrators with the right permission can switch two-factor off for a customer who has been locked out.
+- **Passkeys and passwordless sign-in** — Sign in with a passkey using Windows Hello, Touch ID, Face ID or a hardware security key. A passkey can stand in for your authenticator code as the second step after your password, or replace the password altogether — just choose "Sign in with a passkey" on the login screen and you're in, with nothing to type. Add and name as many passkeys as you like from the Security page.
+- **Visual script editor improvements** — Opening a visual script now centres it in view, so you can see the whole flow at a glance. The start, stop, restart and kill block reports whether the action actually succeeded, with separate success and failure paths you can branch on, plus an option to run it quietly without printing to the console.
+
+### Bug Fixes
+
+- **Remote server setup at startup** — Fixed an error that could stop remote servers from being configured automatically when the panel started.
+- **Console errors without Docker** — Fixed repeated error messages appearing in the console on systems that don't have Docker installed.
+- **Starting PowerShell sessions on Windows** — Fixed an error when opening a PowerShell session on Windows.
+- **Duplicate plugin-repository announcements** — Fixed a repository update posting the same announcement more than once.
