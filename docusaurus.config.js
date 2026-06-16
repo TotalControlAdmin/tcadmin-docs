@@ -5,6 +5,32 @@ import { themes as prismThemes } from "prism-react-renderer";
 const lightLogo = "img/tcadmin-logo.png";
 const darkLogo = "img/TCAdmin_White.png";
 
+// Parse a release label like "3.10 TBD" or "3.9.11.15408" into a numeric key
+// for sorting. Splitting on dots AND whitespace handles both the spaced sidebar
+// label and the dotted filename. Non-numeric segments ("TBD") become Infinity,
+// so an in-progress TBD page sorts ABOVE any numeric build of the same version.
+// (A plain string sort is wrong here: "3.10" < "3.8" < "3.9" lexicographically.)
+/** @param {string} label */
+function releaseSortKey(label) {
+  return String(label)
+    .split(/[.\s]+/)
+    .filter(Boolean)
+    .map((seg) => (/^\d+$/.test(seg) ? parseInt(seg, 10) : Infinity));
+}
+
+/** Descending comparator (newest release first). @param {string} a @param {string} b */
+function compareReleasesDesc(a, b) {
+  const ka = releaseSortKey(a);
+  const kb = releaseSortKey(b);
+  const len = Math.max(ka.length, kb.length);
+  for (let i = 0; i < len; i++) {
+    const va = ka[i] ?? -1;
+    const vb = kb[i] ?? -1;
+    if (va !== vb) return vb - va;
+  }
+  return 0;
+}
+
 const config = {
   title: "TCAdmin Documentation",
   tagline: "TCAdmin Documentation",
@@ -44,11 +70,9 @@ const config = {
                 if (item.type === "category") {
                   let sorted = /** @type {any[]} */ (sortItems(item.items));
                   if (item.label === "Releases") {
-                    sorted.sort((/** @type {any} */ a, /** @type {any} */ b) => {
-                      const la = a.label ?? "";
-                      const lb = b.label ?? "";
-                      return lb < la ? -1 : lb > la ? 1 : 0;
-                    });
+                    sorted.sort((/** @type {any} */ a, /** @type {any} */ b) =>
+                      compareReleasesDesc(a.label ?? "", b.label ?? "")
+                    );
                     // Keep the sidebar short: show only the newest few releases, then a
                     // "More…" link to the full Release Notes index — the same page the
                     // "Releases" category header opens. (Newest-first from the sort above.)

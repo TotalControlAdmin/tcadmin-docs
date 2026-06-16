@@ -4,6 +4,31 @@ const matter = require("gray-matter");
 
 const RELEASES_DIR_REL = path.join("versioned_docs", "version-3", "releases");
 
+// Parse a release filename like "3.10.tbd.mdx" or "3.9.11.15408.mdx" into a
+// numeric key for sorting. Non-numeric segments ("tbd") become Infinity so an
+// in-progress TBD page sorts ABOVE any numeric build of the same version. A
+// plain string sort is wrong here: "3.10" < "3.8" < "3.9" lexicographically.
+function releaseSortKey(name) {
+  return name
+    .replace(/\.(mdx|md)$/, "")
+    .split(/[.\s]+/)
+    .filter(Boolean)
+    .map((seg) => (/^\d+$/.test(seg) ? parseInt(seg, 10) : Infinity));
+}
+
+// Descending comparator (newest release first).
+function compareReleasesDesc(a, b) {
+  const ka = releaseSortKey(a);
+  const kb = releaseSortKey(b);
+  const len = Math.max(ka.length, kb.length);
+  for (let i = 0; i < len; i++) {
+    const va = ka[i] ?? -1;
+    const vb = kb[i] ?? -1;
+    if (va !== vb) return vb - va;
+  }
+  return 0;
+}
+
 function escapeXml(str) {
   return String(str)
     .replace(/&/g, "&amp;")
@@ -30,8 +55,7 @@ function getReleases(siteDir) {
   return fs
     .readdirSync(releasesDir)
     .filter((f) => (f.endsWith(".mdx") || f.endsWith(".md")) && f !== "index.mdx")
-    .sort()
-    .reverse()
+    .sort(compareReleasesDesc)
     .map((file) => {
       const raw = fs.readFileSync(path.join(releasesDir, file), "utf8");
       const { data, content } = matter(raw);
