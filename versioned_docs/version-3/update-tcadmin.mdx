@@ -8,13 +8,94 @@ import TabItem from "@theme/TabItem";
 
 # Update TCAdmin
 
-When a new version of TCAdmin is released, you can update using a single command. The updater handles everything — downloading, installing, database changes, and restarting services.
+When a new version of TCAdmin is released you can update your whole cluster — the master and every remote server — straight from the control panel. From **TCAdmin 3.8** onwards there's a built-in **System Update** page that downloads, installs, applies any database changes and restarts the services for you, one server at a time. No command line required.
 
-:::tip How do I know if there's an update?
-Check the TCAdmin announcements or community channels for new releases. Running the update command will tell you if you're already on the latest version.
+If you're still on a version older than 3.8, or you simply prefer the terminal, you can also update with a single command — see [Update from the command line](#update-from-the-command-line).
+
+:::info Game servers stay running
+Updating only restarts the TCAdmin management services (Monitor and Web). Your actual game servers keep running, so players aren't disconnected.
 :::
 
-## How to Update
+## Update from the web
+
+Open **System → System Update** in the control panel. This page is the home for everything to do with updating your cluster.
+
+:::note Who can do this
+You need an administrator account with permission to manage system updates to open this page and start an update.
+:::
+
+At the top of the page a banner tells you where you stand:
+
+- **You're up to date** — every server is running the newest version on your channel.
+- **Update available** — a newer version is ready, and the banner shows which version it is.
+
+### Start an update
+
+1. Go to **System → System Update**.
+2. Click **Update Now**. (If you're already on the latest version but want to repair an install or re-run database changes, the same button instead reads **Reinstall current version**.)
+3. Confirm in the dialog. The update starts straight away.
+
+Here's what happens, in order:
+
+1. **The master server updates first.** It downloads and installs the new version, applies any database changes, and restarts. The web interface will be unavailable for a minute or two while this happens — the page shows a **Reconnecting…** badge and comes back on its own.
+2. **Once the master is healthy, your remote servers roll out.** They all update to the exact same version and channel as the master. You watch each one move through **Queued → Updating → Done** live on the page.
+
+:::note The master always goes first
+Remote servers are only touched after the master has fully updated, migrated and come back healthy. If the master doesn't come back within about 20 minutes the update stops and no remote servers are changed.
+:::
+
+A server that is **offline** when the rollout reaches it is marked **Skipped** and left untouched — you can update it later once it's back.
+
+### When a server fails or is skipped
+
+A finished update may show some servers as **Failed** or **Skipped (offline)**. Each of those rows gets a **Retry** button — bring the server back online, then click **Retry** to update just that one. When you've finished reviewing the results, click **Dismiss** to clear the completed update.
+
+### Update a single server
+
+You don't have to update the whole cluster at once. In the **Servers** list at the bottom of the page, each remote server has its own button:
+
+- **Update** — shown when the server is behind the master (it also gets a **Behind** tag). Click it to bring that server up to the master's version.
+- **Reinstall** — shown when the server already matches the master. Click it to reinstall the same version.
+
+The button is greyed out for servers that are offline. The master server has no button here — update it with **Update Now** at the top of the page.
+
+### Updating many servers at once
+
+If you run a lot of servers, the **Max concurrent remotes** box next to the Update button controls how many update at the same time. Leave it at the default, or set it to **0** to update every remote at once. TCAdmin remembers your choice for next time.
+
+## Choose your update channel
+
+A **channel** decides which stream of builds your cluster receives. You set it once, and every server in the cluster follows the same channel.
+
+To change it, open **System → System Update** and find the **Update Channel** card:
+
+1. Pick a channel from the dropdown:
+   - **Beta** — the default channel, with the latest releases. This is the recommended channel.
+   - **Custom** — choose this to type the exact name of a specific channel, for example a build your provider asked you to use. Channel names are **case-sensitive**, so `Dev-Fix` and `dev-fix` are not the same channel.
+2. Click **Save**.
+
+The channel is saved for the whole cluster, and the version status refreshes to show the latest build on your new channel.
+
+:::note
+The channel must already exist on the update server (a build must have been published to it) or the save is rejected. If you entered a custom name, double-check the spelling and capitalisation.
+:::
+
+:::info Stable channel
+You may notice a **Stable** option in the list. It isn't selectable yet — **Beta** is currently the channel for everyone.
+:::
+
+:::tip Change the channel from the command line
+On the master server you can also view or set the channel without running an update:
+
+```
+tca channel            # show the current channel and the latest version on it
+tca channel Beta       # switch the whole cluster to a channel
+```
+:::
+
+## Update from the command line
+
+Prefer the terminal, or updating a server that's still older than 3.8? You can run the updater directly. It does the same work — download, install, database changes and restart — for the machine you run it on.
 
 <Tabs>
   <TabItem value="windows" label="Windows">
@@ -51,23 +132,21 @@ cd /opt/tcadmin3/cli
   </TabItem>
 </Tabs>
 
-## What Happens During the Update
+Running the command updates the machine you run it on. On the master it also applies the database changes; on a remote server it just updates that server's files and services.
 
-The update process is automatic. Here's what it does behind the scenes:
+:::tip Update a single run on a specific channel
+Add `--channel` to update from a particular channel just for this run, without changing your saved channel:
 
-1. **Stops** the TCAdmin services (Monitor and Web) — game servers keep running, but you can't manage them during the update
-2. **Downloads** the latest version
-3. **Installs** the updated files
-4. **Applies database migrations** — updates the database structure if the new version requires it
-5. **Restarts** the TCAdmin services
-
-:::info Game servers stay running
-The update only restarts the TCAdmin management services, not your actual game servers. Players won't be disconnected during the update.
+```
+tca update --channel Beta
+```
 :::
 
-## After Updating
+## After updating
 
-Verify that the services came back up successfully:
+If you updated from the web, the page shows each server reaching **Done** when it's finished — there's nothing else to do.
+
+If you updated from the command line, you can confirm the services came back up:
 
 <Tabs>
   <TabItem value="windows" label="Windows">
@@ -90,7 +169,7 @@ Both should show **active (running)**.
   </TabItem>
 </Tabs>
 
-Then open your control panel in the browser to confirm everything is working. You can check the version number in the panel footer or settings page.
+Then open your control panel in the browser to confirm everything is working. You can check the version number on the System Update page or in the panel footer.
 
 :::tip Something went wrong?
 If a service doesn't start after updating, run it in [Console Mode](troubleshooting/console-mode.mdx) to see the error messages and figure out what happened.
