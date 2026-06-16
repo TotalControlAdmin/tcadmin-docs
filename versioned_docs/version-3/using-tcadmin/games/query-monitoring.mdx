@@ -65,7 +65,7 @@ When **Log activity on failure** is enabled, every confirmed detection adds an e
 
 ## Scripting
 
-You can run your own scripts whenever a detection fires — for example, to post an announcement, notify an external service, or run extra cleanup before the server is restarted.
+You can run your own scripts whenever a detection fires — for example, to post an announcement, notify an external service, or run extra cleanup before the server is restarted. You can also run a script on **every** query check, not just when something is wrong — see [Run a script on every query](#run-a-script-on-every-query-servicequeried).
 
 ### Events
 
@@ -75,6 +75,7 @@ You can run your own scripts whenever a detection fires — for example, to post
 | `AfterServiceMonitoringDetection` | After the action has completed. |
 | `BeforeServiceQueryFailed` | Same point as the "before" event above, but **only** for query-failure detections. |
 | `AfterServiceQueryFailed` | Same point as the "after" event above, but **only** for query-failure detections. |
+| `ServiceQueried` | On **every** query check, online or offline — not just when a detection fires. See [Run a script on every query](#run-a-script-on-every-query-servicequeried). |
 
 :::tip
 Prefer the generic `BeforeServiceMonitoringDetection` / `AfterServiceMonitoringDetection` pair and check the `DetectionType` variable to decide what to do. The `*ServiceQueryFailed` events are kept for older scripts — don't bind a script to both pairs, or it will run twice on a query failure.
@@ -123,5 +124,65 @@ ScriptConsole.WriteLine($"Query monitoring: {detection} detected on '{ThisServic
 if (detection == "QueryFailure")
 {
     ScriptConsole.WriteLine($"'{ThisService.Name}' has failed {Variables["ConsecutiveFailures"]} time(s) in a row.");
+}
+```
+
+### Run a script on every query (`ServiceQueried`)
+
+The events above only fire when something is *wrong*. If you instead want a script to run on **every** query check — to keep your own running count, log player numbers, or act on something the built-in detections can't express — bind a script to the `ServiceQueried` event.
+
+It runs once per **check interval** for each monitored service that has a script attached to it, whether the server answered the query or not. There's no extra switch to turn it on: it runs as soon as a script is bound to the event, as long as Query Monitoring is **Enabled** on the blueprint.
+
+A good example is *"stop a server that has sat empty for too long"* — something a single detection can't do on its own, because it has to count consecutive empty checks over time.
+
+:::note
+`ServiceQueried` fires on **every** check, including when the server is offline. An offline reading is not the same as "zero players" — the server is down, which the *Query failure* detection already handles — so check `QueryStatus` before you start counting.
+:::
+
+Alongside the standard service objects (`ThisService`, `ThisServer`, `ThisGame`, …), the event provides the query result:
+
+| Variable | Type | Description |
+|---|---|---|
+| `Query` | `GameQueryResponse` | The full query result, for anything not listed below — e.g. `Query.Players` (the player list), `Query.Rules["key"]`, `Query.Hostname`, `Query.Map`, `Query.GameType`, `Query.Name`. |
+| `QueryStatus` | string | The query status: `online` when the server answered, otherwise an offline status. |
+| `QueryOnline` | bool | `true` when `QueryStatus` is `online`. |
+| `NumPlayers` | int | Players currently connected. |
+| `MaxPlayers` | int | Maximum players the server reported. |
+| `NumSpectators` | int | Spectators currently connected. |
+| `MaxSpectators` | int | Maximum spectators the server reported. |
+
+To remember a value between checks, store it on the service with `ThisService.Variables["YourKey"]` and save it with `ServiceManager.UpdateAsync(ThisService, true)`. A plain variable inside the script won't survive, because each check runs the script fresh.
+
+#### Example: stop a server after an hour with no players
+
+With a 5-minute check interval, 12 empty checks in a row is about one hour. This script counts consecutive empty checks and stops the server once it reaches 12.
+
+```csharp
+//refAssemblies: TCAdmin.SDK.dll, TCAdmin.GameHosting.SDK.dll, TCAdmin.Scripting.dll, TCAdmin.Monitor.dll
+var Globals = new TCAdmin.Scripting.Engines.Addons.CSharpGameGlobals(); // DO NOT MODIFY THIS LINE
+
+const int maxEmptyChecks = 12; // 12 x 5-minute interval is about 1 hour
+
+// Only count while the server is actually responding.
+if (Variables["QueryStatus"].ToString() != "online")
+    return;
+
+int players = Convert.ToInt32(Variables["NumPlayers"]);
+int count = ThisService.Variables.ContainsKey("EmptyQueryCount")
+    ? Convert.ToInt32(ThisService.Variables["EmptyQueryCount"])
+    : 0;
+
+count = players > 0 ? 0 : count + 1; // reset when someone is on, otherwise add one
+ThisService.Variables["EmptyQueryCount"] = count;
+await ServiceManager.UpdateAsync(ThisService, true);
+
+ScriptConsole.WriteLine($"'{ThisService.Name}' has been empty for {count}/{maxEmptyChecks} checks.");
+
+if (count >= maxEmptyChecks)
+{
+    ScriptConsole.WriteLine($"Stopping '{ThisService.Name}' after {maxEmptyChecks} empty checks.");
+    await ServiceManagerService.StopService(ThisService.ServiceId);
+    ThisService.Variables["EmptyQueryCount"] = 0; // reset so it starts clean next time
+    await ServiceManager.UpdateAsync(ThisService, true);
 }
 ```
