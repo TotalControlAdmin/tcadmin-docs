@@ -32,6 +32,10 @@ function compareReleasesDesc(a, b) {
 }
 
 const config = {
+  future: {
+    v4: true,
+  },
+
   title: "TCAdmin Documentation",
   tagline: "TCAdmin Documentation",
   favicon: "img/cropped-tcadmin-favicon-32x32.png",
