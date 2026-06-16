@@ -1,3 +1,7 @@
+/* Tailwind v3 — no base/preflight so Docusaurus/Infima styles stay intact */
+@tailwind components;
+@tailwind utilities;
+
 /**
  * Any CSS included here will be global. The classic template
  * bundles Infima by default. Infima is a CSS framework designed to
@@ -65,6 +69,10 @@
     var(--ifm-color-emphasis-200) 0%,
     var(--ifm-color-emphasis-100) 100%
   );
+}
+
+.footer--dark {
+  --ifm-footer-background-color: var(--ifm-navbar-background-color);
 }
 
 .unique-tabs .tabs__item {
