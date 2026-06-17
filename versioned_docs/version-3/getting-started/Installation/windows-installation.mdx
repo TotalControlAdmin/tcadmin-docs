@@ -16,7 +16,7 @@ Make sure you have:
 - Your MySQL **username, password, and database name** ready (you'll need these during setup)
 - **Administrator access** to the server
 
-:::tip Don't have MySQL set up yet?
+:::tip[Don't have MySQL set up yet?]
 Install [MariaDB](https://mariadb.org/download) first. During the MariaDB installer, set a root password and remember it. You can use the root account for TCAdmin, or create a dedicated `tcadmin3` user for better security.
 :::
 
@@ -33,7 +33,7 @@ Install [MariaDB](https://mariadb.org/download) first. During the MariaDB instal
 
 3. The installer will walk you through a series of prompts (component selection, database setup, etc.). For a detailed explanation of each step, see the [Master Server Configuration](../initial-configuration/master-server-configuration.mdx) guide.
 
-:::info What does this command do?
+:::info[What does this command do?]
 It downloads the official TCAdmin installer script from `v3.tcafiles.com` and runs it. The script installs the TCAdmin components, sets up Windows Services, and configures the initial settings based on your answers to the prompts.
 :::
 
@@ -45,7 +45,7 @@ Once the installer finishes:
 - Your control panel will be available at **`https://127.0.0.1:31001`** (or `https://YOUR-SERVER-IP:31001` from another computer)
 - Default login: **admin** / **Password!23**
 
-:::warning Browser Security Warning
+:::warning[Browser Security Warning]
 Your browser will show a security warning because TCAdmin uses a self-signed certificate by default. This is normal — click "Advanced" and then "Proceed" to continue. You can set up a proper certificate later using the [Web Certificate](../initial-configuration/web-certificate.mdx) guide.
 :::
 

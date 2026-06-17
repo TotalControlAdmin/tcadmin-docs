@@ -10,7 +10,7 @@ import TabItem from "@theme/TabItem";
 
 Before installing TCAdmin, make sure your server meets the requirements below. TCAdmin v3 is built on .NET 9, so it runs on most modern Windows and Linux servers.
 
-:::tip Not sure what server to get?
+:::tip[Not sure what server to get?]
 If you're just starting out, a **Windows Server 2022** or **Ubuntu 24.04** VPS/dedicated server with at least **4 GB RAM** and **2 CPU cores** is a solid starting point. You can always scale up later.
 :::
 
@@ -36,7 +36,7 @@ TCAdmin stores all of its data (users, game servers, settings) in a MySQL-compat
 
 We recommend **[MariaDB](https://mariadb.org/download)** — it's free, open-source, and fully compatible with MySQL. Install it on the same machine as TCAdmin for the best performance.
 
-:::tip First time with MySQL/MariaDB?
+:::tip[First time with MySQL/MariaDB?]
 During the MariaDB installer, you'll be asked to set a **root password** — remember this! You'll use it later when configuring TCAdmin. You can also create a dedicated `tcadmin3` database user during setup (recommended for security).
 :::
 
@@ -46,7 +46,7 @@ TCAdmin requires the Visual C++ runtime for game server process management. With
 
 - [Microsoft Visual C++ **(x64)**](https://aka.ms/vc14/vc_redist.x64.exe) 2015 to 2022 — **required by TCAdmin** and most game servers
 
-:::tip Also install the x86 version
+:::tip[Also install the x86 version]
 While only the x64 runtime is required by TCAdmin, many game servers also need the x86 version. We recommend installing both:
 - [Microsoft Visual C++ **(x86)**](https://aka.ms/vs/17/release/vc_redist.x86.exe) 2015 to 2022
 :::
@@ -86,7 +86,7 @@ These are **not** needed for TCAdmin itself, but certain game servers won't run 
 | Fedora                   | 42      | Yes           | Ends security support in May 2026.                                               |
 | Fedora                   | 41      | Yes           | Ends security support in November 2025.                                          |
 
-:::tip Recommended for beginners
+:::tip[Recommended for beginners]
 If you're new to Linux, **Ubuntu 24.04 LTS** or **Debian 12** are the easiest to work with and have the most community support.
 :::
 
@@ -98,7 +98,7 @@ TCAdmin stores all of its data (users, game servers, settings) in a MySQL-compat
 
 We recommend **[MariaDB](https://mariadb.org/download)** — it's free, open-source, and fully compatible with MySQL. Install it on the same machine as TCAdmin for the best performance.
 
-:::warning Linux Knowledge Required
+:::warning[Linux Knowledge Required]
 TCAdmin support does not provide instruction on basic Linux tasks such as logging in via SSH, executing commands, or installing OS-level dependencies. If you're new to Linux, we recommend learning the basics of SSH, package managers (`apt`, `dnf`), and file permissions before proceeding.
 :::
 
@@ -116,7 +116,7 @@ TCAdmin support does not provide instruction on basic Linux tasks such as loggin
 
 ### Windows & Linux
 
-:::info Running Multiple Servers?
+:::info[Running Multiple Servers?]
 
 If you plan to add **remote servers** (additional machines to host more game servers), the MySQL database on your master server must be accessible from all your TCAdmin servers over the network. You'll configure this connection during installation.
 

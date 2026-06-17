@@ -9,7 +9,7 @@ sidebar_label: Fast Downloads
 
 The fast downloads (FastDL) feature allows you to copy or upload custom game content to a website so they can be downloaded directly by players.
 
-:::tip Important
+:::tip[Important]
 Before attempting to configure fast downloads in TCAdmin you should take the time to learn how to configure fast downloads for the game server manually without a control panel. That's the only way you will be able to troubleshoot if you have any problems with the game server's fast download configuration.
 :::
 
@@ -61,7 +61,7 @@ If the FTP server's file system is case sensitive enable File `system is case se
 - Fast Downloads Save Path - Enter the path to the root of the fast downloads website.
 - Fast Downloads Folder Template - Enter the template used to determine the folder where the fast download files will be saved for each game or voice service. You may use the default value.
 
-:::note example
+:::note[example]
 
 This will create a folder with the service's IP and port `(1.2.3.4_27960)` : `$[Service.IpAddress]_$[Service.GamePort]\`
 
@@ -134,17 +134,17 @@ You have to enable fast downloads and specify the url in the game server's confi
 
 ## Tips
 
-:::tip security
+:::tip[security]
 Make sure you don't sync config files. They will be downloadable from the fast download website and someone might steal rcon and other passwords.
 
 Don't sync .php and other scripts. For better security your fast download website should not allow execution of .php and other scripts.
 :::
 
-:::tip Exclude compressed files
+:::tip[Exclude compressed files]
 A client can upload a large zip or rar and extract it on the server. If he doesn't delete it the fast download will think it is custom content and upload it. Also if you have compression enabled it will try to compress it and use lots of CPU in the process. Just add the common compression formats in your exclude list: `*.zip;*.rar;*.7z;*.tar;*.tar.gz;*.tgz;*.tar.bz2;*.tbz2;*.tar;*.lzma;*.tlz`
 :::
 
-:::tip How to create a list of exclude files the easy way
+:::tip[How to create a list of exclude files the easy way]
 Normally you would only want to upload files that are not included by default. To do this you need a list of all the files included by default and set it in the "Exclude Files" field. You can do this easily by executing a few commands from a command prompt or shell session.
 :::
 
@@ -159,7 +159,7 @@ notepad exclude.txt
 
 This below creates an exclude file named `exclude.txt` for `C:\TCAFiles\Games\css\css`. Copy the file's contents and paste it in the fast download exclude field.
 
-:::note example
+:::note[example]
 
 ```bash
 FastDownloadExclude.bat C:\TCAFiles\Games\css\css > exclude.txt
@@ -177,7 +177,7 @@ find . -name \*.* -print| sed 's/^..//'|sed ':a;N;$!ba;s/\n/;/g'|sed 's/^..//' >
 
 This below creates an exclude file named `/home/tcadmin/tcafiles/games/exclude.txt` for Garry's Mod. Download the file, copy the contents and paste it in the fast download exclude field.
 
-:::note example
+:::note[example]
 
 ```bash
 cd /home/tcadmin/tcafiles/games/garrysmod-linux

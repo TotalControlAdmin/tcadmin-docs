@@ -99,7 +99,7 @@ The Workshop browser downloads the content to `ServiceRoot/steamapps/Workshop/co
 The parallel code in the after installed script below causes Mono to crash. **On Linux use the script in the Linux tab instead**
 :::
 
-:::note update notes
+:::note[update notes]
 - Updated 2020/08/24. Fix for file ids > 2147483647 after this was fixed in the game
 - Updated 2020/07/07. Fix for file ids > 2147483647
 :::
@@ -113,10 +113,10 @@ The parallel code in the after installed script below causes Mono to crash. **On
 - **Ignore execution errors:** Unchecked
 - **Notes** - This script supports extraction of multiple files simultaneously. `The default is 2`. You can increase it by editing this line near the bottom of the script.
 
-:::tip Recommended parallelism value
+:::tip[Recommended parallelism value]
 **options.MaxDegreeOfParallelism = 2**
 :::
-:::danger Change if you know what you are doing
+:::danger[Change if you know what you are doing]
 For VPS the recommended value is `2`. For dedicated servers the recommended value is `4`. The higher the value the faster the script will execute but it will require more CPU and disk. Set it too high and it might take even longer.
 :::
 
@@ -416,7 +416,7 @@ if Directory.Exists(InstallPath) :
 
 
 
-:::note update notes
+:::note[update notes]
 - Updated 2020/08/24. Fix for file ids > 2147483647 after game was fixed
 - Updated 2020/7/7. Fix for file ids > 2147483647
 - Updated 2020/6/9. Some Linux mods are placed in /downloads/ instead of /content/
@@ -1388,7 +1388,7 @@ if match.Success :
 
 ### Arma 3
 
-:::info ESSENTIAL PREREQUISITE'S
+:::info[ESSENTIAL PREREQUISITE'S]
 - Go to the game's settings. Add a variable named Mods and another named ServerMods.
 - Go to the game's command lines. Add the variables to the game's command line: `-mod=![Mods]` `-servermod=![ServerMods]`
 - Go to the game's steam settings. Set Workshop File Id Format to `![FileId]` and Workshop File Id Separator to ;
@@ -1783,7 +1783,7 @@ for file in Directory.GetFiles(InstallPath, "*", SearchOption.AllDirectories):
 
 ### DayZ
 
-:::info ESSENTIAL PREREQUISITE'S
+:::info[ESSENTIAL PREREQUISITE'S]
 - Create a variable named `Mods`
 - Add this to the command line: `-mod=![Mods]`
 :::
@@ -2093,7 +2093,7 @@ ThisService.Configure()
 
 ### Garry's Mod
 
-:::note update notes
+:::note[update notes]
 - Updated 2021/05/23. Fixed errors when file already exists. Gave execute permissions to bin/gmad_linux.
 :::
 

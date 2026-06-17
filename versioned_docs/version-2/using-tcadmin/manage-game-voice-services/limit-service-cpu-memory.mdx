@@ -20,7 +20,7 @@ To set the CPU limit go to the game server's service settings, set the value of 
 
 ### Limiting a service's memory and virtual memory
 
-:::info important notes
+:::info[important notes]
 - If you limit a service's memory it will use more virtual memory. This can increase your server's disk activity.
 - If you set the virtual memory limit too low the service might crash while starting up or it might crash later if it requires more memory than allowed.
 - If you set the virtual memory limit and the service is currently using more than allowed you will have to restart it to apply the limit.
@@ -31,7 +31,7 @@ To set the memory or virtual memory limit go to the game server's service settin
 
 ### Virtual Servers
 
-:::info important notes
+:::info[important notes]
 - When a service belongs to a virtual server the memory limit in service settings can't be set higher than the memory assigned to the virtual server.
 - A single process can't use more memory than what is assigned in the virtual server's settings even if there is no limit assigned in service settings.
 - CPU limit of a service is affected by the number of cores assigned to the service or virtual server. For example if the parent server has 16 cores, the virtual server has 4 cores and CPU limit of a service is set to 50% it will use up to 2 cores. In this case if you change the virtual server's cores the service needs to be restarted for the change to take effect.

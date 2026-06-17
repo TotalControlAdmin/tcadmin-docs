@@ -7,7 +7,7 @@ sidebar_position: 3
 
 Game Updates let you offer alternative builds or branches of a game that users can switch between on their service — for example Vanilla / Paper / Spigot for Minecraft, or different Steam betas. Installing an update replaces the game files, and **only one update can be installed per service at a time**.
 
-:::info Updates vs. Mods
+:::info[Updates vs. Mods]
 An **update** swaps the whole game build (one at a time). **[Mods](../common/mods.mdx)** are optional add-ons that can be installed alongside each other. Use Updates for "which build of the game", and Mods for "extra content on top of the build".
 :::
 
@@ -74,7 +74,7 @@ You can attach scripts to an update that run before and after the files are inst
 | `BeforeUpdateInstall` | Before the update files are placed. |
 | `AfterUpdateInstall` | After the update files are placed and the service is marked as having that update. |
 
-:::note Attaching scripts is a two-step process
+:::note[Attaching scripts is a two-step process]
 Adding `BeforeUpdateInstall` / `AfterUpdateInstall` to a script's events only makes it **eligible**. The script doesn't run until you also **attach** it to a specific update in the update editor's **Update scripts** list. A script that isn't attached to an update never runs for that update.
 :::
 

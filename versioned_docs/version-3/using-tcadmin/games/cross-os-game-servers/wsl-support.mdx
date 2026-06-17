@@ -7,7 +7,7 @@ sidebar_label: Linux Games on Windows (WSL)
 
 TCAdmin v3 can run **Linux game servers on a Windows host** by transparently launching them inside [Windows Subsystem for Linux 2 (WSL2)](https://learn.microsoft.com/en-us/windows/wsl/about). You install a Linux distro once, and from then on any blueprint marked **Linux** runs natively in that distro — no extra config per game.
 
-:::info When to use this
+:::info[When to use this]
 You're hosting on a Windows server (or want to keep your existing Windows infrastructure) but the game only ships a Linux server build.
 :::
 
@@ -19,7 +19,7 @@ You'll need:
 - **Administrator access** to install WSL.
 - A few minutes of downtime — installing WSL requires a reboot.
 
-:::tip Already have WSL?
+:::tip[Already have WSL?]
 If `wsl --status` runs without error and shows a default distro, you can skip to [Install Required Packages](#step-2-install-required-packages-in-the-distro).
 :::
 
@@ -33,7 +33,7 @@ wsl --install -d Ubuntu
 
 This installs WSL2, sets it as the default version, and downloads Ubuntu. **Reboot when prompted.** After the reboot, Ubuntu launches automatically and asks you to create a Linux user — pick any username and password, this is the distro's default user (TCAdmin uses it internally).
 
-:::note Prefer a different distro?
+:::note[Prefer a different distro?]
 Run `wsl --list --online` to see what's available. Debian, Alma, and Rocky also work. The instructions below assume Ubuntu — adjust the package manager commands if you pick something else.
 :::
 
@@ -60,7 +60,7 @@ sudo apt-get update
 sudo apt-get install -y screen procps coreutils gawk passwd bash
 ```
 
-:::tip Source-engine games (CS2, Garry's Mod, TF2, etc.)
+:::tip[Source-engine games (CS2, Garry's Mod, TF2, etc.)]
 Most Source dedicated server binaries are 32-bit. A fresh 64-bit Ubuntu can't load them until you add the i386 multiarch:
 
 ```bash
@@ -122,7 +122,7 @@ wsl --shutdown
 
 The next distro launch uses mirrored mode. Verify with `wsl -- ip a` — `eth0` should show your host's LAN IP, not `172.x.x.x`.
 
-:::warning Windows 10 silently ignores `mirrored`
+:::warning[Windows 10 silently ignores `mirrored`]
 On Windows 10, the `mirrored` setting is **parsed but not applied** — the distro keeps coming up on the NAT subnet with no error or warning. Mirrored networking is a Windows 11 22H2+ feature regardless of which WSL version is installed.
 :::
 
@@ -142,7 +142,7 @@ New-NetFirewallRule -DisplayName "WSL Game 27015" -Direction Inbound -Protocol T
 New-NetFirewallRule -DisplayName "WSL Game 27015 UDP" -Direction Inbound -Protocol UDP -LocalPort 27015 -Action Allow
 ```
 
-:::tip The cleanest fix is upgrading to Windows 11
+:::tip[The cleanest fix is upgrading to Windows 11]
 Mirrored networking eliminates the entire forwarding problem. If your hardware supports Windows 11 22H2+, that's the recommended path.
 :::
 
@@ -169,7 +169,7 @@ When you open a Linux game's web console, you'll see one of two views:
 
 In the blueprint's **Console Configuration**, the **Log File** field is renamed **"Log File (for Wine/WSL)"** when the blueprint's Output Source isn't directly compatible with cross-OS hosting (e.g. a Linux blueprint with `LinuxScreen` output running on Windows). Setting that field tells TCAdmin which file to tail; leaving it blank falls back to the live terminal.
 
-:::tip Blank console?
+:::tip[Blank console?]
 If the service shows **Started** but the console is empty:
 - **Log File mode:** the path doesn't match what the game actually writes. Update the field to point at the game's real log (e.g. `garrysmod/logs/console.log`).
 - **Terminal mode:** the game doesn't write to stdout. Set the "Log File (for Wine/WSL)" field to switch to log-file mode and tail the right file.

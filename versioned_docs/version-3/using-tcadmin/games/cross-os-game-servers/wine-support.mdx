@@ -7,7 +7,7 @@ sidebar_label: Windows Games on Linux (Wine)
 
 TCAdmin v3 can run **Windows game servers on a Linux host** by transparently launching them through [Wine](https://www.winehq.org/). You install Wine and a few helpers once, and from then on any blueprint marked **Windows** runs through Wine — no extra config per service.
 
-:::info When to use this
+:::info[When to use this]
 You're hosting on Linux (lower licensing cost, better performance per dollar) but the game only ships a Windows server build, or you want to consolidate Windows-only games (MTA:SA, older Source-engine titles, certain mod servers) onto a Linux host.
 :::
 
@@ -21,7 +21,7 @@ You'll need:
 
 ## Step 1: Install Wine 10.0 or Newer
 
-:::warning Don't use Ubuntu's distro-packaged Wine
+:::warning[Don't use Ubuntu's distro-packaged Wine]
 Ubuntu ships **Wine 9.0**, which has a known crash bug that affects many Source-engine and older Win32 games. Install **WineHQ-stable (Wine 10.0+)** from the official repo instead.
 :::
 
@@ -46,7 +46,8 @@ sudo apt-get update
 sudo apt-get install -y --install-recommends winehq-stable
 ```
 
-:::tip Check the [WineHQ download page](https://wiki.winehq.org/Ubuntu) for the exact instructions for your Ubuntu/Debian version.
+:::tip
+Check the [WineHQ download page](https://wiki.winehq.org/Ubuntu) for the exact instructions for your Ubuntu/Debian version.
 :::
 
 ### Other Helpers
@@ -67,7 +68,7 @@ which winetricks Xvfb xdotool
 
 `wine --version` should report **wine-10.x** or newer. If any of `wineserver`, `winetricks`, `Xvfb`, or `xdotool` aren't found, TCAdmin's preflight check will fail at service create/start time with a clear message — install the missing piece and retry.
 
-:::note Mixed-package setups
+:::note[Mixed-package setups]
 If you previously installed wine via `update-alternatives` and only ran `--install /usr/bin/wine ...` without `--slave` entries, you'll find that `wine` resolves but `wineserver`/`wineboot`/`winecfg` don't. The cleanest fix is `sudo apt-get install --reinstall winehq-stable`, which sets the alternatives correctly.
 :::
 
@@ -79,7 +80,7 @@ You're done configuring the host. Open the TCAdmin web panel and go to **Plugin 
 
 Many Windows games depend on Microsoft runtimes that aren't part of Wine — Visual C++ redistributables, DirectX components, .NET, etc. TCAdmin doesn't auto-install these. The recommended way is via an **AfterServiceCreated** script on your blueprint.
 
-:::danger Run winetricks as the service user, NOT root
+:::danger[Run winetricks as the service user, NOT root]
 If you run winetricks as `root`, the prefix files end up owned by root and the service fails at runtime with permission errors. Always use `sudo -u "$SERVICE_USER"` and pass the right `WINEPREFIX` and `HOME` so winetricks operates on the service's own prefix.
 :::
 
@@ -98,7 +99,7 @@ sudo -u "$SERVICE_USER" \
 - **`WINEPREFIX="$SERVICE_ROOT_DIR/.wine"`** — the same prefix TCAdmin uses at runtime. Get this wrong and your runtimes go to a prefix the service never sees.
 - **`HOME="$SERVICE_ROOT_DIR"`** — keeps wine's per-user config inside the service tree.
 
-:::tip Use AfterServiceCreated, not BeforeServiceCreated
+:::tip[Use AfterServiceCreated, not BeforeServiceCreated]
 The service's Linux user doesn't exist yet during `BeforeServiceCreated` — `sudo -u "$SERVICE_USER"` will fail. `AfterServiceCreated` runs after the user is created and the prefix is initialized, which is the right time.
 :::
 
@@ -113,11 +114,11 @@ When you open a Windows service's web console on Linux, you'll see one of two vi
 
 In the blueprint's **Console Configuration**, the **Log File** field is renamed **"Log File (for Wine)"** when the blueprint's Output Source is set to `ConsoleWrapper`, `MemoryWrapper`, or `ScreenCapture` — those modes don't work under Wine. The Log File field is the cross-OS fallback.
 
-:::tip Source-engine games (srcds.exe and friends)
+:::tip[Source-engine games (srcds.exe and friends)]
 Source-engine games use the **Windows Console API**, which Wine routes through its own internal console server — the PTY can't see it. For these games the Terminal view will look blank, even when the service is running fine. Set "Log File (for Wine)" to the service's actual log file (e.g. `garrysmod/console.log` for Garry's Mod) and the console will tail that instead.
 :::
 
-:::tip Curses-style apps (MTA:SA Server, etc.)
+:::tip[Curses-style apps (MTA:SA Server, etc.)]
 Apps that read stdin and write to stdout/stderr work great in Terminal mode. You can leave "Log File (for Wine)" blank.
 :::
 
@@ -127,7 +128,7 @@ On the service's settings page, **admins** and **top-level subadmins** see a **P
 
 If a service won't start and you want to see the real error, copy the commands and run them yourself from a terminal — see [Troubleshoot a Service with Preview Start Command](../../../troubleshooting/preview-start-command.mdx) for the step-by-step.
 
-:::note WINEARCH in the preview defaults to win64
+:::note[WINEARCH in the preview defaults to win64]
 The runtime auto-detects 32-bit vs 64-bit by inspecting the service executable's PE header. The preview hard-codes `win64` since the web tier doesn't have file-system access to the executable. If your service runs a 32-bit Windows binary, change `WINEARCH=win64` to `WINEARCH=win32` when copy/pasting the preview.
 :::
 
