@@ -7,13 +7,13 @@ sidebar_position: 3
 
 The **Import V2 Services** tool migrates your existing game services from a TCAdmin V2 installation into V3 — the services, their owners, command lines, variables, and billing details — by connecting directly to your V2 database.
 
-:::info Administrators only
+:::info[Administrators only]
 The tool is in **System Settings → Import V2 Services**. It requires the **V2 Service Import** permission, which can only be granted to administrators.
 :::
 
 ## Before you start
 
-:::warning Game files are adopted, not copied
+:::warning[Game files are adopted, not copied]
 The import does **not** copy or move any game files. The new V3 service points at the **same folders on disk** that the V2 service used. Two things follow from this:
 
 - **Do not use V2's "Delete service" action on a service you've imported** — in V2 that also deletes the files on disk, which V3 now relies on. To tidy up V2's database safely, use V2's **"Detach"** action instead, which removes the V2 record but leaves the files alone.

@@ -12,7 +12,7 @@ When a new version of TCAdmin is released you can update your whole cluster — 
 
 If you're still on a version older than 3.8, or you simply prefer the terminal, you can also update with a single command — see [Update from the command line](#update-from-the-command-line).
 
-:::info Game servers stay running
+:::info[Game servers stay running]
 Updating only restarts the TCAdmin management services (Monitor and Web). Your actual game servers keep running, so players aren't disconnected.
 :::
 
@@ -20,7 +20,7 @@ Updating only restarts the TCAdmin management services (Monitor and Web). Your a
 
 Open **System → System Update** in the control panel. This page is the home for everything to do with updating your cluster.
 
-:::note Who can do this
+:::note[Who can do this]
 You need an administrator account with permission to manage system updates to open this page and start an update.
 :::
 
@@ -40,7 +40,7 @@ Here's what happens, in order:
 1. **The master server updates first.** It downloads and installs the new version, applies any database changes, and restarts. The web interface will be unavailable for a minute or two while this happens — the page shows a **Reconnecting…** badge and comes back on its own.
 2. **Once the master is healthy, your remote servers roll out.** They all update to the exact same version and channel as the master. You watch each one move through **Queued → Updating → Done** live on the page.
 
-:::note The master always goes first
+:::note[The master always goes first]
 Remote servers are only touched after the master has fully updated, migrated and come back healthy. If the master doesn't come back within about 20 minutes the update stops and no remote servers are changed.
 :::
 
@@ -80,11 +80,11 @@ The channel is saved for the whole cluster, and the version status refreshes to 
 The channel must already exist on the update server (a build must have been published to it) or the save is rejected. If you entered a custom name, double-check the spelling and capitalisation.
 :::
 
-:::info Stable channel
+:::info[Stable channel]
 You may notice a **Stable** option in the list. It isn't selectable yet — **Beta** is currently the channel for everyone.
 :::
 
-:::tip Change the channel from the command line
+:::tip[Change the channel from the command line]
 On the master server you can also view or set the channel without running an update:
 
 ```
@@ -134,7 +134,7 @@ cd /opt/tcadmin3/cli
 
 Running the command updates the machine you run it on. On the master it also applies the database changes; on a remote server it just updates that server's files and services.
 
-:::tip Update a single run on a specific channel
+:::tip[Update a single run on a specific channel]
 Add `--channel` to update from a particular channel just for this run, without changing your saved channel:
 
 ```
@@ -171,6 +171,6 @@ Both should show **active (running)**.
 
 Then open your control panel in the browser to confirm everything is working. You can check the version number on the System Update page or in the panel footer.
 
-:::tip Something went wrong?
+:::tip[Something went wrong?]
 If a service doesn't start after updating, run it in [Console Mode](troubleshooting/console-mode.mdx) to see the error messages and figure out what happened.
 :::

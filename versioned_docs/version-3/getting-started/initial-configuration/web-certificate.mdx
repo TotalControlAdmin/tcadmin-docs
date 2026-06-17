@@ -10,7 +10,7 @@ import TabItem from "@theme/TabItem";
 
 By default, TCAdmin uses a self-signed certificate for HTTPS, which causes your browser to show a security warning every time you visit the panel. This guide shows you how to replace it with a trusted certificate so the warning goes away.
 
-:::info What is an SSL certificate?
+:::info[What is an SSL certificate?]
 An SSL certificate encrypts the connection between your browser and the TCAdmin panel, keeping your login credentials and data safe. A **self-signed** certificate provides encryption but isn't trusted by browsers (hence the warning). A **Let's Encrypt** certificate is free, trusted by all browsers, and auto-renews.
 :::
 
@@ -105,11 +105,11 @@ sudo systemctl restart tca3web
   </TabItem>
 </Tabs>
 
-:::warning Don't forget the firewall
+:::warning[Don't forget the firewall]
 Make sure ports **80** and **443** are open in your firewall. Let's Encrypt connects to port 80 to verify that you control the domain — if it can't reach your server, certificate generation will fail.
 :::
 
-:::tip After switching ports
+:::tip[After switching ports]
 Your panel URL changes too! Instead of `https://YOUR-IP:31001`, you'll now access it at `https://YOUR-IP` (port 443 is the default HTTPS port, so you don't need to type it).
 :::
 
@@ -164,7 +164,7 @@ Log in to your DNS provider (e.g., Cloudflare, Namecheap, GoDaddy) and create a 
 - **Type:** `TXT`
 - **Value:** The record value shown in TCAdmin
 
-:::warning DNS propagation
+:::warning[DNS propagation]
 DNS changes can take anywhere from a few minutes to several hours to propagate. Wait at least 5-10 minutes before proceeding to the next step. You can verify propagation using an online DNS checker or by running `nslookup -type=TXT _acme-challenge.yourdomain.com`.
 :::
 
@@ -172,11 +172,11 @@ DNS changes can take anywhere from a few minutes to several hours to propagate. 
 
 Once the DNS records are in place, click **Complete Validation** in TCAdmin. It will verify the DNS records and generate your certificate.
 
-:::info Starting over
+:::info[Starting over]
 If you need to cancel the DNS validation process (e.g., you entered the wrong domain), click **Cancel and Start Over** to restart.
 :::
 
-:::note Renewal
+:::note[Renewal]
 DNS validation certificates are **not** automatically renewed. You will need to repeat this process before the certificate expires (90 days). The system health indicator will warn you when your certificate is approaching expiry.
 :::
 
@@ -201,7 +201,7 @@ If you already have an SSL certificate (purchased from a CA or generated elsewhe
 
 TCAdmin will validate the certificate, check that it contains a private key, and apply it to the web service.
 
-:::note Renewal
+:::note[Renewal]
 Custom certificates are **not** automatically renewed. You will need to upload a new certificate before the current one expires. The system health indicator will warn you when your certificate is approaching expiry.
 :::
 

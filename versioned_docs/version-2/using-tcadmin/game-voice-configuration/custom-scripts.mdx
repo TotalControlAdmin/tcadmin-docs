@@ -186,7 +186,7 @@ The `Custom icon` & `Custom action` script events can also be configured as a sc
 
 TCAdmin will wait forever until the script completes. To prevent TCAdmin from hanging you need to make sure the commands that you execute never ask for any input from the user. Most commands have a `quiet` mode that disables the user prompts.
 
-:::info examples
+:::info[examples]
 
 - rd (Windows) has a /q command line switch to prevent asking to confirm if you want to delete the directory.
 - rm (Linux) has a -f command to force the command to execute without any prompts.
@@ -246,7 +246,7 @@ An invalid value could cause your script to behave in a way that was not intende
     - Windows: `echo %USERNAME%`
     - Linux: `whoami`
 
-:::info example
+:::info[example]
 You create a backup script for Minecraft. You want your user to enter the name of their world folder. You create a texbox for this.
 :::
 

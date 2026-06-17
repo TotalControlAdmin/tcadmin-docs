@@ -9,7 +9,7 @@ Mods are optional add-ons that you curate on a blueprint and that users can inst
 
 Mods work for both **game and Docker** blueprints.
 
-:::info How Mods differ from similar features
+:::info[How Mods differ from similar features]
 - **Mods** (this page) — add-ons *you* curate on the blueprint; users toggle them on and off.
 - **Custom Mods** — content the *user* picks from an external catalog (Steam Workshop, CurseForge, Nexus, uMod, Modpacks).
 - **[Updates](../games/updates.mdx)** — swap the whole game build; only one at a time.
@@ -83,7 +83,7 @@ You can attach scripts to a mod that run around install, update, and uninstall.
 | `BeforeModUpdate` / `AfterModUpdate` | Around a mod being updated in place. |
 | `BeforeModUninstall` / `AfterModUninstall` | Around a mod being removed. |
 
-:::note Attaching scripts is a two-step process
+:::note[Attaching scripts is a two-step process]
 Adding one of these events to a script only makes it **eligible**. The script doesn't run until you also **attach** it to a specific mod in the mod editor's **Scripts** list.
 :::
 

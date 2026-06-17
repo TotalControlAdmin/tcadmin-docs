@@ -17,7 +17,7 @@ Make sure you have:
 - **Root access** (or a user with `sudo` privileges)
 - An **SSH connection** to your server (using a tool like PuTTY, your hosting provider's web console, or a terminal)
 
-:::tip Don't have MySQL set up yet?
+:::tip[Don't have MySQL set up yet?]
 Install MariaDB first. On Ubuntu/Debian: `sudo apt install mariadb-server`, then run `sudo mysql_secure_installation` to set a root password. On RHEL-based distros: `sudo dnf install mariadb-server` and `sudo systemctl start mariadb`.
 :::
 
@@ -29,7 +29,7 @@ Run the automated installer as **root**:
 bash <(curl -fsSL https://v3.tcafiles.com/linux-beta.sh)
 ```
 
-:::tip Using sudo instead of root?
+:::tip[Using sudo instead of root?]
 If you're not logged in as root, prefix the command with `sudo`:
 
 ```bash
@@ -37,7 +37,7 @@ sudo bash <(curl -fsSL https://v3.tcafiles.com/linux-beta.sh)
 ```
 :::
 
-:::info What does this command do?
+:::info[What does this command do?]
 It downloads the official TCAdmin installer script from `v3.tcafiles.com` and runs it. The script will:
 - Install any missing system dependencies automatically
 - Download the TCAdmin components
@@ -55,11 +55,11 @@ Once the installer finishes:
 - Your control panel will be available at **`https://YOUR-SERVER-IP:31001`** from your browser
 - Default login: **admin** / **Password!23**
 
-:::warning Browser Security Warning
+:::warning[Browser Security Warning]
 Your browser will show a security warning because TCAdmin uses a self-signed certificate by default. This is normal — click "Advanced" and then "Proceed" to continue. You can set up a proper certificate later using the [Web Certificate](../initial-configuration/web-certificate.mdx) guide.
 :::
 
-:::tip Can't connect?
+:::tip[Can't connect?]
 If you can't reach the panel in your browser, check that port **31001** is open in your firewall:
 
 ```bash
