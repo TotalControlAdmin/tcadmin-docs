@@ -10,7 +10,7 @@ import TabItem from "@theme/TabItem";
 
 If the TCAdmin Monitor or Web service isn't starting properly, you can run it in **console mode** to see exactly what's going wrong. Instead of running silently in the background as a service, console mode prints all log messages directly to your terminal so you can spot errors.
 
-:::tip When to use this
+:::tip[When to use this]
 Console mode is your first troubleshooting step when:
 - The TCAdmin panel doesn't load in your browser
 - Game servers aren't starting or being managed
@@ -58,7 +58,7 @@ sudo systemctl stop tca3web
 
 Navigate to the component directory and run the executable directly. All log output will appear in your terminal.
 
-:::note Heads up (Windows)
+:::note[Heads up (Windows)]
 Switching the Web service between service mode and console mode will **log out all users** currently using the panel. This is normal.
 :::
 
@@ -110,7 +110,7 @@ The terminal will show log messages as the service starts up. Here's what to loo
 | Certificate error | The SSL certificate is missing or invalid | Check the certificate path in `config/web/appsettings.Overrides.json`, or regenerate a certificate using the [Web Certificate](../getting-started/initial-configuration/web-certificate.mdx) guide |
 | Redis connection failed | TCAdmin can't connect to Redis | Verify Redis is running and check the Redis settings in the configuration. On a master server, the built-in Redis should start automatically. |
 
-:::tip Copy the error message
+:::tip[Copy the error message]
 If you need to ask for help, copy the full error message from the terminal. The more detail you provide, the faster someone can help you diagnose the issue.
 :::
 

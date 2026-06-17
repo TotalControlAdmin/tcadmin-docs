@@ -29,7 +29,7 @@ The tcadmin2_advanced module can be downloaded from our [**client area**](http:/
 2. Direct client login from WHMCS to TCAdmin.
 3. Configurable options and custom fields can be used to set all the TCAdmin billing API attributes. This makes it flexible. You configure your packages exactly the way you want them.
 
-:::info example
+:::info[example]
 Configure your packages to ask your clients for their game server's location, hostname and passwords in the WHMCS order page.
 :::
 
@@ -156,17 +156,17 @@ To configure attributes that are not on the Module settings edit file default_va
 
 - To configure it to use a `Custom Field` set the value to `CustomField:FieldName`
 
-:::info example
+:::info[example]
 `CustomField:Hostname`
 :::
 
 - To configure it to use a `Configuration Option` set the value to `ConfigOption:OptionName`
 
-:::info example
+:::info[example]
 `ConfigOption:Slots`
 :::
 
-:::info full example in code
+:::info[full example in code]
 ```php
 $billing_api_values["game_additional_slots"] = "ConfigOption:Extra Slots";
 ```
@@ -379,7 +379,7 @@ If you are going to keep the same custom fields and configurable options in your
 
 If you are going to change custom fields and configurable options we recommend you create a copy of the product and modify the copy (Duplicate link at the top of the products page). When the new product is ready go to the client's service. Change the package and server. Enter the correct values again and save.
 
-:::danger warning
+:::danger[warning]
 After you change the package all the values of custom fields and configurable options for that service will be lost and you will not be able to recover them.
 :::
 

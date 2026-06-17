@@ -7,7 +7,7 @@ sidebar_position: 14
 
 Specify permissions for sub administrators, resellers and users. Each user type can have different permissions depending on your requirements.
 
-:::warning note
+:::warning[note]
 By default the following extensions are blocked
 `*.exe;*.dll;*.so;*.bat;*.sh;*.cmd;*.vbs;*.pif;*.scr;*.com`
 :::
@@ -16,20 +16,20 @@ By default the following extensions are blocked
 
 - `Add permissions by file name` - Specify permissions for specific files and extensions. Specify more than one file by separating them with `;` Wildcards are supported.
 
-:::note example
+:::note[example]
 `app.exe;mod*.dll;game*.dll;pak?.pk?`
 :::
 
 - `Add permissions by file path` - Specify permissions for relative path to files. Wildcards are supported. Specify more than one path by separating them with `;`
 
-:::note example
+:::note[example]
 `images\*.png;logs\*.log`
 `images\*.png` will only apply the permissions to files with the png extension inside the images directory.
 :::
 
 - `Add permissions by sub directory` - Specify permissions to a relative directory. Specify more than one path by separating with `;`
 
-:::note example
+:::note[example]
 `server\cfg;server\dll`
 :::
 

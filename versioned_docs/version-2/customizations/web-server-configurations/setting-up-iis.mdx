@@ -7,11 +7,11 @@ sidebar_label: Setting up IIS with TCAdmin
 
 ## Prerequisites
 
-:::info Prerequisite
+:::info[Prerequisite]
 Make sure you are running a supported Windows Server environment and have already downloaded and installed TCAdmin 2 before starting this guide.
 :::
 
-:::caution Warning for IIS Users
+:::caution[Warning for IIS Users]
 
 If you are using IIS with TCAdmin, **do not configure your monitor ports as 80 or 443**. Instead, use the default ports **8880 and 8881**.  
 
@@ -37,7 +37,7 @@ Before setting up IIS with TCAdmin, ensure that:
 
 ## Step 2: Set up SQLite Database (Skip if using MySQL)
 
-:::tip Using SQLite
+:::tip[Using SQLite]
 If you are using an SQLite database, ensure you copy `sqlite3.dll` to the correct location (`C:\Windows\System32`).
 :::
 
@@ -81,7 +81,7 @@ Ensure the **Aspx** application uses the same user as the main website (from ste
 
 ### 5. Let's Encrypt (Optional)
 
-:::note Let's Encrypt Option
+:::note[Let's Encrypt Option]
 Using Let's Encrypt for SSL certificates is recommended if you don’t already have a custom SSL certificate.
 :::
 
@@ -89,7 +89,7 @@ If using Let's Encrypt, bind the website to a specific IP and hostname to preven
 
 ### 6. Set Folder Permissions
 
-:::caution Permissions
+:::caution[Permissions]
 Ensure that you assign the correct permissions to `IIS APPPOOL\.NET v4.5`. Missing or incorrect permissions can cause issues with the TCAdmin control panel.
 :::
 
@@ -104,7 +104,7 @@ Ensure that you assign the correct permissions to `IIS APPPOOL\.NET v4.5`. Missi
 
 2. Under **"Connect as..."**, enter the user and password of the Windows user that runs your website.
 
-:::important TCAWeb Setup
+:::important[TCAWeb Setup]
 If using **TCAWeb**, start the monitor in **console mode** and execute `tcaweb-pass` to obtain the password or attach `TCAdmin2\Monitor\TCAWeb.config` to a support ticket for assistance.
 :::
 
@@ -116,7 +116,7 @@ tcaweb-pass
 
 ## Step 4: Database Configuration
 
-:::caution Warning
+:::caution[Warning]
 Disabling the built-in TCAdmin web server is permanent unless you run the re-enable command provided.
 :::
 
@@ -145,7 +145,7 @@ Disabling the built-in TCAdmin web server is permanent unless you run the re-ena
 
 ## Step 6: Configure IIS for Multiple Worker Processes
 
-:::tip Multiple Worker Processes
+:::tip[Multiple Worker Processes]
 Running multiple worker processes improves performance for high-traffic websites but requires proper session state configuration.
 :::
 
@@ -179,7 +179,7 @@ Running multiple worker processes improves performance for high-traffic websites
 
 ### Option 1: Install Let's Encrypt SSL (Recommended)
 
-:::info Let's Encrypt Tip
+:::info[Let's Encrypt Tip]
 For automatic SSL management, Let's Encrypt is the recommended option. Certify The Web provides a simple interface to manage certificates.
 :::
 
@@ -192,7 +192,7 @@ For automatic SSL management, Let's Encrypt is the recommended option. Certify T
 
 ### Option 2: Use a Custom SSL Certificate (optional)
 
-:::caution SSL Certificate Installation
+:::caution[SSL Certificate Installation]
 Ensure that the SSL certificate is correctly installed in Windows following the linked guide, as an incorrectly configured certificate can cause connection issues.
 :::
 
@@ -202,7 +202,7 @@ Ensure that the SSL certificate is correctly installed in Windows following the 
 
 3. Select your custom SSL certificate from the list and apply the changes.
 
-:::tip Best Practices
+:::tip[Best Practices]
 It’s a good idea to back up your configuration and website settings before making any major changes to the IIS or TCAdmin setup.
 :::
 

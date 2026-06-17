@@ -7,11 +7,11 @@ sidebar_label: Windows Auto-Logon
 
 Some game servers need to interact with the Windows desktop to work properly. For these games, a Windows user must be logged in at all times — including after the server reboots. TCAdmin provides a built-in command to set this up securely.
 
-:::info Windows Only
+:::info[Windows Only]
 This feature only applies to Windows servers. If you're running Linux, you can skip this page.
 :::
 
-:::tip Do you actually need this?
+:::tip[Do you actually need this?]
 Most game servers work fine **without** auto-logon. You only need it if a specific game requires the "Interact with Desktop" option to be enabled in its TCAdmin configuration. If you're not sure, skip this for now — you can always set it up later.
 :::
 
@@ -52,7 +52,7 @@ tca enable-autologon --username Administrator --password YourPassword --domain C
 | `--domain` | `-d` | The domain (defaults to local computer name) |
 | `--force` | `-f` | Skip the Shift-key bypass check |
 
-:::tip Is this secure?
+:::tip[Is this secure?]
 Yes. The password is stored using **Windows LSA Secrets** (encrypted), the same method used by Microsoft's own Sysinternals Autologon tool. The password is **not** stored in plain text in the registry.
 :::
 

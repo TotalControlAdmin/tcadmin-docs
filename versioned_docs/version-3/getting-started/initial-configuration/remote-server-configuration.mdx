@@ -10,7 +10,7 @@ import TabItem from "@theme/TabItem";
 
 This guide explains how to add a **remote server** to your TCAdmin setup. A remote server is an additional machine that hosts game servers, controlled from your main (master) TCAdmin panel.
 
-:::info When do you need a remote server?
+:::info[When do you need a remote server?]
 You only need remote servers if you want to host game servers on **more than one machine**. If you're running everything on a single server, you can skip this guide entirely.
 
 Common reasons to add remote servers:
@@ -44,7 +44,7 @@ Before the remote server can connect, you need to tell the master server to shar
 | `TCAdmin:Database:User` | Database username | Login credentials for the database |
 | `TCAdmin:Database:Password` | Database password | Login credentials for the database |
 
-:::warning Use your server's real IP, not "localhost"
+:::warning[Use your server's real IP, not "localhost"]
 Remote servers can't connect to `localhost` — that refers to their own machine. Use your master server's actual IP address (e.g., `192.168.1.100` or your public IP).
 :::
 
@@ -59,7 +59,7 @@ In the same **Global Server Configuration** page, click the **Advanced** section
 | `TCAdmin:Redis:Port` | `6379` (or your custom port) | The port Redis listens on |
 | `TCAdmin:Redis:Password` | Redis password | Authentication for the Redis connection |
 
-:::tip Where to find the Redis password
+:::tip[Where to find the Redis password]
 The Redis password is stored in the master server's config file:
 - **Windows:** `C:\Program Files\TCAdmin3\config\appsettings.global.json`
 - **Linux:** `/opt/tcadmin3/config/appsettings.global.json`
@@ -94,7 +94,7 @@ The deployment token lets the remote server automatically pull its configuration
 3. Click **Reset Deployment Token**
 4. **Copy the token** — you'll paste this during the remote server installation
 
-:::warning Keep this token safe
+:::warning[Keep this token safe]
 The deployment token grants access to your TCAdmin configuration. Don't share it publicly. It's single-use for the initial setup.
 :::
 
@@ -136,7 +136,7 @@ sudo bash <(curl -fsSL https://v3.tcafiles.com/linux-beta.sh)
 - **monitor** — **required** for remote servers (this is what manages game servers)
 - **web** — **optional** for remote servers (only install if you want users to access the control panel directly from this server)
 
-:::tip For most setups
+:::tip[For most setups]
 Just install **monitor** on remote servers. Users will access the control panel through your master server's web interface, which can manage all servers from one place.
 :::
 

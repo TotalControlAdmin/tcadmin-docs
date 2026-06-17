@@ -10,7 +10,7 @@ import TabItem from "@theme/TabItem";
 
 This guide walks you through the TCAdmin installer prompts and your first login. By the end, you'll have a fully working control panel.
 
-:::info What is a "Master Server"?
+:::info[What is a "Master Server"?]
 The master server is your **main** TCAdmin server. It runs the database, the web-based control panel, and the monitor service that manages game servers. If you're only setting up one machine, this is what you need. You can add more servers (called "remote servers") later if you want to scale up.
 :::
 
@@ -67,7 +67,7 @@ This is where you tell TCAdmin how to connect to your MySQL/MariaDB database. En
 | **MySQL password** | The password for the MySQL user you entered above. | — |
 | **MySQL database** | The database name to use. TCAdmin will create it if it doesn't exist (and your user has CREATE privileges). | `tcadmin3` |
 
-:::tip Don't have a database user yet?
+:::tip[Don't have a database user yet?]
 If you installed MariaDB/MySQL and only have the `root` user, that's fine for getting started. You can create a dedicated user later. If you want to create one now, connect to MySQL and run:
 
 ```sql
@@ -86,7 +86,7 @@ The installer asks if you want to add the TCAdmin command-line tool (`tca`) to y
 
 ## Back Up Your Encryption Key
 
-:::danger This is the most important step — do not skip it!
+:::danger[This is the most important step — do not skip it!]
 After installation, the installer displays a **Master Encryption Key**. This key is used to encrypt all sensitive data in your database (passwords, API keys, etc.).
 
 **You MUST save this key somewhere safe:**
@@ -115,7 +115,7 @@ Open your browser on your own computer (not the server) and go to **`https://YOU
   </TabItem>
 </Tabs>
 
-:::info Default Login Credentials
+:::info[Default Login Credentials]
 
 Username: **admin**
 
@@ -123,14 +123,14 @@ Password: **Password!23**
 
 :::
 
-:::tip Can't connect?
+:::tip[Can't connect?]
 If the page doesn't load:
 - **Check your firewall** — ports **31000** (HTTP) and **31001** (HTTPS) need to be open
 - If your server is behind a router (NAT), you'll need to set up **port forwarding** for these ports
 - Wait 30 seconds after installation for the services to fully start
 :::
 
-:::note About the Browser Security Warning
+:::note[About the Browser Security Warning]
 The installer creates a self-signed HTTPS certificate, so your browser will show a security warning the first time. This is expected and safe — just click "Advanced" > "Proceed" (Chrome) or "Accept the Risk" (Firefox). You can replace this with a proper certificate later using the [Web Certificate](web-certificate.mdx) guide.
 :::
 
@@ -146,7 +146,7 @@ Click **Change Password** and set a strong, unique password. You won't be able t
 
 Click on the server name in the widget to enter your TCAdmin license key. Your license unlocks the ability to import games from the Plugin Repository and enables all features.
 
-:::info Don't have a license key yet?
+:::info[Don't have a license key yet?]
 You can use your existing TCAdmin v2 master license key to preview v3.
 :::
 

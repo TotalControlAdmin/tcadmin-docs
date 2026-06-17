@@ -8,7 +8,7 @@ import TabItem from "@theme/TabItem";
 
 # Layout Templates
 
-:::info Themes and templates
+:::info[Themes and templates]
 A **theme** sets colors, the logo, and other visual options. A **layout template** changes page structure. A theme can use one layout template (chosen on the theme's **Advanced** tab), and several themes can share the same template. With no template assigned, the panel uses its built-in layout.
 :::
 
@@ -18,7 +18,7 @@ A **theme** sets colors, the logo, and other visual options. A **layout template
 2. Add one or more **surfaces** (for example `LoginPage` or `Shell`) and edit each surface's markup and CSS. Use **Validate / Preview** to check a surface as you work.
 3. Save the template, then open a theme's **Advanced** tab and choose it. Select that theme to see it in action.
 
-:::tip Locked out by a template?
+:::tip[Locked out by a template?]
 Add `?safeMode=1` to the panel's address to temporarily ignore the template's markup and CSS and fall back to the built-in layout — handy if a custom login or shell ever renders incorrectly.
 :::
 
@@ -163,7 +163,7 @@ When you hand-build the shell like this, one CSS rule is required so the navigat
 </TabItem>
 </Tabs>
 
-:::tip Just restyling?
+:::tip[Just restyling?]
 If you only want to recolor or restyle the panel without rebuilding it, make your `Shell` simply `{% component "shell" %}` and put everything in the stylesheet — you won't need the drawer rule above.
 
 And if you don't need to change the shell's markup or CSS at all, just disable the `Shell` surface (or leave it out) — the built-in shell is used, and the other surfaces (top bar, drawer, footer and content slots) still appear on their own.
