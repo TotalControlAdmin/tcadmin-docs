@@ -29,32 +29,34 @@ Make sure you have:
 
 ## Step 1: Configure the Master to Share Its Database
 
-Before the remote server can connect, you need to tell the master server to share its database and Redis connection details.
-
-### Set Up Database Connection Info
+Before the remote server can connect, you need to tell the master server to share its database and Redis connection details. You only do this once, on the master.
 
 1. Log in to your TCAdmin control panel
 2. Go to **Settings** > **Global Server Configuration**
-3. Add the following settings so remote servers know how to reach the database:
 
-| Key | Value | What It Does |
-|-----|-------|--------------|
-| `TCAdmin:Database:Host` | Master server IP and port (e.g., `192.168.1.100:3306`) | Tells remote servers where to find the database |
-| `TCAdmin:Database:Database` | Database name (e.g., `tcadmin3`) | Which database to connect to |
-| `TCAdmin:Database:User` | Database username | Login credentials for the database |
-| `TCAdmin:Database:Password` | Database password | Login credentials for the database |
+### Set Up the Database Connection
+
+On the **Common Settings** tab, fill in the database connection fields and click **Save**. You don't need to add the individual `TCAdmin:Database:*` keys by hand — these fields do that for you.
+
+| Field | Value | What It Does |
+|-------|-------|--------------|
+| **Database Host** | Master server IP address (e.g., `192.168.1.100`) | Tells remote servers where to find the database |
+| **Database Port** | `3306` (or your custom port) | The port MySQL listens on |
+| **Database Name** | Database name (e.g., `tcadmin3`) | Which database to connect to |
+| **Database Username** | Database username | Login credentials for the database |
+| **Database Password** | Database password | Login credentials for the database |
 
 :::warning[Use your server's real IP, not "localhost"]
 Remote servers can't connect to `localhost` — that refers to their own machine. Use your master server's actual IP address (e.g., `192.168.1.100` or your public IP).
 :::
 
-### Set Up Redis Connection Info
+### Set Up the Redis Connection
 
-In the same **Global Server Configuration** page, click the **Advanced** section and add these Redis settings:
+Redis doesn't have dedicated fields on the Common Settings tab, so add it on the **Advanced** tab. Click **Add Option** and create each of the following:
 
 | Key | Value | What It Does |
 |-----|-------|--------------|
-| `TCAdmin:Redis:Mode` | `External` | Tells remote servers to connect to the master's Redis instead of running their own |
+| `TCAdmin:Redis:Mode` | `External` | Tells remote servers to connect to the master's Redis instead of running their own. `External` is the only supported value for remote servers. |
 | `TCAdmin:Redis:Server` | Master server IP address | Where Redis is running |
 | `TCAdmin:Redis:Port` | `6379` (or your custom port) | The port Redis listens on |
 | `TCAdmin:Redis:Password` | Redis password | Authentication for the Redis connection |
