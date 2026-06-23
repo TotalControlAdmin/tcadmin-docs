@@ -1,0 +1,41 @@
+---
+sidebar_label: 3.11.36.37490
+date: 2026-06-22
+authors: [tcadmin]
+---
+
+import ReleaseDate from '@site/src/components/ReleaseDate';
+
+# Version 3.11.36.37490
+
+<ReleaseDate />
+
+### New Features
+
+- **Default Steam settings** — You can now set one Steam account and Steam Web API key for the whole panel under *Settings → Default Steam Settings*. Any game that doesn't have its own Steam login or API key falls back to these automatically, so you no longer have to enter the same Steam credentials on every game. A game with its own account — or one set explicitly to *anonymous* — still uses that; simply leave a game's Steam username blank to use the default.
+- **Query and monitor EOS-based games** — TCAdmin can now read the status and player count of games that use Epic Online Services (EOS) for their server browser rather than Steam. *ARK: Survival Ascended* and *The Isle: Evrima* work out of the box, and a generic EOS option lets you enter the details for other EOS games. *Palworld* is now read through its own built-in REST API instead — turn on its REST API and set an admin password on the server, and its players and status show up like any other game. See [Query Monitoring](/3/using-tcadmin/games/query-monitoring).
+- **Extract any archive from the File Manager** — The File Manager's *Extract* option now works for every supported archive type — `.zip`, `.rar`, `.7z` and all the `.tar` variants such as `.tar.gz`, `.tgz` and `.tar.bz2` — on every operating system. Previously some archives, multi-part `.tar.*` files in particular, gave you no Extract option even though they could be unpacked.
+- **Import databases from V2's MySQL Manager** — The V2 service import tool now brings across the databases your services used through V2's MySQL Manager module. TCAdmin records each database against the imported service and points the server's database manager at the same MySQL server V2 was using, so the existing databases keep working — it doesn't move or copy any data. See [Importing V2 services](/3/using-tcadmin/importing-v2-services).
+- **Faster service-creation pickers** — The *Create New Service* wizard now loads users, servers, and game and Docker blueprints a page at a time as you scroll and search. The pickers stay quick and responsive even on panels with thousands of users or hundreds of games.
+- **Sort plugin repository listings** — When browsing a plugin repository you can now sort the list — newest or oldest first, or by name A–Z or Z–A — alongside the default order that shows items with an update available first. See [Plugin Repositories](/3/getting-started/initial-configuration/plugin-repository).
+- **Remote server setup checks** — When you add a remote server, TCAdmin now checks that the shared database and Redis settings the new server needs have been filled in first, and warns you with links to fix them — instead of letting you add a server that can't connect. See [Remote Server Configuration](/3/getting-started/initial-configuration/remote-server-configuration).
+- **Clearer logs** — Web and Monitor logs are now colour-coded by severity when you view them in the panel, so warnings and errors stand out at a glance. The Web and Monitor services also print a header with version and system details when they start, making logs easier to read and support questions easier to answer.
+- **Release notes from the update page** — The System Update page now links straight to the release notes, so you can see what's in an update before you install it.
+- **Administrator accounts ready to use** — New administrator accounts are now given the Administrator role automatically, and any account left without a role shows a clear alert — so you won't end up with a user who can't do anything.
+
+### Bug Fixes
+
+- **Steadier when Redis is offline** — Fixed the Web and Monitor crashing or showing repeated errors when Redis was unavailable or unreachable; the panel now carries on and degrades gracefully instead.
+- **Web panel failing to start** — Fixed the web panel failing to load when its settings file was empty or invalid.
+- **FileZilla FTPS connections** — Fixed a "TLS connection was non-properly terminated" error when connecting to the built-in FTPS server with FileZilla. Other clients, such as WinSCP, were unaffected.
+- **Correct FTP port on the service page** — Fixed the FTPS connection details on a service's page sometimes showing the wrong port; the correct FTP port for the hosting server is now shown.
+- **Terminal output on Linux** — Fixed Terminal console output not working on Linux when the game's program path contained spaces.
+- **Console font on Linux and macOS** — Fixed the console using a Windows-only font, so console text now stays neatly monospaced on Linux and macOS.
+- **"Update" label when sharing a plugin** — Fixed the share-back dialog so it shows the plugin's name with "Update" when you're updating an existing plugin in a repository, rather than implying you're adding a new one.
+- **Web crash when saving scripts, variables or custom links** — Fixed a crash in the web panel that could occur when saving certain global scripts, variables or custom links.
+- **Memory usage for Wine games** — Fixed Wine games (Windows games running on Linux) reporting only a few megabytes of memory instead of their real usage; the full amount is now shown.
+- **Files extracted as root on Linux** — Fixed archives extracted on Linux creating files owned by root — whether unpacked from the File Manager or installed as part of a mod or game update; extracted files now belong to the service's own user, matching the folders around them.
+- **Changed variables on create and reinstall** — Fixed the command line not picking up an updated variable value when creating or reinstalling a service.
+- **Returning to the service after creation** — Fixed the panel not opening the new service's page after creation when a Steam update was set to run as part of the install.
+- **Wine command preview** — Fixed the command-line preview shown when setting up a Wine game.
+- **V2 import script mapping** — Fixed mod scripts not coming across correctly when importing from V2, and scripts that ran after a Steam update in V2 being attached to the wrong event in V3.
