@@ -5,9 +5,16 @@
     <link>https://docs.tcadmin.com/3/releases</link>
     <description>Latest TCAdmin v3 release notes</description>
     <language>en</language>
-    <lastBuildDate>Tue, 16 Jun 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 22 Jun 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://docs.tcadmin.com/releases/rss.xml" rel="self" type="application/rss+xml"/>
     <copyright>Copyright © 2026 TCADMIN.COM</copyright>
+    <item>
+      <title>3.11.36.37490</title>
+      <link>https://docs.tcadmin.com/3/releases/3.11.36.37490</link>
+      <guid isPermaLink="true">https://docs.tcadmin.com/3/releases/3.11.36.37490</guid>
+      <description>Default Steam settings, Query and monitor EOS-based games, Extract any archive from the File Manager, Import databases from V2's MySQL Manager, Faster service-creation pickers, and more.</description>
+      <pubDate>Mon, 22 Jun 2026 00:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>3.10.24.45532</title>
       <link>https://docs.tcadmin.com/3/releases/3.10.24.45532</link>
