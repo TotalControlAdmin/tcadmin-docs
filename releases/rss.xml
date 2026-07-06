@@ -5,9 +5,16 @@
     <link>https://docs.tcadmin.com/3/releases</link>
     <description>Latest TCAdmin v3 release notes</description>
     <language>en</language>
-    <lastBuildDate>Mon, 22 Jun 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 05 Jul 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://docs.tcadmin.com/releases/rss.xml" rel="self" type="application/rss+xml"/>
     <copyright>Copyright © 2026 TCADMIN.COM</copyright>
+    <item>
+      <title>3.12.11.1716</title>
+      <link>https://docs.tcadmin.com/3/releases/3.12.11.1716</link>
+      <guid isPermaLink="true">https://docs.tcadmin.com/3/releases/3.12.11.1716</guid>
+      <description>Command line stays in sync, Steam branch from a variable, Faster import pickers.</description>
+      <pubDate>Sun, 05 Jul 2026 00:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>3.11.36.37490</title>
       <link>https://docs.tcadmin.com/3/releases/3.11.36.37490</link>
