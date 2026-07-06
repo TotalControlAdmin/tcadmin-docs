@@ -1,0 +1,25 @@
+---
+sidebar_label: 3.12.11.1716
+date: 2026-07-05
+authors: [tcadmin]
+---
+
+import ReleaseDate from '@site/src/components/ReleaseDate';
+
+# Version 3.12.11.1716
+
+<ReleaseDate />
+
+### New Features
+
+- **Command line stays in sync** — A service's start command line now updates automatically whenever the values behind it change: editing the service's settings or command-line variables, changes synced from configuration files, and reinstalls, moves and copies all refresh it immediately. Administrators can still take full manual control — turn on the new *Override command line* option on a service's settings page to enter an exact command line that TCAdmin will leave untouched, and turn it off to go back to the automatic one.
+- **Steam branch from a variable** — A game's Steam *Branch* and *Branch Password* settings can now contain a variable such as `${branch}`. The variable is resolved with each service's own values when the game installs or updates, so you can, for example, add a customer-editable variable that lets each customer switch their own server between the game's stable and beta branches.
+- **Faster import pickers** — The Import dialogs for games, scripts, themes, Docker blueprints and layout templates now search as you type, with the matching done on the server. They stay quick and show every match even when there are hundreds of items to choose from.
+
+### Bug Fixes
+
+- **Services stuck after a long start script** — Fixed a service becoming stuck when one of its start scripts ran for a long time (Rust's startup script, for example): Stop appeared to do nothing and further Start attempts hung until the monitor was restarted. Stop and Kill now cancel any start script that is still running, and a power operation that can't get its turn returns a clear "another operation is still running" message instead of waiting forever.
+- **Starting an already-running service** — Fixed clicking Start on a service that was already running (possible when a page showed a slightly out-of-date status) re-running the whole start sequence against the live server — which could mark the running server as stopped, or restart it. TCAdmin now recognises that the server is already running and simply reports it as started, leaving it untouched.
+- **Live updates after a connection drop** — Fixed service pages no longer receiving live updates — console output, status and progress changes — after the browser's connection to the panel briefly dropped. Everything now resumes automatically when the connection returns, without refreshing the page.
+- **Service creation failing on Windows** — Fixed service creation on Windows occasionally failing with "The password does not meet the password policy requirements". Generated service-account passwords now always satisfy Windows' password-complexity policy.
+- **Process priority locked on Windows** — Fixed game processes on Windows having their priority pinned even when no specific priority was configured for the service, which quietly prevented scripts and other tools from adjusting the priority of a running game. A priority is now only enforced when one is actually set.

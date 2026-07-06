@@ -255,3 +255,19 @@ AnnouncementManager:CreateAnnouncementAsync(announcement, scopes):Wait()
 
   </TabItem>
 </Tabs>
+
+## Sync Variable Across All Command Lines
+
+This script syncs a variable's value across all of a service's command lines (predefined and custom).
+
+```csharp
+//refAssemblies: TCAdmin.SDK.dll, TCAdmin.GameHosting.SDK.dll, TCAdmin.Scripting.dll, TCAdmin.Monitor.dll
+using TCAdmin.Web.Shared.Models;   // TCAdminVars
+
+var Globals = new TCAdmin.Scripting.Engines.Addons.CSharpGameGlobals(); // DO NOT MODIFY THIS LINE
+
+var variables = new TCAdminVars { ["MyVariable"] = "My Value" };
+await ServiceManager.SyncCommandlineVariables(ThisService.Owner, ThisService, variables);
+
+ScriptConsole.WriteLine("Synced 'MyVariable' across all command lines.");
+```
