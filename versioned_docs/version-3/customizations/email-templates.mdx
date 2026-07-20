@@ -1,0 +1,187 @@
+---
+sidebar_position: 3
+sidebar_label: Email Templates
+---
+
+# Email Templates
+
+Every email TCAdmin sends comes from a template you can change — from the welcome message a new user receives to the notice that a game server went down. Templates are managed at **Settings → Email Templates**: rewrite the wording, restyle the layout, translate messages into your users' languages, change who receives a copy, or switch individual messages off entirely.
+
+:::info[Emails are also in-app messages]
+Every email sent to a panel user also lands in their **Messages** inbox inside the panel, with an unread badge in the navigation. The in-app copy is delivered even while outbound mail is turned off — so you can set up and try templates before configuring a mail server.
+:::
+
+## Setting up
+
+Two other pages under **Settings** feed every email:
+
+- **Email Settings** — the mail server. Use standard SMTP (with or without a password), or app-only sign-in for **Microsoft 365** or **Google Workspace**. Set the default **From** name and address, then use **Send test email** to confirm delivery — the mail server's exact response is shown if it fails, which helps when the provider needs extra setup on its side. Outbound mail has an on/off switch; while it's off, messages still reach panel inboxes.
+- **Company Information** — your branding: company name, support email, website, logo, control panel address, and an email header and signature (HTML and plain-text versions). These are applied to every template through the `Company` variables, so all of your messages share one look. The control panel address is also what makes emailed links work — the "manage your service" links and password links are built from it.
+
+:::tip
+If no control panel address is set in Company Information, templates hide their panel links instead of sending broken ones.
+:::
+
+## The built-in templates
+
+| Template | Sent when |
+|---|---|
+| New user welcome | An administrator creates a user. Contains a set-password link valid for 3 days — new users choose their own password instead of receiving one. |
+| Password recovery | Someone uses **Forgot password?** on the login page. The link is valid for 1 hour. |
+| Service created | A game or Docker server finishes installing. |
+| Service reinstalled | A reinstall completes. |
+| Service moved | A service finishes moving to another server. |
+| Server query failure | Query monitoring confirms a game server stopped responding. |
+| Server maximum query failures | The failure count reaches the game's configured limit. |
+| Slot limit exceeded | Query monitoring detects more player slots than allowed. |
+| Private status detection | Query monitoring detects the server went private. |
+| Server branding removed | Query monitoring detects the required branding is missing from the server's name. |
+| Monitoring rule triggered | A custom query-monitoring rule fires. |
+| Scheduled task error | A recurring scheduled task fails while running. |
+
+Built-in templates can't be deleted — turn one off instead, or use **Reset to default** to restore its original content at any time.
+
+:::note[Monitoring emails are opt-in per game]
+The monitoring templates only send for games whose query-monitoring action includes **Send email**, configured per game on its [Query Monitoring](../using-tcadmin/games/query-monitoring.mdx#owner-emails) settings. Turning a template off on the Email Templates page stops it for every game.
+:::
+
+## Editing a template
+
+The **subject** and the **body** accept variables (see [Available variables](#available-variables) below). The body has a **Source** tab for editing the HTML directly, an optional **Design** tab with a visual editor, and a **Plain Text** tab for the text-only alternative some mail apps prefer. A variables menu inserts any available variable at the cursor.
+
+- **Preview** renders the template with sample data and your real company branding, so what you see matches what a real send produces.
+- **Send test** delivers the rendered template to an address you choose. It works even while the template or outbound mail is switched off, and shows the mail server's exact error if delivery fails.
+
+| Option | Description |
+|---|---|
+| Enabled | The master switch. A disabled template is silently skipped everywhere it would normally send. |
+| Template key | The identifier the system sends by (for example `service.created`). Fixed on built-in templates; custom templates can use any unused key. |
+| From name / From email | Override the default sender from Email Settings for this template only. |
+| To / CC / BCC emails | Extra addresses, separated by commas. The user the email is about is always included automatically. |
+| To / CC / BCC roles | Every member of the selected roles that has an email address receives a copy. Built-in templates BCC the Administrator role by default — remove it if you don't want admin copies. |
+| Force user to view | The in-app copy pops up in a dialog the next time the user opens the panel (shown once). |
+| Icon | Shown next to the message in the user's inbox and in the pop-up dialog. |
+| Notes | Your own reference notes — never sent. |
+
+## Custom templates and variants
+
+**New Template** creates your own template. Give it a key and send it from a script or the API whenever you need — see the [scripting examples](#sending-email-from-scripts) below.
+
+The **Based on** option creates a **variant of a built-in template**: it copies the original's content, keeps the same variables available, and suggests a name and key. Variants of the monitoring templates appear in the per-game template pickers on the Query Monitoring page — so one game can send a different "server down" email than another, without touching the default.
+
+## Translations
+
+Every template — built-in, custom, or variant — can be translated into the panel's languages. Emails are sent in the language of **the user the email is about**: if the template has a translation for that language, the translated subject and bodies are used; if not, the user receives the default content — so an untranslated template keeps working for everyone. A translation also formats dates and numbers the way its language expects. If a user's language is later disabled, their email falls back to the default content.
+
+Users pick their language with the panel's language selector in the top bar — signed-in users keep the choice on their account, so it follows them across devices. It can also be changed under **Preferences** on their profile, or by an administrator on the user's page.
+
+To translate a template, use the **Editing layer** selector at the top of the editor's **Content** tab. It starts on **Default content**; **Add translation** lists the panel languages that don't have a translation yet and starts one from a copy of the default content, ready to translate in place. Each translation carries its own subject, HTML body and plain-text body, with the same variables available. **Preview** renders the layer you're editing, **Send test** sends the selected layer (save a new translation before test-sending it), and **Remove translation** deletes the selected one when you save.
+
+:::note[One language per email]
+Each email is rendered once. Extra recipients — the To / CC / BCC addresses and roles — receive the same copy as the user the email is about, in that user's language.
+:::
+
+:::note[Variable values are not translated]
+A variable inserts its value as-is: `{{ ValidFor }}` always produces English wording such as `3 days`, and `{{ Service.Kind }}` produces `Game` or `Docker`. The password-link lifetimes never change, so a translation can simply write the duration out in its own language instead of using `{{ ValidFor }}`.
+:::
+
+:::tip
+**Reset to default** restores only the default content — your translations are kept.
+:::
+
+## Available variables
+
+Insert a variable anywhere in the subject or bodies with `{{ Variable }}`. Values are safely encoded in HTML bodies (the company header and signature are the exception — they're inserted as authored). Liquid conditions and loops work too:
+
+```html
+{% if Service.Url != blank %}
+<p><a href="{{ Service.Url }}">Manage your service</a></p>
+{% endif %}
+```
+
+The editor's variables menu always shows the exact list available to the template you're editing.
+
+### Every template
+
+| Variable | Type | Description |
+|---|---|---|
+| `Company.Name` | string | The company name. |
+| `Company.Email` | string | The support email address. |
+| `Company.Website` | string | The company website address. |
+| `Company.LogoUrl` | string | The logo image address. |
+| `Company.ControlPanelUrl` | string | The control panel address. |
+| `Company.HeaderHtml` | string | The email header — inserted as HTML, exactly as authored. |
+| `Company.HeaderText` | string | The plain-text header. |
+| `Company.SignatureHtml` | string | The signature — inserted as HTML, exactly as authored. |
+| `Company.SignatureText` | string | The plain-text signature. |
+
+### The user the email is about
+
+| Variable | Type | Description |
+|---|---|---|
+| `User.Username` | string | The user's login name. |
+| `User.FirstName` | string | The user's first name. |
+| `User.LastName` | string | The user's last name. |
+| `User.FullName` | string | The user's full name. |
+| `User.Email` | string | The user's email address. |
+
+### Password link templates
+
+Available in **New user welcome** and **Password recovery**:
+
+| Variable | Type | Description |
+|---|---|---|
+| `ResetUrl` | string | The set-password / reset-password link. |
+| `ValidFor` | string | How long the link stays valid, in words (for example `1 hour`, `3 days`). |
+
+### Service templates
+
+Available in **Service created / reinstalled / moved** and every monitoring template:
+
+| Variable | Type | Description |
+|---|---|---|
+| `Service.Name` | string | The service's name. |
+| `Service.Url` | string | A link to the service's page in the panel. Empty when no control panel address is configured — guard it with `{% if Service.Url != blank %}`. |
+| `Service.Kind` | string | `Game` or `Docker`. |
+| `Service.PlatformName` | string | The game's or Docker blueprint's name. |
+| `Service.IpAddress` | string | The service's IP address. |
+| `Service.Port` | number | The service's main port. |
+| `Service.Slots` | number | The service's player slots. |
+| `Server.Name` | string | The server hosting the service. |
+
+The **Service moved** template additionally has `SourceServerName` and `TargetServerName` (both strings) — where the service moved from and to.
+
+### Monitoring templates
+
+| Variable | Type | Description |
+|---|---|---|
+| `Detection.Type` | string | What was detected: `QueryFailure`, `SlotsExceeded`, `WentPublic`, `BrandingRemoved` or `RuleViolation`. |
+| `Detection.Failures` | number | Confirmed query failures so far. |
+| `Detection.Threshold` | number | The game's configured failure limit. |
+| `Detection.QueryStatus` | string | The failure detail for query failures (for example `Connection timed out`). |
+| `Detection.Detected` | string | The observed value that triggered the detection — the announced slot count, the detected private value, the unbranded server name, or the rule's observed value. |
+| `Detection.Rule` | string | The custom rule's description (**Monitoring rule triggered** only). |
+
+:::note
+In the slot / private / branding / rule templates, show `Detection.Detected` — `Detection.QueryStatus` is only meaningful in the two query-failure templates, because the other detections only run while the server is responding.
+:::
+
+### Scheduled task error
+
+| Variable | Type | Description |
+|---|---|---|
+| `Task.Name` | string | The scheduled task's name. |
+| `Task.StepName` | string | The step that failed. |
+| `Task.Error` | string | The error message. |
+| `Task.ServerName` | string | The server the task ran on. |
+
+## Delivery and the email queue
+
+Sent emails go into an outbox and are delivered in the background — a send that fails is retried automatically with increasing delays before it's marked failed. **Settings → Email Queue** shows the outbox and the send history: open a message to see exactly what was sent, retry a failed one, or cancel and delete entries.
+
+## Sending email from scripts
+
+Scripts can queue email through the `EmailService` scripting object — either a free-form message or any template by its key (including your custom ones). See the worked examples on the Script Examples page:
+
+- [Email All Users](./scripts/script-examples.mdx#email-all-users) — a raw message to every user with an email address.
+- [Email the Service Owner Using a Template](./scripts/script-examples.mdx#email-the-service-owner-using-a-template) — render and send a template with the service's details filled in.

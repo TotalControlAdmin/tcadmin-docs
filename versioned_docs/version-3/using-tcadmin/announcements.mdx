@@ -1,0 +1,84 @@
+---
+sidebar_label: Announcements
+sidebar_position: 4
+---
+
+# Announcements
+
+Announcements let administrators post messages inside the panel — a maintenance window, a new game launch, a warning about an ongoing issue — targeted at exactly the users who should see them. They are managed at **System → Announcements**, and delivery is live: publishing, editing, or removing an announcement updates every signed-in user's screen immediately, without a page reload.
+
+:::info[Some announcements are posted automatically]
+When a plugin repository you follow publishes new or updated plugins, TCAdmin posts an announcement about it to administrators on its own. It behaves like any other announcement and can be dismissed the same way.
+:::
+
+## Creating an announcement
+
+| Setting | Description |
+|---|---|
+| Subject | The short headline shown to customers. |
+| Body | Optional detail text. Supports **Markdown** (bold, links, lists), with a live preview under the editor. |
+| Severity | *Info*, *Success*, *Warning*, or *Error* — sets the announcement's color and default icon. |
+| Custom icon | Optionally replaces the severity icon. |
+| Display type | How the announcement appears on screen (below). |
+| Behavior | How long it stays and who can dismiss it (below). |
+| Priority | When several announcements are visible, higher priority is shown first. |
+| Active | The master switch. Turning it off removes the announcement from every screen immediately; you can turn it back on later. |
+
+### Display types
+
+| Type | What the customer sees |
+|---|---|
+| Banner | A colored bar across the top of every page. |
+| Snackbar | A pop-up notification in the corner of the screen. |
+| Dialog | A window in the middle of the screen that must be closed before continuing. |
+
+### Behaviors
+
+| Behavior | How it works |
+|---|---|
+| Show once | Shown a single time, then dismissed automatically — it will not return on the next visit. |
+| Show until acknowledged | Stays on every visit until the user clicks **OK**. A dialog additionally asks the user to tick *"I have read this announcement"* first. |
+| Show until removed | The user has no dismiss control — the announcement stays visible until you deactivate or delete it. |
+| Auto expire | Disappears by itself at the date and time you set (entered in your local time). |
+| Show at login page | Shown on the sign-in page, before anyone logs in. Always visible to everyone, and never asks for acknowledgment. |
+
+## Choosing who sees it
+
+The **Targeting** tab decides the audience. An announcement can target:
+
+| Scope | Who matches |
+|---|---|
+| Everyone | All customers. |
+| User | A specific user. |
+| Role | Every user assigned to a role. |
+| Service | The owner of a specific service. |
+| Blueprint | Owners of services created from a game or Docker blueprint. |
+| Region / Datacenter | Owners of services hosted in a region or datacenter. |
+
+You can add several scopes. Scopes of the **same kind** widen the audience (matching *any* of them is enough), while scopes of **different kinds** narrow it (a user must match *all* of them). For example, two blueprint scopes plus a datacenter scope reaches users who own a service from *either* blueprint **and** in *that* datacenter.
+
+:::note
+A *Show at login page* announcement always targets everyone — nobody is signed in yet, so there is no audience to narrow.
+:::
+
+## Acknowledgments
+
+The edit page's **Acknowledgments** tab counts how many users the announcement targets, how many have acknowledged it, and how many are still pending. *Show once* announcements are counted as acknowledged as soon as they are seen. Login-page announcements are not tracked — there is no signed-in user to record.
+
+## Translations
+
+Every announcement can be translated into the panel's languages. Each user sees the translation matching their own language — their preferred panel language or, when they haven't chosen one, the language they are viewing the panel in. Users without a matching translation see the default content, so an untranslated announcement keeps working for everyone. Login-page announcements follow the language selected on the sign-in page.
+
+To translate an announcement, use the **Editing layer** selector above the subject field. It starts on **Default content**; **Add translation** lists the panel languages that don't have a translation yet and starts one from a copy of the default content, ready to translate in place. A translation carries its own subject and body — everything else (severity, icon, display type, behavior, targeting) is shared with the default content. The Markdown preview always shows the layer you are editing, and **Remove translation** deletes the selected one when you save.
+
+When a user switches the panel language, announcements already on their screen switch language with it.
+
+:::note
+A dialog announcement that is already open keeps the language it opened with until it is closed.
+:::
+
+Users pick their language with the panel's language selector — see [Email Templates](../customizations/email-templates.mdx#translations) for how the per-user language preference works; announcements and emails follow the same choice.
+
+## Scripting
+
+The `AnnouncementManager` object is available in every script engine for creating and managing announcements programmatically — for example, posting a warning banner from a maintenance script. See the [script objects reference](../customizations/scripts/script-objects.mdx) and the ready-to-use *Create an announcement* example on the [script examples page](../customizations/scripts/script-examples.mdx).

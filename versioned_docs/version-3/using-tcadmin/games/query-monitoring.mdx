@@ -13,7 +13,7 @@ Query Monitoring applies to **game blueprints only** — it is not available for
 
 ## How it works
 
-TCAdmin queries each running game service on a schedule. When a check fails, TCAdmin can **restart**, **stop**, or **disable** the service automatically, and (optionally) write an entry to the activity log so the owner has a record of what happened.
+TCAdmin queries each running game service on a schedule. When a check fails, TCAdmin can **restart**, **stop**, or **disable** the service automatically, **email the service's owner**, and (optionally) write an entry to the activity log so there's a record of what happened.
 
 Monitoring is **off by default**. You turn it on per game from the game blueprint's **Query Monitoring** page.
 
@@ -27,7 +27,7 @@ Monitoring is **off by default**. You turn it on per game from the game blueprin
 | **Branding removed** | Your required brand text (or pattern) is no longer in the server's hostname. |
 | **Custom rule** | A comparison you define against a query field fails. |
 
-Each detection has its own on/off switch and its own action, so you can (for example) restart on a crash but only log a slot overage.
+Each detection has its own on/off switch and its own action, so you can (for example) restart on a crash but only log a slot overage — and each can email the service's owner (see [Owner emails](#owner-emails)).
 
 ## Settings
 
@@ -40,11 +40,11 @@ On the game blueprint's **Query Monitoring** page:
 | **Startup grace period** | Checks are paused for this long after a service starts or restarts, so a slow-starting server isn't flagged. Default: 10 minutes. |
 | **Retry delay** | After a failed query, TCAdmin waits this long and re-checks once before counting the failure — this avoids acting on a brief network blip. Default: 30 seconds. |
 | **Failure threshold** | How many failures in a row before escalating to the stronger action. Default: 3. |
-| **Failure action** | The action taken below the threshold. Default: Restart. |
-| **Max failure action** | The action taken once the threshold is reached, so a server that keeps failing isn't restart-looped forever. Default: Disable. |
+| **Failure action** | The action taken below the threshold. Default: Restart + Send email. |
+| **Max failure action** | The action taken once the threshold is reached, so a server that keeps failing isn't restart-looped forever. Default: Disable + Send email. |
 | **Log activity on failure** | Write an activity-log entry each time a detection fires. Default: on. |
 
-Actions are always one of **None**, **Restart**, **Stop**, or **Disable**.
+An action is a small set of choices: at most one power action — **Restart**, **Stop**, or **Disable** — optionally combined with **Send email**. Selecting *Send email* reveals a template picker for that detection (see [Owner emails](#owner-emails)).
 
 ### Per-service settings
 
@@ -57,6 +57,30 @@ Some options live on the individual service's settings page, in the **Query Moni
 
 :::note
 These per-service options require the **Service Settings** permission, so customers can't change them on their own services.
+:::
+
+## Owner emails
+
+Any detection's action can include **Send email**, which notifies the service's owner. Each detection has a matching built-in email template:
+
+| Detection | Template used |
+|---|---|
+| Query failure (below the threshold) | Server query failure |
+| Query failure (threshold reached) | Server maximum query failures |
+| Slot overage | Slot limit exceeded |
+| Went public | Private status detection |
+| Branding removed | Server branding removed |
+| Custom rule | Monitoring rule triggered |
+
+When *Send email* is selected, a picker appears next to the action. Keep the default template, or choose a **variant** of it — a copy created on the [Email Templates](../../customizations/email-templates.mdx) page with *Based on* — so different games can send differently worded emails for the same event.
+
+Emails are sent once per event, not on every check, so an owner's inbox isn't flooded while a problem persists:
+
+- A failing server emails once when the failure is first confirmed, and once more if it reaches the failure threshold.
+- The other detections email once per occurrence. If the server is restarted and the problem is still there, that's a new occurrence and the email is sent again — one per server run.
+
+:::note
+Turning a template off on the Email Templates page stops that email for **every** game, even where *Send email* is selected. Every email also lands in the owner's in-app **Messages** inbox — including when outbound mail isn't set up yet.
 :::
 
 ## Activity log
@@ -88,7 +112,7 @@ Alongside the standard service objects (`ThisService`, `ThisServer`, `ThisGame`,
 | Variable | Type | Description |
 |---|---|---|
 | `DetectionType` | `EMonitoringDetectionType` | Which detection fired: `QueryFailure`, `SlotsExceeded`, `WentPublic`, `BrandingRemoved`, or `RuleViolation`. |
-| `MonitoringAction` | `EQueryMonitoringAction` | The action TCAdmin chose: `None`, `Restart`, `Stop`, or `Disable`. |
+| `MonitoringAction` | `EQueryMonitoringAction` | The action set TCAdmin chose: `None`, or at most one of `Restart` / `Stop` / `Disable`, optionally combined with `SendEmail` (it's a `[Flags]` enum, so the value can be a combination). |
 | `ConsecutiveFailures` | int | The consecutive failure count (always `1` for detections other than query failure). |
 | `FailureThreshold` | int | The configured failure threshold. |
 | `ThresholdReached` | bool | `true` once the failure threshold has been reached. |
@@ -104,7 +128,7 @@ Depending on the detection type, extra variables are also provided:
 | Custom rule | `RuleDescription` (string), `ObservedValue` (string), `RuleValueExpanded` (string), `RuleOperator` (string), `RuleId` (long) |
 
 :::note
-In a C# script the enum variables read as their name when you call `.ToString()` (for example `Variables["MonitoringAction"].ToString()` returns `"Restart"`).
+In a C# script the enum variables read as their name when you call `.ToString()` (for example `Variables["DetectionType"].ToString()` returns `"QueryFailure"`). A flag set reads as the combined names — `Variables["MonitoringAction"].ToString()` returns `"Restart, SendEmail"` when both are selected.
 :::
 
 ### Example: announce when a detection fires

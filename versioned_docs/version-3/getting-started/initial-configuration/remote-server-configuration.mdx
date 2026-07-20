@@ -27,9 +27,22 @@ Make sure you have:
 - A second server (the remote) that meets the [System Requirements](../system-requirements.mdx)
 - The remote server must be able to connect to the master server's **MySQL database** and **Redis** service over the network
 
+:::note[Is your master running in the Docker appliance?]
+The all-in-one Docker image only publishes the web panel ports by default. Because a remote connects directly to the master's database and Redis, **publish those ports** on the master's container: recreate it adding `-p 3306:3306 -p 6379:6379` (or run it with `--network host` on Linux). The data volumes persist, so recreating is safe. Only open ports 3306 and 6379 to your remote servers — never to the public internet.
+
+You don't need to copy any passwords — the deployment token delivers them. If you ever do need them (for example, to pin explicit values in Step 1):
+
+- Database password: `docker exec tcadmin cat /tcadmin/.db.env`
+- Redis password: `docker exec tcadmin cat /tcadmin/app/config/appsettings.global.json` (look for `TCAdmin:Redis:Password`) — it's also printed once in the container's first-boot logs.
+:::
+
 ## Step 1: Configure the Master to Share Its Database
 
-Before the remote server can connect, you need to tell the master server to share its database and Redis connection details. You only do this once, on the master.
+:::tip[Using the Flash Token method? You can usually skip this step]
+A remote installed with a deployment token (the recommended method in Step 4) pulls the master's database **and Redis** connection details — passwords included — automatically, and connects to both at whichever master address answered when it joined. Skip straight to [Step 2](#step-2-add-the-remote-server-in-the-panel) unless you need to **pin explicit addresses**: for example, your database lives at a hostname only some machines can resolve, or your remotes reach the database over a dedicated network.
+:::
+
+The settings below override what remote servers are sent automatically. You only do this once, on the master, and they apply to every remote.
 
 1. Log in to your TCAdmin control panel
 2. Go to **Settings** > **Global Server Configuration**
@@ -101,6 +114,10 @@ The deployment token grants access to your TCAdmin configuration. Don't share it
 :::
 
 ## Step 3: Install TCAdmin on the Remote Server
+
+:::tip[Prefer Docker for the remote, too?]
+If Docker is available on this machine, you can run the remote server as a container instead of installing on the host — paste the deployment token from Step 2 into the `FLASH` variable. See [Running as a Remote Server](../Installation/docker-installation.mdx#running-as-a-remote-server); the installer-prompt steps below then don't apply.
+:::
 
 Connect to your remote server and run the TCAdmin installer:
 

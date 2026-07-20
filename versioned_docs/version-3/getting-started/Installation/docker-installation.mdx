@@ -1,0 +1,498 @@
+---
+sidebar_position: 3
+sidebar_label: Docker Installation
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Docker Installation
+
+TCAdmin ships an all-in-one Docker image that bundles the database, the web control panel, and the monitor service into a single container. It's the fastest way to get a panel running — one command, and there's no separate database to install. The image runs on both Intel/AMD (amd64) and ARM64 hosts.
+
+:::info[How the Docker image works]
+The image contains **no TCAdmin version**. The first time the container starts, it downloads and installs the **latest** TCAdmin release onto a persistent volume. This means a freshly pulled image always deploys the current version, and your installation updates in place afterward — you don't rebuild or re-pull the image just to update TCAdmin.
+:::
+
+## Before You Begin
+
+Make sure you have:
+
+- A host that meets the [System Requirements](../system-requirements.mdx) for memory and CPU
+- **[Docker Engine](https://docs.docker.com/engine/install/) installed** and running
+- The two panel ports (**31000** and **31001**) free on your host
+
+You do **not** need to install MySQL or MariaDB separately — the image includes its own database.
+
+:::tip[Trying it out on Windows or macOS?]
+The container is Linux-based, but it runs anywhere Docker does — including [Docker Desktop](https://docs.docker.com/desktop/) on Windows and macOS — which makes it easy to evaluate the panel on your own computer.
+
+For **production game hosting**, run it on a **Linux host with Docker Engine** — game servers need `--network host` for their dynamically-assigned ports (see [Hosting Game Servers](#hosting-game-servers) below). You can also host games from **Docker Desktop on Windows 11**, using mirrored WSL networking instead of `--network host` (covered in that section) — but that isn't available on **Windows Server** or **macOS**, so for production hosting on those, use a Linux host or the native [Windows Installation](windows-installation.mdx).
+:::
+
+## Install TCAdmin
+
+First, pull the image:
+
+```bash
+docker pull ghcr.io/totalcontroladmin/tcadminv3_appliance:latest
+```
+
+:::tip[Installing with default settings]
+The commands below install TCAdmin with its default settings. To customize the install — update channel, automatic updates, a pinned version, and more — add the environment variables listed in [Configuration Options](#configuration-options) below.
+:::
+
+Then start the container:
+
+<Tabs>
+  <TabItem value="linux" label="Linux">
+
+```bash
+docker run -d --name tcadmin \
+  --restart unless-stopped \
+  --cap-add SYS_ADMIN \
+  --network host \
+  -v tcadmin_app:/tcadmin \
+  -v tcadmin_db:/var/lib/mysql \
+  -v /usr/local/tcadmin-files:/usr/local/tcadmin-files \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  ghcr.io/totalcontroladmin/tcadminv3_appliance:latest
+```
+
+`--network host` lets game servers use their dynamically-assigned ports. The last two mounts are for **Docker-blueprint** games (each game server in its own container): `/usr/local/tcadmin-files` is a real folder on the host where the game-server files will live, and the Docker socket lets TCAdmin manage the game containers. If you won't use Docker blueprints, you can leave out both lines — see [Hosting Game Servers](#hosting-game-servers) for the one panel setting that goes with them.
+
+  </TabItem>
+  <TabItem value="windows" label="Windows (PowerShell)">
+
+```powershell
+docker run -d --name tcadmin `
+  --restart unless-stopped `
+  --cap-add SYS_ADMIN `
+  -p 31000:31000 -p 31001:31001 `
+  -v tcadmin_app:/tcadmin `
+  -v tcadmin_db:/var/lib/mysql `
+  ghcr.io/totalcontroladmin/tcadminv3_appliance:latest
+```
+
+  </TabItem>
+  <TabItem value="macos" label="macOS">
+
+```bash
+docker run -d --name tcadmin \
+  --restart unless-stopped \
+  --cap-add SYS_ADMIN \
+  -p 31000:31000 -p 31001:31001 \
+  -v tcadmin_app:/tcadmin \
+  -v tcadmin_db:/var/lib/mysql \
+  ghcr.io/totalcontroladmin/tcadminv3_appliance:latest
+```
+
+  </TabItem>
+</Tabs>
+
+Finally, watch the first-boot progress:
+
+```bash
+docker logs -f tcadmin
+```
+
+:::info[What does this do?]
+The `run` command creates two persistent volumes (one for the TCAdmin install and its configuration, one for the database) and starts the container — on Linux it also connects `/usr/local/tcadmin-files`, a plain folder on the host where game-server files will live. On this **first start**, the container downloads and installs the latest TCAdmin release — **expect several minutes**. Progress streams to `docker logs`.
+
+The `--cap-add SYS_ADMIN` option enables **per-service CPU/memory limits and Virtual Servers** inside the container (Docker normally mounts the system's resource-control filesystem read-only; this permission lets TCAdmin make it writable for its own container). Without it the panel still works, but services start without resource limits and Virtual Servers refuse to start.
+:::
+
+## Back Up Your Encryption Key
+
+:::danger[This is the most important step — do not skip it!]
+During the first boot, the container prints a **Master Encryption Key** to `docker logs` **exactly once**. This key encrypts all the sensitive data in your database (passwords, API keys, and so on).
+
+**Save it now, before you remove or recreate the container:**
+- Copy it into a password manager (like Bitwarden, 1Password, or KeePass) or another secure store
+- Keep it somewhere **other than** this server, in more than one place
+
+**If you lose this key, your encrypted data is gone forever — there is no recovery option.** Once the container is removed, the log line is gone with it.
+:::
+
+## After Installation
+
+Once `docker logs` shows the install has finished:
+
+- Your control panel is available at **`http://YOUR-SERVER-IP:31000`** (HTTP) or **`https://YOUR-SERVER-IP:31001`** (HTTPS) from your browser
+- Default login: **admin** / **Password!23** (you'll be required to change it on first login)
+
+:::warning[Browser Security Warning]
+On HTTPS, your browser will show a security warning because TCAdmin uses a self-signed certificate by default. This is normal — click "Advanced" and then "Proceed" to continue. You can set up a proper certificate later using the [Web Certificate](../initial-configuration/web-certificate.mdx) guide.
+:::
+
+## Configuration Options
+
+The container works with no configuration, but you can customize it with environment variables (add them to the `docker run` command with `-e`, for example `-e AUTO_UPDATE=true`):
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `TCADMIN_VERSION` | *(latest)* | Pin a specific TCAdmin version to install on first boot instead of the latest. |
+| `TCADMIN_CHANNEL` | `Beta` | The update channel to install and update from (for example `Beta` or `Stable`). |
+| `AUTO_UPDATE` | `false` | Update TCAdmin to the latest version on every container restart. |
+| `MYSQL_MGR` | `true` | Automatically set up the **MySQL Manager** so game servers on this machine can be given their own MySQL database. Set to `false` to turn it off. |
+| `MYSQL_MGR_HOST` | `127.0.0.1` | The address stored in the panel for those game-server databases. Set it to this machine's reachable address if customers connect to their databases from outside the host. |
+| `FLASH` | *(none)* | Run this container as a **remote server** that joins an existing master, instead of a standalone panel. Set it to a deployment token from the master. See [Running as a Remote Server](#running-as-a-remote-server). Combined with `TCADMIN_ROLE=web`, it instead runs a **web panel that joins the master** — see [Web panel in its own container](#web-panel-in-its-own-container). |
+| `FLASH_FILE` | *(none)* | Read the token from a file instead of putting it in `FLASH` — useful with Docker secrets or a mounted file. Only used while `FLASH` itself is unset. |
+
+:::note[The bundled database manages itself]
+The built-in database's name and credentials are generated automatically on first boot and persisted in the container's volumes — there is nothing to configure or remember. (If you ever need the credentials for troubleshooting, they're readable at `/tcadmin/.db.env` inside the container.) To use a database server of your own instead, see [Using your own database server](#using-your-own-database-server).
+:::
+
+### Advanced deployment variables
+
+These apply only to the setups in [Advanced Deployments](#advanced-deployments) below — running the web panel in its own container, or using a database server you already have. Leave them unset for the standard all-in-one container.
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `TCADMIN_ROLE` | `all` | What this container runs: `all` is the standard combined container, `monitor` runs the master **without serving the panel** (pair it with a web-panel container), and `web` runs **only the web panel** — always joined to a master with a `FLASH` web panel token (see [Web panel in its own container](#web-panel-in-its-own-container)). |
+| `WEB_TOKEN` | `false` | Masters only: create a **web panel token** on first boot so web-panel containers can join this master. The token is printed in `docker logs` and saved to `/tcadmin/app/config/.web-flash-token` inside the container. |
+| `TCADMIN_PRIVATE_NETWORK_ID` | *(none)* | Web-panel containers only: the ID of the **private network** (**Settings > Private Networks** — the ID column) the web machine belongs to. Servers on that network are then reached at their private network IPs instead of their public addresses. Leave unset when the web machine has no private connection to your servers. |
+| `CUSTOM_DB_HOST` | *(built-in)* | Run TCAdmin's database on your **own MySQL or MariaDB server** instead of the built-in one. Setting it makes `CUSTOM_DB_PASSWORD` required. |
+| `CUSTOM_DB_PORT` | `3306` | Port of your external database server. |
+| `CUSTOM_DB_NAME` | `tcadmin3` | Database name to use on your external server. |
+| `CUSTOM_DB_USER` | `tcadmin3` | Database user on your external server. |
+| `CUSTOM_DB_PASSWORD` | *(none)* | Password for the external database user. Required whenever `CUSTOM_DB_HOST` is set. |
+| `TCADMIN_INSTALL_SCRIPT_URL` | *(official)* | Advanced/testing: download the installer script from a custom URL instead of the official one. |
+
+## Volumes
+
+The container keeps all of its data in two volumes so nothing is lost when the container is recreated, plus (on Linux) a plain host folder for game-server files:
+
+| Volume | Purpose |
+|---|---|
+| `/tcadmin` | The TCAdmin install, configuration, logs, and generated secrets. |
+| `/var/lib/mysql` | The database. |
+| `/usr/local/tcadmin-files` | Game-server files — a real folder on the host, shared with Docker-blueprint game containers (see [Hosting Game Servers](#hosting-game-servers)). |
+
+:::warning[Resetting the appliance]
+Removing **both** volumes wipes everything and returns the appliance to a clean state — the next start runs a fresh install. Game-server files are separate: delete the `/usr/local/tcadmin-files` folder on the host too if you want a truly clean slate. Only do this if you truly want to start over.
+:::
+
+## Ports
+
+| Port | Purpose |
+|---|---|
+| 31000 / 31001 | Web control panel (HTTP / HTTPS). |
+| 50051 / 50052 | Monitor — only needed if you add remote servers or a standalone web panel that connect to this master. |
+| 3306 / 6379 | Database and Redis — only if you add remote servers or a standalone web panel (they connect to both directly). See [Adding a Remote Server](../initial-configuration/remote-server-configuration.mdx). |
+| 8821 + 5000-5100 | FTP control port and passive data range — for end-user file access to game servers. |
+
+On **Windows and macOS**, the commands above publish only the panel ports (31000/31001) — all you need to reach the control panel; publish the other ports when you add remote servers or FTP. The **Linux** command uses `--network host`, so every port the container listens on (panel, games, FTP) is already reachable on the host.
+
+### Hosting Game Servers
+
+Game server ports are assigned **dynamically**, which Docker's fixed port publishing (`-p`) can't follow — so to host real game servers, the container has to reach the host's network directly. What that takes depends on the OS.
+
+<Tabs>
+  <TabItem value="linux" label="Linux">
+
+Nothing more to do for networking — the Linux install command above already runs the container with `--network host`, so game servers can use their dynamically-assigned ports right away.
+
+For **Docker-blueprint** games, the install command also mounts the Docker socket and the `/usr/local/tcadmin-files` host folder. Game-server files must live in that folder so the game containers can reach them: open **Settings → Servers → (your server)** and set **User Files Path** to `/usr/local/tcadmin-files/users`.
+
+:::note[Keep the folder path identical on both sides]
+Docker-blueprint game containers read their files straight from the host, so the folder must be mounted at the **same path** inside and outside the TCAdmin container — exactly what `-v /usr/local/tcadmin-files:/usr/local/tcadmin-files` does. Use a real folder on the host, not a Docker volume. If the mount is missing, starting a Docker-blueprint game server fails with an error that names the mount to add.
+:::
+
+  </TabItem>
+  <TabItem value="windows" label="Windows">
+
+**Don't use `--network host`** — on Docker Desktop it breaks connectivity to the container rather than enabling it.
+
+On **Windows 11 (version 22H2 or newer)**, turn on **mirrored** WSL networking, the Docker Desktop equivalent. Add this to `%USERPROFILE%\.wslconfig`, then run `wsl --shutdown` and restart Docker Desktop:
+
+```ini
+[wsl2]
+networkingMode=mirrored
+```
+
+With mirrored networking, the game-server ports inside the container become reachable from other machines at your host's LAN or public IP. Because the container binds an internal address (something like `172.17.0.2`), open **Settings → Servers → (your server) → IP Addresses** and set each IP's **hostname** to your LAN or public IP so the panel advertises the right address to players.
+
+**Windows Server and Windows 10 can't host games this way** — mirrored networking needs Windows 11 22H2+ and isn't supported on Windows Server (including Server 2025). For production game hosting there, use the native [Windows install](windows-installation.mdx).
+
+  </TabItem>
+  <TabItem value="macos" label="macOS">
+
+Docker Desktop for macOS can't expose the container's dynamically-assigned game ports to your network — there's no host-networking or mirrored-mode equivalent — so use it to **evaluate the panel** only. For real game hosting, run the appliance on a **Linux host**.
+
+  </TabItem>
+</Tabs>
+
+## Running as a Remote Server
+
+The same image can also run as a **remote server** — an extra machine that only hosts game servers and is controlled from an existing master panel — instead of a standalone panel. It's the container equivalent of installing a remote server on a bare-metal machine, and the fastest way to add hosting capacity on another host.
+
+Set the **`FLASH`** variable to a deployment token from your master and the container skips the standalone setup: it runs the monitor (no web panel) and pulls TCAdmin's own configuration — database, Redis, and encryption keys — from the master. By default it **also** runs a **local MariaDB** so it can host game-server databases for services on this node through the **MySQL Manager** — set `MYSQL_MGR=false` for a monitor-only node with no local database.
+
+:::info[Set up the master first]
+A remote server needs to reach the master's database and Redis over the network (see [Ports](#ports) — on a Docker master that means publishing `3306` and `6379`), plus a deployment token generated for this server. Follow **Step 2** of the [Remote Server Configuration](../initial-configuration/remote-server-configuration.mdx#step-2-add-the-remote-server-in-the-panel) guide to add the server and copy its token — then come back here and use the token below instead of running the bare-metal installer. The token takes care of the rest: the remote pulls the database and Redis connection details, passwords included, straight from the master.
+:::
+
+Start the container with your deployment token in `FLASH`. Game-server networking works the same as on a standalone host — see [Hosting Game Servers](#hosting-game-servers) above for the per-OS details:
+
+<Tabs>
+  <TabItem value="linux" label="Linux">
+
+```bash
+docker run -d --name tcadmin-node \
+  --restart unless-stopped \
+  --cap-add SYS_ADMIN \
+  --network host \
+  -e FLASH=PASTE-YOUR-DEPLOYMENT-TOKEN-HERE \
+  -v tcadmin_node:/tcadmin \
+  -v tcadmin_node_db:/var/lib/mysql \
+  -v /usr/local/tcadmin-files:/usr/local/tcadmin-files \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  ghcr.io/totalcontroladmin/tcadminv3_appliance:latest
+```
+
+`-v tcadmin_node_db:/var/lib/mysql` persists the game-server databases the MySQL Manager creates on this node — keep it unless you run with `MYSQL_MGR=false`. The Docker socket and `/usr/local/tcadmin-files` mounts are only needed for **Docker-blueprint** games: set this server's **User Files Path** to `/usr/local/tcadmin-files/users` so game files live in the host folder, as described in [Hosting Game Servers](#hosting-game-servers) above. Leave both lines out if you won't use Docker blueprints.
+
+  </TabItem>
+  <TabItem value="windows" label="Windows (PowerShell)">
+
+```powershell
+docker run -d --name tcadmin-node `
+  --restart unless-stopped `
+  --cap-add SYS_ADMIN `
+  -e FLASH=PASTE-YOUR-DEPLOYMENT-TOKEN-HERE `
+  -v tcadmin_node:/tcadmin `
+  -v tcadmin_node_db:/var/lib/mysql `
+  ghcr.io/totalcontroladmin/tcadminv3_appliance:latest
+```
+
+On **Windows 11 (22H2+)**, turn on mirrored WSL networking (see [Hosting Game Servers](#hosting-game-servers) above) so the games this remote hosts are reachable, and set each IP's hostname in the panel to your LAN or public address. Mirrored networking isn't available on **Windows Server** or **Windows 10** — for production hosting there, use the native [Windows remote install](../initial-configuration/remote-server-configuration.mdx#step-3-install-tcadmin-on-the-remote-server) instead.
+
+  </TabItem>
+  <TabItem value="macos" label="macOS">
+
+Docker Desktop for macOS can't expose game-server ports to your network, so a remote node on macOS can join the master but can't actually host reachable game servers. Run remote nodes on a **Linux host** instead.
+
+  </TabItem>
+</Tabs>
+
+Then watch it connect:
+
+```bash
+docker logs -f tcadmin-node
+```
+
+The first boot downloads the monitor (a few minutes) and connects to the master. The remote then appears as **Online** under **Settings → Servers** on the master panel, ready for you to [import its IP addresses](../initial-configuration/remote-server-configuration.mdx#import-the-servers-ip-addresses) and create game servers on it.
+
+A few things work differently in this mode:
+
+- **Little to back up on the node.** There's no web panel, and the encryption key and TCAdmin's secrets live on the master — the [Back Up Your Encryption Key](#back-up-your-encryption-key) and login steps above don't apply. The exception is any game-server databases the MySQL Manager creates here: those live in the node's `tcadmin_node_db` volume, so keep that volume across container recreations. (`docker exec tcadmin-node tca ...` still works if you need the command line.)
+- **No ports to publish.** The remote only makes outbound connections, so it just needs to reach the master's panel, database (3306), and Redis (6379) over the network.
+- **Rotating the token.** If you reset the deployment token on the master, update `-e FLASH=` with the new token and run `docker restart tcadmin-node` — the container re-reads the token on every start.
+
+## Updating TCAdmin
+
+Because the image is only a bootstrap and your install lives on the volume, you update it like any other TCAdmin installation — you do **not** need a new image:
+
+- **In-app** — go to **System → Update** in the panel and run the update exactly like on any other install. The updater restarts the panel and monitor inside the container by itself when it finishes — **game servers keep running**, and no container restart is needed.
+- **From the command line** — run `docker exec tcadmin tca update`. Same behavior: the TCAdmin services restart on their own when the update finishes.
+- **Automatically on restart** — set `AUTO_UPDATE=true` and every `docker restart tcadmin` also installs the latest version before the panel comes back up.
+
+:::note[Pulling a newer image]
+Pulling a newer image only refreshes the underlying operating system and database layer — it does **not** change your TCAdmin version. TCAdmin updates in place on the volume using the methods above.
+:::
+
+## Rebooting the Server
+
+The panel's server **Reboot** action works in Docker too — it restarts the **container** (a container has no operating system of its own to reboot). Game servers that were running come back automatically once the container is up again, just like after a real server reboot.
+
+TCAdmin picks whichever of these is available, automatically:
+
+- **With the Docker socket mounted** (the same mount recommended for Docker blueprints above), TCAdmin asks Docker directly to restart the container. This works no matter how the container was started.
+- **Without the socket**, TCAdmin shuts the container down cleanly and Docker's restart policy starts it again. The install commands on this page already include `--restart unless-stopped`, so this works out of the box.
+
+:::warning[A restart policy is required]
+If the container was started **without** `--restart unless-stopped` (or `always`) and the Docker socket is not mounted, a reboot from the panel stops the container and nothing starts it again — you would have to run `docker start tcadmin` yourself. Always run the appliance with a restart policy.
+:::
+
+:::tip
+With `AUTO_UPDATE=true`, rebooting from the panel also installs the latest TCAdmin version while the container starts back up.
+:::
+
+## Advanced Deployments
+
+The single all-in-one container covers most installs. For larger setups or existing infrastructure, the same image can also run the **web panel in its own container** — on the same machine or a different one — or run against a **database server you already have**. Skip this section unless you need one of these.
+
+### Web panel in its own container
+
+The web panel can run in a container of its own — on the **same machine** as the master or a **different one**. The web container installs just the panel software onto its own volume and pulls all of its configuration — database, cache, and encryption keys — **from the master**, using a **web panel token**: the web equivalent of a remote server's deployment token. The web container only serves the panel interface; game servers keep running on the master and its remote servers.
+
+Two common shapes:
+
+- **A separate front-end machine** — the panel is served from its own host while the master concentrates on hosting games.
+- **Split containers on one machine** — run the master with `TCADMIN_ROLE=monitor` so it doesn't serve the panel itself, and the web container serves it. The ready-made Compose file below sets this up in one command.
+
+:::info[The web machine must reach the master]
+A web panel container connects to the master's database and Redis directly, exactly like a remote server does. On a different machine, publish `3306` and `6379` on the master (see [Ports](#ports)) and open them **only** to the web machine. The configuration takes care of itself: the token delivers the database and Redis connection details, passwords included, and the web container connects to both at **whichever master address answered its join request**. Follow [Step 1 of Remote Server Configuration](../initial-configuration/remote-server-configuration.mdx#step-1-configure-the-master-to-share-its-database) only if you need to pin explicit addresses — for example, a database on its own network. (You do **not** need Step 2's deployment token — the web panel token below is a different token.)
+:::
+
+**1. Turn on the web panel token on the master.** Add `-e WEB_TOKEN=true` to the master's `docker run` command. For a master that's already running, remove and re-run the container with the extra variable — the volumes keep all of your data. On the next start the master creates the token (once) and prints it in `docker logs`; you can also read it at any time afterward:
+
+```bash
+docker exec tcadmin cat /tcadmin/app/config/.web-flash-token
+```
+
+**2. Start the web container with the token.** It publishes only the panel ports and needs none of the game-hosting options, so the same setup works on Linux, Windows, and macOS hosts — including Docker Desktop:
+
+<Tabs>
+  <TabItem value="linux" label="Linux / macOS">
+
+```bash
+docker run -d --name tcadmin-web \
+  --restart unless-stopped \
+  -p 31000:31000 -p 31001:31001 \
+  -e TCADMIN_ROLE=web \
+  -e FLASH=PASTE-YOUR-WEB-PANEL-TOKEN-HERE \
+  -v tcadmin_web:/tcadmin \
+  ghcr.io/totalcontroladmin/tcadminv3_appliance:latest
+```
+
+  </TabItem>
+  <TabItem value="windows" label="Windows (PowerShell)">
+
+```powershell
+docker run -d --name tcadmin-web `
+  --restart unless-stopped `
+  -p 31000:31000 -p 31001:31001 `
+  -e TCADMIN_ROLE=web `
+  -e FLASH=PASTE-YOUR-WEB-PANEL-TOKEN-HERE `
+  -v tcadmin_web:/tcadmin `
+  ghcr.io/totalcontroladmin/tcadminv3_appliance:latest
+```
+
+  </TabItem>
+</Tabs>
+
+Watch `docker logs -f tcadmin-web`: the first boot downloads the web panel (a few minutes), fetches its configuration from the master, and then serves the panel at this machine's address on ports **31000 / 31001**.
+
+A few things work differently in this mode:
+
+- **Nothing to back up here.** The encryption key and all secrets live on the master — this container holds only the panel software. Do treat the **token itself** as a secret, though: anyone who has it can read the master's configuration.
+- **The master must stay reachable.** The token carries the master's addresses as they were when it was created; the panel tries them all and uses whichever answers, so it keeps working when either the master's panel or its monitor service is up.
+- **Servers are reached at their public addresses.** A standalone web panel normally connects to the master and every remote server at their firewall or primary IP. If the web machine shares a private network with your servers — the same datacenter LAN, for example — add that network in **Settings > Private Networks**, assign your servers to it with their private network IPs, and add `-e TCADMIN_PRIVATE_NETWORK_ID=<the network's ID>` to the web container. Servers on that network are then reached over the private network instead.
+- **Changing the token.** The container re-reads `FLASH` on every start — update the variable and run `docker restart tcadmin-web`.
+- **Updates are this container's own.** A standalone web has its own installation, so the master's in-app System Update doesn't reach it. Keep it current with `AUTO_UPDATE=true` (updates on every restart) or `docker exec tcadmin-web tca update`, and keep the master and the web on the same update channel.
+
+:::tip[Same machine? Use the ready-made Compose file]
+The appliance ships `docker-compose.split.yml` with exactly this shape: a master that doesn't serve the panel itself (`TCADMIN_ROLE=monitor`, `WEB_TOKEN=true`) plus a web-panel container that picks the token up automatically — `FLASH_FILE` reads it straight from a read-only mount of the master's volume, so there's nothing to copy. Run `docker compose -f docker-compose.split.yml up -d` and the panel comes up on ports **31000 / 31001** once the master's first-boot install finishes.
+:::
+
+### Using your own database server
+
+To store TCAdmin's data on a **separate MySQL or MariaDB** — a database container like the one below, or a server you already run — point the all-in-one container at it with `CUSTOM_DB_HOST` and `CUSTOM_DB_PASSWORD`. (The name, user, and port default to `tcadmin3` / `tcadmin3` / `3306`; override them with `CUSTOM_DB_NAME`, `CUSTOM_DB_USER`, and `CUSTOM_DB_PORT`.)
+
+On **Linux** the database container and TCAdmin both use host networking, so the master still hosts game servers; on **Windows and macOS** they share a Docker network and the panel is published with `-p`.
+
+<Tabs>
+  <TabItem value="linux" label="Linux">
+
+```bash
+# TCAdmin's database (any MySQL or MariaDB works)
+docker run -d --name tcadmin-db \
+  --restart unless-stopped \
+  --network host \
+  -e MARIADB_DATABASE=tcadmin3 \
+  -e MARIADB_USER=tcadmin3 \
+  -e MARIADB_PASSWORD=change-me-db \
+  -e MARIADB_ROOT_PASSWORD=change-me-root \
+  -v tcadmin_db:/var/lib/mysql \
+  mariadb:11
+
+# All-in-one TCAdmin (hosts game servers), using the database above
+docker run -d --name tcadmin \
+  --restart unless-stopped \
+  --cap-add SYS_ADMIN \
+  --network host \
+  -e CUSTOM_DB_HOST=127.0.0.1 \
+  -e CUSTOM_DB_PASSWORD=change-me-db \
+  -e MYSQL_MGR=false \
+  -v tcadmin_app:/tcadmin \
+  -v /usr/local/tcadmin-files:/usr/local/tcadmin-files \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  ghcr.io/totalcontroladmin/tcadminv3_appliance:latest
+```
+
+  </TabItem>
+  <TabItem value="windows" label="Windows (PowerShell)">
+
+```powershell
+docker network create tcadmin-net
+
+# TCAdmin's database (any MySQL or MariaDB works)
+docker run -d --name tcadmin-db `
+  --restart unless-stopped `
+  --network tcadmin-net `
+  -e MARIADB_DATABASE=tcadmin3 `
+  -e MARIADB_USER=tcadmin3 `
+  -e MARIADB_PASSWORD=change-me-db `
+  -e MARIADB_ROOT_PASSWORD=change-me-root `
+  -v tcadmin_db:/var/lib/mysql `
+  mariadb:11
+
+# All-in-one TCAdmin, using the database above
+docker run -d --name tcadmin `
+  --restart unless-stopped `
+  --network tcadmin-net `
+  -e CUSTOM_DB_HOST=tcadmin-db `
+  -e CUSTOM_DB_PASSWORD=change-me-db `
+  -e MYSQL_MGR=false `
+  -p 31000:31000 -p 31001:31001 `
+  -v tcadmin_app:/tcadmin `
+  ghcr.io/totalcontroladmin/tcadminv3_appliance:latest
+```
+
+  </TabItem>
+  <TabItem value="macos" label="macOS">
+
+```bash
+docker network create tcadmin-net
+
+# TCAdmin's database (any MySQL or MariaDB works)
+docker run -d --name tcadmin-db \
+  --restart unless-stopped \
+  --network tcadmin-net \
+  -e MARIADB_DATABASE=tcadmin3 \
+  -e MARIADB_USER=tcadmin3 \
+  -e MARIADB_PASSWORD=change-me-db \
+  -e MARIADB_ROOT_PASSWORD=change-me-root \
+  -v tcadmin_db:/var/lib/mysql \
+  mariadb:11
+
+# All-in-one TCAdmin, using the database above
+docker run -d --name tcadmin \
+  --restart unless-stopped \
+  --network tcadmin-net \
+  -e CUSTOM_DB_HOST=tcadmin-db \
+  -e CUSTOM_DB_PASSWORD=change-me-db \
+  -e MYSQL_MGR=false \
+  -p 31000:31000 -p 31001:31001 \
+  -v tcadmin_app:/tcadmin \
+  ghcr.io/totalcontroladmin/tcadminv3_appliance:latest
+```
+
+  </TabItem>
+</Tabs>
+
+Watch the first boot with `docker logs -f tcadmin`. This is the same all-in-one master (web + monitor) as the standard install — only its database now lives in a separate container (or a server you already run). A few things to know:
+
+- **Using a server you already run instead?** Skip the `tcadmin-db` container and set `CUSTOM_DB_HOST` (and `CUSTOM_DB_PORT`) to your server's address. The database user needs the usual access — the equivalent of `GRANT ALL ON tcadmin3.*` — plus permission to **create** the database if it doesn't exist yet, which the container does on first boot. Use a database dedicated to TCAdmin.
+- **Game-server databases:** `MYSQL_MGR=false` here because the separate database replaces the container's built-in one — and on Linux the built-in database would otherwise clash with the `tcadmin-db` container on port 3306. That built-in database is what the MySQL Manager normally uses to give game servers their own MySQL databases, so keep the all-in-one install at the top of the page if you need that.
+- **Changing the database password later:** update it on the database, then recreate the TCAdmin container with the new `CUSTOM_DB_PASSWORD` — external database settings are re-applied on every start.
+
+## What's Next?
+
+The container runs the installer automatically, so the installer-prompt steps in the Master Server Configuration guide don't apply to Docker — start at logging in:
+
+- [Log In to Your Control Panel](../initial-configuration/master-server-configuration.mdx#log-in-to-your-control-panel) — your first login and the **Getting Started** widget: change your password, enter your license key, and import game configurations
+- [Set up a Web Certificate](../initial-configuration/web-certificate.mdx) — get a proper HTTPS certificate so your browser stops showing security warnings
+- [Browse the Plugin Repository](../initial-configuration/plugin-repository.mdx) — learn more about installing games, scripts, themes, and more
