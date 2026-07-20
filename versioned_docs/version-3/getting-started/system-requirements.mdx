@@ -8,7 +8,7 @@ import TabItem from "@theme/TabItem";
 
 # System Requirements
 
-Before installing TCAdmin, make sure your server meets the requirements below. TCAdmin v3 is built on .NET 9, so it runs on most modern Windows and Linux servers.
+Before installing TCAdmin, make sure your server meets the requirements below. TCAdmin v3 is built on .NET 10, so it runs on most modern Windows and Linux servers. Windows servers need a 64-bit x86 (x64) processor; Linux servers can be either x64 or 64-bit ARM (ARM64).
 
 :::tip[Not sure what server to get?]
 If you're just starting out, a **Windows Server 2022** or **Ubuntu 24.04** VPS/dedicated server with at least **4 GB RAM** and **2 CPU cores** is a solid starting point. You can always scale up later.
@@ -88,6 +88,10 @@ These are **not** needed for TCAdmin itself, but certain game servers won't run 
 
 :::tip[Recommended for beginners]
 If you're new to Linux, **Ubuntu 24.04 LTS** or **Debian 12** are the easiest to work with and have the most community support.
+:::
+
+:::note[ARM64 servers]
+TCAdmin also runs on 64-bit ARM (ARM64) Linux machines — as the master server, as remote servers, or both. Keep in mind that the game servers themselves must also run on ARM: most games only ship x86 builds, so an ARM machine is best suited for games with native ARM64 server builds (such as Minecraft and other Java-based games) or for Docker images built for ARM64.
 :::
 
 ### Dependencies

@@ -24,7 +24,7 @@ Add `?safeMode=1` to the panel's address to temporarily ignore the template's ma
 
 ## How a surface is written
 
-A template is organized into **surfaces** — named regions you can take over (the login page, the whole shell, or individual parts of the shell). In a surface you write ordinary HTML with three special tags:
+A template is organized into **surfaces** — named regions you can take over (the login page, the whole shell, individual parts of the shell, or the pages of a game or Docker server). In a surface you write ordinary HTML with three special tags:
 
 - `{{ Variable }}` — inserts a value, such as the application name or the signed-in user.
 - `{% component "name" %}` — drops in a live, interactive piece of the panel (the login form, the navigation menu, the dark-mode toggle, and so on).
@@ -399,6 +399,249 @@ The `Shell.MenuLinks` surface adds your own links to the **end of the navigation
 :::note
 Use **Font Awesome** icons (`<i class="fa-solid ...">`). Keep the `mud-icon-root` class so the label collapses to an icon-only button when the drawer is minimized.
 :::
+
+## Service pages
+
+Layout templates can also restyle the pages of an individual game or Docker server. Four surfaces cover them:
+
+| Surface | What it replaces |
+|---|---|
+| `GameService.Home` | A game server's home page — the content you see when you open the service. |
+| `DockerService.Home` | A Docker server's home page. |
+| `GameService.Header` | A game server's header strip — the title, connection cards and power buttons shown on **every page** of the service. |
+| `DockerService.Header` | A Docker server's header strip, on every page of the service. |
+
+A `Home` surface replaces only the page's content — the panel's top bar, menu and bottom bar stay. A `Header` surface replaces the band that stays visible while you move between a service's pages (Home, Console, File Manager and so on). Voice servers use the `GameService` surfaces. These surfaces appear on the service's pages automatically — they are never placed inside another surface with `{% surface %}` — and the editor's **Validate / Preview** shows them with a sample service and every permission granted.
+
+If a template doesn't define a service surface, the built-in page is shown — an unfinished template never leaves a service unusable.
+
+:::tip[Hiding the built-in header]
+A defined surface always wins — so to remove the header strip entirely, add a `Header` surface containing just an empty `<div></div>`. It renders nothing, and the built-in header stays hidden.
+:::
+
+### Targeting one game or blueprint
+
+On their own, the service surfaces apply to every game or Docker server. To design a page for one specific game or Docker blueprint, add its numeric id to the end of the surface key — `GameService.Home.526` applies only to servers of game `526` and wins over the general `GameService.Home`. When you add a surface, the editor's **Limit to blueprint** picker composes the key for you (typing the suffix by hand works too). If the specific surface is disabled, those servers fall back to the general one.
+
+### Service variables
+
+Unlike the other surfaces, a service surface is rendered for the service and the person viewing it each time the page opens. Three extra variable groups are available alongside the standard ones:
+
+- `Service.*` — details of the service being viewed.
+- `Permissions.*` — whether the viewer can see each feature of this service, matching the built-in page's rules exactly.
+- `Features.*` — which features the game or blueprint has switched on at all, regardless of the viewer's permissions.
+
+Use them like any other variable — `{{ Service.Name }}`, or in conditions and loops:
+
+```html
+{% if Permissions.Console %}<div class="my-console">{% component "game-console" %}</div>{% endif %}
+
+{% for p in Service.Ports %}{{ p.Name }}: {{ p.Port }}<br>{% endfor %}
+```
+
+:::note[Snapshots, not live values]
+Variable values are captured when the page loads. For numbers that update in real time — status, players, CPU, memory — place the [service components](#service-components) instead.
+:::
+
+| Variable | Type | Description |
+|---|---|---|
+| `Service.ServiceId` | number | The service's id. |
+| `Service.Name` | string | The service's name. |
+| `Service.ServiceType` | string | `GameService` (also voice servers) or `DockerService`. |
+| `Service.BlueprintId` | number | The game or Docker blueprint id. |
+| `Service.BlueprintName` | string | The game or Docker blueprint name. |
+| `Service.IpAddress` | string | The service's IP address. |
+| `Service.Hostname` | string | The service's hostname, when one is set. |
+| `Service.HostnameOrIp` | string | The hostname if set, otherwise the IP address. |
+| `Service.Url` | string | The relative address of the service's home page — handy for links to sub-pages, e.g. `{{ Service.Url }}/FileManager`. |
+| `Service.Status` | string | The status name when the page loaded (for example `Started`, `Stopped`). |
+| `Service.OwnerName` | string | The name of the user who owns the service. |
+| `Service.DiskSpace` | number | The disk quota in bytes (empty when unlimited). |
+| `Service.DiskUsage` | number | The last known disk usage in bytes. |
+| `Service.Slots` | number | Player slots (game servers). |
+| `Service.GamePort` | number | The game port (game servers). |
+| `Service.QueryPort` | number | The query port (game servers). |
+| `Service.RconPort` | number | The RCON port (game servers). |
+| `Service.VirtualServerName` | string | The virtual server hosting the service, when there is one. |
+| `Service.CpuLimit` | number | The CPU limit, as a percentage. |
+| `Service.MemoryLimit` | number | The memory limit in bytes. |
+| `Service.Image` | string | The container image (Docker servers). |
+| `Service.Tag` | string | The image tag (Docker servers). |
+| `Service.Ports` | list | Every named port — loop with `{% for p in Service.Ports %}`. |
+
+Each entry in `Service.Ports` has:
+
+| Variable | Type | Description |
+|---|---|---|
+| `Name` | string | The port's name (for example `GamePort`). |
+| `Port` | number | The port number. |
+| `Description` | string | The port's description, when one is set. |
+| `Uri` | string | A click-to-connect link when the game defines one (for example `steam://connect/…`). |
+
+The `Permissions.*` values mirror what the built-in pages would show this viewer for this service — the stat values already include `LiveStats`, and `Console` and `FastDL` already include the matching feature toggle, so each one can be tested on its own. They control visibility only; every action is still checked when it's used.
+
+| Variable | Type | Description |
+|---|---|---|
+| `Permissions.Control` | boolean | Start, stop and restart the service. |
+| `Permissions.KillService` | boolean | Force-stop the service. |
+| `Permissions.Console` | boolean | Use the console (game) or the interactive terminal (Docker). |
+| `Permissions.Logs` | boolean | View the service's log files. |
+| `Permissions.ServiceActivity` | boolean | View the service's activity history. |
+| `Permissions.LiveStats` | boolean | See live usage statistics. |
+| `Permissions.PlayerStats` | boolean | See the players tile. |
+| `Permissions.CpuStats` | boolean | See the CPU tile. |
+| `Permissions.MemoryStats` | boolean | See the memory tile. |
+| `Permissions.NetworkStats` | boolean | See the network tile. |
+| `Permissions.ServiceSettings` | boolean | Open the service's settings. |
+| `Permissions.CustomScripts` | boolean | Manage the service's custom scripts. |
+| `Permissions.Reinstall` | boolean | Reinstall the service. |
+| `Permissions.Delete` | boolean | Delete the service. |
+| `Permissions.Mods` | boolean | Install mods. |
+| `Permissions.FastDL` | boolean | Manage Fast Downloads. |
+| `Permissions.LogConsole` | boolean | View the container log (Docker servers; always false for game servers). |
+| `Permissions.FileManager` | boolean | Use the File Manager. |
+| `Permissions.ConfigFiles` | boolean | Edit configuration files. |
+| `Permissions.ScheduledTasks` | boolean | Manage scheduled tasks. |
+| `Permissions.Backups` | boolean | Manage backups. |
+| `Permissions.Ftp` | boolean | See FTP connection details. |
+
+The `Features.*` values tell you what the game or blueprint has enabled at all — useful to tell "this viewer can't see it" apart from "this service doesn't have it". All are booleans: `Features.ConsoleEnabled`, `Features.FileManagerEnabled`, `Features.ConfigFilesEnabled`, `Features.BackupsEnabled`, `Features.ScheduledTasksEnabled`, `Features.UpdatesEnabled`, `Features.SteamUpdateEnabled` and `Features.FastDLEnabled`.
+
+### Service components
+
+These components drop live, interactive pieces of the service pages into your surface. Each one shows and hides itself using the same rules as the built-in page — a viewer without the right permission simply sees nothing — so wrap one in `{% if Permissions.… %}` only when your surrounding markup should disappear too. The `service-…` components work on both service types; `game-…` and `docker-…` components render only for their own type. Outside a service's pages (for example in a `Shell` surface) they render nothing.
+
+| Component | What it adds |
+|---|---|
+| `service-title` | The service's name, icon and address line (updates live). |
+| `service-power` | The Start / Stop / Restart / Kill buttons. |
+| `service-advanced-actions` | The extra action buttons — settings, scripts, reinstall, delete, move. |
+| `service-details` | The service details table. |
+| `service-uptime-tile` | The uptime tile. |
+| `service-cpu-tile` | The live CPU tile. |
+| `service-memory-tile` | The live memory tile. |
+| `service-disk-tile` | The disk usage tile. |
+| `service-recent-logs` | The recent log files panel. |
+| `service-recent-activity` | The recent activity timeline. |
+| `game-status-alert` | The warning shown while a game server's status is unknown. |
+| `game-connection-info` | The connection, FTPS and RCON info cards. |
+| `game-players-tile` | The live players tile. |
+| `game-network-tile` | The live network traffic tile. |
+| `game-console` | The game's web console (text or screen capture). |
+| `docker-status-header` | The container status header with uptime, ports and quick settings. |
+| `docker-ports` | The IP and port chips. |
+| `docker-logs-terminal` | The read-only container log terminal. |
+| `docker-exec-terminal` | The interactive container terminal. |
+
+A console or terminal placed in a surface connects as soon as the page opens (the built-in pages wait until you open their tab).
+
+:::warning[Consoles need a fixed height]
+In your surface CSS, always give `game-console` and the Docker terminals a **fixed-height** container (for example `height: 480px; min-width: 0; overflow: hidden;`), and use `minmax(0, …)` for any CSS grid tracks around them. In an auto-sized cell, the terminal and the cell resize each other in a loop and the browser tab can freeze.
+:::
+
+:::tip[Responsive layouts]
+Media queries are filtered out of shared templates' CSS, but the panel's built-in helper classes still work: add `class="d-none d-md-flex"` to an element to hide it on phones (it appears from medium screens up).
+:::
+
+### Example: a game home page
+
+Saved as `GameService.Home` — a hero strip with the power buttons, a row of live tiles, the console, and the standard info blocks:
+
+<Tabs>
+<TabItem value="html" label="HTML">
+
+```html
+<div class="svc-hero">
+    <div>
+        <h2>{{ Service.Name }}</h2>
+        <p>{{ Service.BlueprintName }} — {{ Service.HostnameOrIp }}{% if Service.GamePort %}:{{ Service.GamePort }}{% endif %}</p>
+    </div>
+    <span class="svc-hero-spacer"></span>
+    {% component "service-power" %}
+</div>
+{% component "game-status-alert" %}
+<div class="svc-tiles">
+    {% component "service-uptime-tile" %}
+    {% component "game-players-tile" %}
+    {% component "service-cpu-tile" %}
+    {% component "service-memory-tile" %}
+</div>
+{% if Permissions.Console %}
+<div class="svc-console">{% component "game-console" %}</div>
+{% endif %}
+{% component "game-connection-info" %}
+{% component "service-details" %}
+```
+
+</TabItem>
+<TabItem value="css" label="CSS">
+
+```css
+.svc-hero {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    border-radius: 14px;
+    background: linear-gradient(120deg, #1a1f3a, #2d1b4e);
+    color: #fff;
+}
+.svc-hero h2 { margin: 0; }
+.svc-hero p { margin: 4px 0 0; opacity: 0.75; }
+.svc-hero-spacer { flex: 1; }
+
+.svc-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+}
+
+/* Required: consoles and terminals need a fixed height */
+.svc-console {
+    height: 480px;
+    min-width: 0;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+```
+
+</TabItem>
+</Tabs>
+
+### Example: a service header
+
+Saved as `GameService.Header` — replaces the title / connection / power band on every page of the service. The connection cards are hidden on phones with the `d-none d-md-flex` helper classes:
+
+<Tabs>
+<TabItem value="html" label="HTML">
+
+```html
+<div class="svc-head">
+    {% component "service-title" %}
+    <span class="svc-head-spacer"></span>
+    <div class="d-none d-md-flex">{% component "game-connection-info" %}</div>
+    {% component "service-power" %}
+</div>
+```
+
+</TabItem>
+<TabItem value="css" label="CSS">
+
+```css
+.svc-head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: rgba(124, 77, 255, 0.12);
+}
+.svc-head-spacer { flex: 1; }
+```
+
+</TabItem>
+</Tabs>
 
 ## Sharing templates
 

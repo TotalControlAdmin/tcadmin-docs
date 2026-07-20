@@ -223,8 +223,8 @@ var announcement = new TCAdmin.SDK.Database.Entities.Announcement();
 announcement.Subject = "Maintenance";
 announcement.Body = "Server restart in 30 minutes";
 announcement.Severity = 2; // EAnnouncementSeverity.Warning
-announcement.DisplayType = 1; // EAnnouncementDisplayType.Banner
-announcement.DisplayBehavior = 1; // EAnnouncementDisplayBehavior.AutoExpire
+announcement.DisplayType = 0; // EAnnouncementDisplayType.Banner
+announcement.DisplayBehavior = 3; // EAnnouncementDisplayBehavior.AutoExpire
 announcement.IsActive = true;
 announcement.ExpiresAt = System.DateTime.UtcNow.AddMinutes(30);
 
@@ -245,8 +245,8 @@ local announcement = TCAdmin.SDK.Database.Entities.Announcement()
 announcement.Subject = "Maintenance"
 announcement.Body = "Server restart in 30 minutes"
 announcement.Severity = 2 -- EAnnouncementSeverity.Warning
-announcement.DisplayType = 1 -- EAnnouncementDisplayType.Banner
-announcement.DisplayBehavior = 1 -- EAnnouncementDisplayBehavior.AutoExpire
+announcement.DisplayType = 0 -- EAnnouncementDisplayType.Banner
+announcement.DisplayBehavior = 3 -- EAnnouncementDisplayBehavior.AutoExpire
 announcement.IsActive = true
 announcement.ExpiresAt = System.DateTime.UtcNow:AddMinutes(30)
 
@@ -270,4 +270,77 @@ var variables = new TCAdminVars { ["MyVariable"] = "My Value" };
 await ServiceManager.SyncCommandlineVariables(ThisService.Owner, ThisService, variables);
 
 ScriptConsole.WriteLine("Synced 'MyVariable' across all command lines.");
+```
+
+## Email All Users
+
+This script queues an email to every user that has an email address on file. Each message is added to the outbox and delivered by the mail queue, so it works the same whether you have ten users or ten thousand.
+
+`EmailService.SendRawAsync` returns `null` when the message is queued successfully, or a short description of the problem otherwise.
+
+:::info
+Outbound mail must be turned on and a **From** address set on the *Email Settings* page — otherwise every send returns an error instead of being queued.
+:::
+
+```csharp
+//refAssemblies: TCAdmin.SDK.dll, TCAdmin.GameHosting.SDK.dll, TCAdmin.Scripting.dll, TCAdmin.Monitor.dll, Microsoft.Extensions.DependencyInjection.Abstractions.dll
+using Microsoft.Extensions.DependencyInjection;   // GetRequiredService
+using TCAdmin.SDK;                                 // TCAdminDI
+using TCAdmin.SDK.Database.Managers;               // UserManager
+
+var Globals = new TCAdmin.Scripting.Engines.Addons.CSharpGameGlobals(); // DO NOT MODIFY THIS LINE
+
+var subject = "Scheduled maintenance tonight";
+var htmlBody = "<p>Hello,</p><p>All game servers will be offline for maintenance at 10 PM UTC.</p>";
+
+// UserManager isn't one of the built-in Globals, so resolve it from a scope.
+using (var scope = TCAdminDI.GetScopedServiceProvider())
+{
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager>();
+
+    // Every user that has an email address (add more conditions here to target a subset).
+    var users = userManager.GetDbSet().Where(u => u.Email != null && u.Email != "").ToList();
+    ScriptConsole.WriteLine($"Sending to {users.Count} user(s)...");
+
+    var sent = 0;
+    foreach (var user in users)
+    {
+        var error = await EmailService.SendRawAsync(user.Email, subject, htmlBody);
+        if (error is null)
+            sent++;
+        else
+            ScriptConsole.WriteLine($"Skipped {user.Email}: {error}");
+    }
+
+    ScriptConsole.WriteLine($"Queued {sent} of {users.Count} email(s).");
+}
+```
+
+## Email the Service Owner Using a Template
+
+This script sends one of the panel's email templates to the current service's owner. It looks the template up by its key, fills in the standard service, server, owner and company details, and delivers it — exactly like the built-in *service created* and *service reinstalled* notifications.
+
+:::info
+Nothing is sent if the template key doesn't exist or the template is turned off on the *Email Templates* page — `SendTemplateAsync` never throws. The owner also receives the message in their in-app inbox, even when outbound mail is off.
+:::
+
+```csharp
+//refAssemblies: TCAdmin.SDK.dll, TCAdmin.GameHosting.SDK.dll, TCAdmin.Scripting.dll, TCAdmin.Monitor.dll
+using TCAdmin.SDK.Email;   // ServiceEmailContexts
+
+var Globals = new TCAdmin.Scripting.Engines.Addons.CSharpGameGlobals(); // DO NOT MODIFY THIS LINE
+
+// The key of the template to send, as listed on the Email Templates page — e.g.
+// "service.created", "service.reinstalled", or the key of your own custom template.
+var templateKey = "service.created";
+
+var owner = ThisService.Owner;
+
+// Supplies the Service, Server, User and Company variables the template can use.
+var context = ServiceEmailContexts.ForService(ThisService);
+
+// Delivered to the owner (plus any extra role recipients set on the template).
+await EmailService.SendTemplateAsync(templateKey, owner, context);
+
+ScriptConsole.WriteLine($"Sent '{templateKey}' to {owner.Email}.");
 ```

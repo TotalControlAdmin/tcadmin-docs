@@ -3,6 +3,6 @@
   "position": 2,
   "link": {
     "type": "generated-index",
-    "description": "Step-by-step installation guides for Windows and Linux. Pick the one that matches your server's operating system."
+    "description": "Step-by-step installation guides for Windows, Linux, and Docker. Pick the one that matches your server's operating system."
   }
 }
