@@ -1,12 +1,12 @@
 ---
-sidebar_label: 3.13.62.27756
-date: 2026-07-20
+sidebar_label: 3.13.63.64713
+date: 2026-07-21
 authors: [tcadmin]
 ---
 
 import ReleaseDate from '@site/src/components/ReleaseDate';
 
-# Version 3.13.62.27756
+# Version 3.13.63.64713
 
 <ReleaseDate />
 
@@ -39,3 +39,6 @@ import ReleaseDate from '@site/src/components/ReleaseDate';
 - **Two-step verification with passkeys** — Fixed accounts that only had passkeys being unable to set up an authenticator app, and the two-factor login screen asking for an authentication code from accounts that had no way to generate one. The login screen now offers only the sign-in options your account actually has, and disabling the authenticator app, deleting a passkey or regenerating recovery codes now explains what will happen before asking for your password.
 - **Browser autofill in credential fields** — Fixed the browser filling your saved panel login into credential fields across the panel — such as a game's Steam account, the mail server sign-in, and database or FTP details. This could make an "Unsaved changes" warning appear on its own and silently replace the stored values the next time the page was saved. These fields no longer receive browser autofill.
 - **Steam account with a blank password ignored** — Fixed game installs and updates that use Depot Downloader logging in anonymously when the game's Steam account had a username but no password, which made paid games fail to download as if no account was set. Depot Downloader now also remembers its Steam sign-in on each server after you authorize the account once, so downloads no longer ask you to approve a Steam Guard prompt every time.
+- **Saving a sub-user's permissions on a service** — Fixed the sub-user permissions page listing the *Mods* permission twice and then failing to save with an error. Each permission is now listed once and saves correctly.
+- **"No roles assigned" warning on sub-users** — Fixed the sub-user editing page warning that the account had no roles assigned. Sub-users are granted permissions per service instead of roles, so the warning never applied to them.
+- **Administrator-only scripts could be given to sub-users** — Fixed scripts with no roles assigned — which makes them administrator-only — being offered when choosing the scripts a sub-user may run, so an owner could hand a sub-user a script the owner could not run themselves. They are now hidden from that list and from the service's own script menus. Scripts a customer writes for their own service are unaffected and can still be shared with their sub-users.
