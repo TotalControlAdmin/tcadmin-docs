@@ -1,12 +1,12 @@
 ---
-sidebar_label: 3.13.63.64713
+sidebar_label: 3.13.66.64834
 date: 2026-07-21
 authors: [tcadmin]
 ---
 
 import ReleaseDate from '@site/src/components/ReleaseDate';
 
-# Version 3.13.63.64713
+# Version 3.13.66.64834
 
 <ReleaseDate />
 
@@ -35,6 +35,7 @@ import ReleaseDate from '@site/src/components/ReleaseDate';
 - **Steam game update error** — Fixed an error that could interrupt a Steam game install or update as it recorded its progress.
 - **Runaway Redis disk usage** — Fixed the panel's built-in Redis storage growing very large over time and never releasing the space, which could use a lot of disk on long-running installations.
 - **Saving settings with a missing configuration file** — Fixed saving a service's settings failing when the service's configuration file was missing; the file is now recreated automatically.
+- **Editing a configuration file that doesn't exist yet** — Fixed an error when opening one of a service's configuration files for editing before it had been created on disk; it now opens as an empty file you can fill in and save.
 - **Layout template editor** — Fixed the layout template editor wrongly warning about unsaved changes when switching between sections or previewing, and now correctly treating your template as saved after you save it.
 - **Two-step verification with passkeys** — Fixed accounts that only had passkeys being unable to set up an authenticator app, and the two-factor login screen asking for an authentication code from accounts that had no way to generate one. The login screen now offers only the sign-in options your account actually has, and disabling the authenticator app, deleting a passkey or regenerating recovery codes now explains what will happen before asking for your password.
 - **Browser autofill in credential fields** — Fixed the browser filling your saved panel login into credential fields across the panel — such as a game's Steam account, the mail server sign-in, and database or FTP details. This could make an "Unsaved changes" warning appear on its own and silently replace the stored values the next time the page was saved. These fields no longer receive browser autofill.
