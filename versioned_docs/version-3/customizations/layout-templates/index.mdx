@@ -1,5 +1,4 @@
 ---
-sidebar_position: 2
 sidebar_label: Layout Templates
 ---
 
@@ -30,7 +29,7 @@ A template is organized into **surfaces** — named regions you can take over (t
 - `{% component "name" %}` — drops in a live, interactive piece of the panel (the login form, the navigation menu, the dark-mode toggle, and so on).
 - `{% surface "Key" %}` — places one of the customizable regions inside your shell.
 
-Each surface also has its own **CSS** box, and the template has a **base stylesheet** that applies whenever the template is active. The editor's **Reference** tab lists every available variable, component, and surface key.
+Each surface also has its own **CSS** box, and the template has a **base stylesheet** that applies whenever the template is active. The editor's **Reference** tab gives a quick in-editor summary; the complete catalog — every surface, tag, variable, component and the live styling contract, with examples — is on the [Layout Template Reference](./reference.mdx) page.
 
 :::note
 Templates imported from others run in a safe mode that strips scripts, so a shared template can't run code. Some advanced CSS (for example blur or animations) is also filtered unless an administrator marks the theme as **trusted**.
@@ -443,69 +442,9 @@ Use them like any other variable — `{{ Service.Name }}`, or in conditions and 
 Variable values are captured when the page loads. For numbers that update in real time — status, players, CPU, memory — place the [service components](#service-components) instead.
 :::
 
-| Variable | Type | Description |
-|---|---|---|
-| `Service.ServiceId` | number | The service's id. |
-| `Service.Name` | string | The service's name. |
-| `Service.ServiceType` | string | `GameService` (also voice servers) or `DockerService`. |
-| `Service.BlueprintId` | number | The game or Docker blueprint id. |
-| `Service.BlueprintName` | string | The game or Docker blueprint name. |
-| `Service.IpAddress` | string | The service's IP address. |
-| `Service.Hostname` | string | The service's hostname, when one is set. |
-| `Service.HostnameOrIp` | string | The hostname if set, otherwise the IP address. |
-| `Service.Url` | string | The relative address of the service's home page — handy for links to sub-pages, e.g. `{{ Service.Url }}/FileManager`. |
-| `Service.Status` | string | The status name when the page loaded (for example `Started`, `Stopped`). |
-| `Service.OwnerName` | string | The name of the user who owns the service. |
-| `Service.DiskSpace` | number | The disk quota in bytes (empty when unlimited). |
-| `Service.DiskUsage` | number | The last known disk usage in bytes. |
-| `Service.Slots` | number | Player slots (game servers). |
-| `Service.GamePort` | number | The game port (game servers). |
-| `Service.QueryPort` | number | The query port (game servers). |
-| `Service.RconPort` | number | The RCON port (game servers). |
-| `Service.VirtualServerName` | string | The virtual server hosting the service, when there is one. |
-| `Service.CpuLimit` | number | The CPU limit, as a percentage. |
-| `Service.MemoryLimit` | number | The memory limit in bytes. |
-| `Service.Image` | string | The container image (Docker servers). |
-| `Service.Tag` | string | The image tag (Docker servers). |
-| `Service.Ports` | list | Every named port — loop with `{% for p in Service.Ports %}`. |
+The `Permissions.*` values mirror exactly what the built-in pages would show this viewer for this service, and control **visibility only** — every action is still checked when it's used. The `Features.*` values tell you what the game or blueprint has enabled at all, so you can tell "this viewer can't see it" apart from "this service doesn't have it".
 
-Each entry in `Service.Ports` has:
-
-| Variable | Type | Description |
-|---|---|---|
-| `Name` | string | The port's name (for example `GamePort`). |
-| `Port` | number | The port number. |
-| `Description` | string | The port's description, when one is set. |
-| `Uri` | string | A click-to-connect link when the game defines one (for example `steam://connect/…`). |
-
-The `Permissions.*` values mirror what the built-in pages would show this viewer for this service — the stat values already include `LiveStats`, and `Console` and `FastDL` already include the matching feature toggle, so each one can be tested on its own. They control visibility only; every action is still checked when it's used.
-
-| Variable | Type | Description |
-|---|---|---|
-| `Permissions.Control` | boolean | Start, stop and restart the service. |
-| `Permissions.KillService` | boolean | Force-stop the service. |
-| `Permissions.Console` | boolean | Use the console (game) or the interactive terminal (Docker). |
-| `Permissions.Logs` | boolean | View the service's log files. |
-| `Permissions.ServiceActivity` | boolean | View the service's activity history. |
-| `Permissions.LiveStats` | boolean | See live usage statistics. |
-| `Permissions.PlayerStats` | boolean | See the players tile. |
-| `Permissions.CpuStats` | boolean | See the CPU tile. |
-| `Permissions.MemoryStats` | boolean | See the memory tile. |
-| `Permissions.NetworkStats` | boolean | See the network tile. |
-| `Permissions.ServiceSettings` | boolean | Open the service's settings. |
-| `Permissions.CustomScripts` | boolean | Manage the service's custom scripts. |
-| `Permissions.Reinstall` | boolean | Reinstall the service. |
-| `Permissions.Delete` | boolean | Delete the service. |
-| `Permissions.Mods` | boolean | Install mods. |
-| `Permissions.FastDL` | boolean | Manage Fast Downloads. |
-| `Permissions.LogConsole` | boolean | View the container log (Docker servers; always false for game servers). |
-| `Permissions.FileManager` | boolean | Use the File Manager. |
-| `Permissions.ConfigFiles` | boolean | Edit configuration files. |
-| `Permissions.ScheduledTasks` | boolean | Manage scheduled tasks. |
-| `Permissions.Backups` | boolean | Manage backups. |
-| `Permissions.Ftp` | boolean | See FTP connection details. |
-
-The `Features.*` values tell you what the game or blueprint has enabled at all — useful to tell "this viewer can't see it" apart from "this service doesn't have it". All are booleans: `Features.ConsoleEnabled`, `Features.FileManagerEnabled`, `Features.ConfigFilesEnabled`, `Features.BackupsEnabled`, `Features.ScheduledTasksEnabled`, `Features.UpdatesEnabled`, `Features.SteamUpdateEnabled` and `Features.FastDLEnabled`.
+Every variable — the full `Service.*` field list (including the click-to-connect `Service.ConnectUrl`), the `Service.Ports` entries, and every `Permissions.*` / `Features.*` boolean — is enumerated in the [Layout Template Reference](./reference.mdx#service-page-variables).
 
 ### Service components
 
@@ -541,6 +480,10 @@ In your surface CSS, always give `game-console` and the Docker terminals a **fix
 
 :::tip[Responsive layouts]
 Media queries are filtered out of shared templates' CSS, but the panel's built-in helper classes still work: add `class="d-none d-md-flex"` to an element to hide it on phones (it appears from medium screens up).
+:::
+
+:::info[Building fully custom designs]
+Beyond these composed blocks, the panel ships **headless live values** (`live-cpu`, `live-status`, `live-name`, …) that render just a self-updating value for your own tiles, **single-purpose atoms** (individual power buttons, copyable addresses, bare lists), a **live styling contract** (`data-part` attributes, `--pct`, and page-wide status attributes so plain CSS can react when a server starts or stops) and a **translation tag** (`{% t %}`). They're what fully custom designs are built from — all enumerated in the [Layout Template Reference](./reference.mdx).
 :::
 
 ### Example: a game home page

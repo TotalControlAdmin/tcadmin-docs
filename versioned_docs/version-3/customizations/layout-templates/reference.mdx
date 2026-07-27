@@ -1,0 +1,517 @@
+---
+sidebar_label: Reference
+sidebar_position: 1
+---
+
+# Layout Template Reference
+
+The complete catalog for template authors: every surface, tag, variable and component, plus the live
+styling contract that lets plain CSS react to a running server. For a guided introduction with
+full-page examples, start with [Layout Templates](./index.mdx); this page is the part you keep open
+while writing.
+
+Everything here works in **shared (sandboxed) templates** unless a row says otherwise — the styling
+contract is deliberately built from inert markup and CSS, so a design downloaded from a plugin
+repository can be just as custom as one written locally.
+
+## Surfaces
+
+A template is a set of **surfaces** — named regions the panel mounts. Add them in the editor's
+surface list; each has its own HTML and CSS, and the template also carries one **base stylesheet**
+that applies whenever the template is active.
+
+| Surface key | What it replaces |
+|---|---|
+| `LoginPage` | The entire login page. **Must** contain `{% component "login-form" %}`. |
+| `Shell` | The shell around every page. **Must** contain `body` (the page content) or `shell` (the whole built-in chrome). |
+| `Shell.TopBarStart` | Extra content at the start (left) of the top app bar. |
+| `Shell.TopBarEnd` | Extra content at the end (right) of the top app bar. |
+| `Shell.DrawerHeader` | The brand zone above the navigation menu. |
+| `Shell.DrawerFooter` | The account zone below the navigation menu. |
+| `Shell.BeforeContent` | A banner strip immediately above the page content, on every page. |
+| `Shell.AfterContent` | A banner strip immediately below the page content, on every page. |
+| `Shell.Footer` | The contents of the bottom bar. |
+| `Shell.MenuLinks` | Extra links appended to the end of the navigation menu (additive — the built-in menu stays). |
+| `GameService.Home` | A game server's home page content. Voice servers use the `GameService` surfaces too. |
+| `GameService.Header` | A game server's header strip — shown on **every** page of the service (Home, Console, File Manager, …). |
+| `DockerService.Home` | A Docker server's home page content. |
+| `DockerService.Header` | A Docker server's header strip, on every page of the service. |
+
+**Blueprint variants.** A service surface key may carry a numeric suffix: `GameService.Home.526`
+applies only to servers of game `526` and wins over the plain `GameService.Home`. The editor's
+**Limit to blueprint** picker composes the key for you.
+
+**Per-viewer rendering.** The four service surfaces are rendered fresh for the service and the
+person viewing it each time the page opens — that's why they get the extra
+[`Service.*` / `Permissions.*` / `Features.*`](#service-page-variables) variables and why
+`{% t %}` translations always match the viewer. All other surfaces render once per visit with the
+[base variables](#base-variables).
+
+:::tip[Locked out?]
+Add `?safeMode=1` to the panel address to temporarily ignore the template and fall back to the
+built-in layout.
+:::
+
+## Tags
+
+Surfaces are ordinary HTML plus the [Liquid](https://shopify.github.io/liquid/) template language:
+`{{ output }}`, `{% if %}`,
+`{% for %}`, `{% assign %}` and the other standard tags
+all work, plus three TCAdmin-specific tags.
+
+### `{{ Variable }}` — insert a value
+
+```html
+<h2>{{ Service.Name }}</h2>
+<p>{{ Service.BlueprintName }} — {{ Service.HostnameOrIp }}:{{ Service.GamePort }}</p>
+```
+
+Output is HTML-encoded automatically. Values are a **snapshot from when the page rendered** — for
+numbers that change while the page is open, use the [live value components](#live-values-headless)
+instead.
+
+### `{% component "name" %}` — splice a live panel piece
+
+```html
+{% component "login-form" %}
+{% component "live-cpu" %}
+```
+
+Drops a real, interactive piece of the panel into your markup — everything in the
+[component catalog](#components) below. Components keep working after render: they update
+themselves, obey permissions, and handle their own clicks.
+
+### `{% surface "Key" %}` — place a customizable region
+
+```html
+{% surface "Shell.Footer" %}
+```
+
+Used inside a hand-built `Shell` to position the placeable regions: `Shell.TopBarStart`,
+`Shell.TopBarEnd`, `Shell.DrawerHeader`, `Shell.DrawerFooter`, `Shell.BeforeContent`,
+`Shell.AfterContent` and `Shell.Footer`. Each renders the author's surface if the template defines
+one, otherwise the built-in default. (`Shell.MenuLinks` and the service surfaces are mounted
+automatically and are never placed this way.)
+
+### `{% t 'Key', 'Fallback' %}` — translated text
+
+Writes a panel UI translation in the **viewer's language** — the same translation catalog the rest
+of the panel uses (**Settings → Languages**). If the key has no translation in the viewer's
+language, the inline fallback is shown; with no fallback, the key itself is.
+
+```html
+<span class="my-tab-label">{% t 'ServiceHome.Connect', 'Connect' %}</span>
+<a href="{{ Service.Url }}/Logs" title="{% t 'Service.Logs', 'Logs' %}">…</a>
+```
+
+- Both arguments accept single or double quotes; single quotes read best inside HTML attributes.
+- Output is always HTML-encoded.
+- Text rendered by `{% component %}` tokens is already translated — the tag is
+  for labels **you** write around them.
+- Reuse keys that already exist (browse them under **Settings → Languages**). Your theme-specific
+  flavor text won't have a key — leave it as plain text rather than inventing keys nobody
+  translates.
+
+### Liquid conditions — one warning
+
+In Liquid, **an empty string is truthy** — only `nil` and `false` are falsy. Test presence
+explicitly:
+
+```html
+{% if Service.ConnectUrl and Service.ConnectUrl != '' %}
+  <a href="{{ Service.ConnectUrl }}">Connect</a>
+{% endif %}
+```
+
+## Base variables
+
+Available on **every** surface:
+
+| Variable | Type | Description |
+|---|---|---|
+| `AppName` | string | The application name. |
+| `AppVersion` | string | The running version. |
+| `Culture` | string | The current language code. |
+| `IsAuthenticated` | boolean | Whether the visitor is signed in. |
+| `UserName` | string | The signed-in user's name. |
+| `Branding.Title` | string | The branding title. |
+| `Branding.Subtitle` | string | The branding subtitle. |
+| `Branding.LogoUrl` | string | The branding logo image URL. |
+
+## Service page variables
+
+Available on the four service surfaces (`GameService.Home` / `.Header`, `DockerService.Home` /
+`.Header`) and their blueprint variants, in addition to the base variables.
+
+### `Service.*`
+
+| Variable | Type | Description |
+|---|---|---|
+| `Service.ServiceId` | number | The service's id. |
+| `Service.Name` | string | The service's name. |
+| `Service.ServiceType` | string | `GameService` (also voice servers) or `DockerService`. |
+| `Service.BlueprintId` | number | The game or Docker blueprint id. |
+| `Service.BlueprintName` | string | The game or Docker blueprint name. |
+| `Service.IpAddress` | string | The service's IP address. |
+| `Service.Hostname` | string | The service's hostname, when one is set. |
+| `Service.HostnameOrIp` | string | The hostname if set, otherwise the IP address. |
+| `Service.Url` | string | The relative address of the service's home page — for links to sub-pages, e.g. `{{ Service.Url }}/FileManager`. |
+| `Service.ConnectUrl` | string | The blueprint's click-to-connect link, resolved for this service (e.g. `steam://connect/1.2.3.4:28015`). Empty when the blueprint defines none or a value in it can't be resolved. |
+| `Service.Status` | string | The status name when the page loaded (`Started`, `Stopped`, …) — a snapshot, not live. |
+| `Service.OwnerName` | string | The name of the user who owns the service. |
+| `Service.DiskSpace` | number | The disk quota in bytes (empty when unlimited). |
+| `Service.DiskUsage` | number | The last known disk usage in bytes. |
+| `Service.Slots` | number | Player slots (game servers). |
+| `Service.GamePort` | number | The game port (game servers). |
+| `Service.QueryPort` | number | The query port (game servers). |
+| `Service.RconPort` | number | The RCON port (game servers). |
+| `Service.VirtualServerName` | string | The virtual server hosting the service, when there is one. |
+| `Service.CpuLimit` | number | The CPU limit, as a percentage. |
+| `Service.MemoryLimit` | number | The memory limit in bytes. |
+| `Service.Image` | string | The container image (Docker servers). |
+| `Service.Tag` | string | The image tag (Docker servers). |
+| `Service.Ports` | list | Every named port — see below. |
+
+Each entry in `Service.Ports`:
+
+| Variable | Type | Description |
+|---|---|---|
+| `Name` | string | The port's name (for example `GamePort`). |
+| `Port` | number | The port number. |
+| `Description` | string | The port's description, when one is set. |
+| `Uri` | string | A click-to-connect link when the blueprint defines one. |
+
+```html
+{% for p in Service.Ports %}
+  <div class="my-port" data-part="item" data-kind="port">
+    <b>{{ p.Port }}</b> <span>{{ p.Name }}</span>
+    {% if p.Uri and p.Uri != '' %}<a href="{{ p.Uri }}">Open</a>{% endif %}
+  </div>
+{% endfor %}
+```
+
+### `Permissions.*`
+
+What the built-in pages would show **this viewer** for **this service** — visibility only; every
+action is re-checked when used. The stat booleans already include `LiveStats`, and `Console` /
+`FastDL` already include their feature toggles, so each can be tested on its own.
+
+| Variable | Description |
+|---|---|
+| `Permissions.Control` | Start, stop and restart the service. |
+| `Permissions.KillService` | Force-stop the service. |
+| `Permissions.Console` | Use the console (game) or the interactive terminal (Docker). |
+| `Permissions.Logs` | View the service's log files. |
+| `Permissions.ServiceActivity` | View the service's activity history. |
+| `Permissions.LiveStats` | See live usage statistics. |
+| `Permissions.PlayerStats` | See player counts. |
+| `Permissions.CpuStats` | See CPU usage. |
+| `Permissions.MemoryStats` | See memory usage. |
+| `Permissions.NetworkStats` | See network traffic. |
+| `Permissions.ServiceSettings` | Open the service's settings. |
+| `Permissions.CustomScripts` | Manage the service's custom scripts. |
+| `Permissions.Reinstall` | Reinstall the service. |
+| `Permissions.Delete` | Delete the service. |
+| `Permissions.Mods` | Install mods. |
+| `Permissions.FastDL` | Manage Fast Downloads. |
+| `Permissions.LogConsole` | View the container log (Docker servers; always false for game servers). |
+| `Permissions.FileManager` | Use the File Manager. |
+| `Permissions.ConfigFiles` | Edit configuration files. |
+| `Permissions.ScheduledTasks` | Manage scheduled tasks. |
+| `Permissions.Backups` | Manage backups. |
+| `Permissions.Ftp` | See FTP connection details. |
+
+### `Features.*`
+
+Permission-independent blueprint/config toggles — to tell "this viewer can't see it" apart from
+"this service doesn't have it". All booleans: `Features.ConsoleEnabled`,
+`Features.FileManagerEnabled`, `Features.ConfigFilesEnabled`, `Features.BackupsEnabled`,
+`Features.ScheduledTasksEnabled`, `Features.UpdatesEnabled`, `Features.SteamUpdateEnabled`,
+`Features.FastDLEnabled`.
+
+## Components
+
+Placed with `{% component "name" %}`. Every service-page component
+**self-gates**: it shows and hides itself with the same permission and feature rules as the
+built-in pages, and renders nothing outside a service's pages — wrap one in
+`{% if Permissions.… %}` only when your *surrounding* markup should disappear
+too. `service-…` components work on both service types; `game-…` / `docker-…` only on their own.
+
+### Shell and login
+
+| Component | What it adds |
+|---|---|
+| `body` | The current page's content (required in a hand-built shell). |
+| `shell` | The entire built-in shell — a quick base when you only want to restyle with CSS. |
+| `menu` | The navigation drawer and menu. |
+| `menu-toggle` | The button that opens and collapses the drawer. |
+| `topbar` | The complete built-in top bar. |
+| `breadcrumbs` | The breadcrumb trail. |
+| `login-form` | The sign-in form (required on the login page). |
+| `brand` | The logo and branding block. |
+| `dark-mode-toggle` | The light / dark switch. |
+| `language-selector` | The language picker. |
+| `connection-status` | A warning shown only when the live connection drops. |
+| `connection-indicator` | An always-on connection dot (green / amber / red). |
+| `health-indicator` | A system-health indicator (shown only to permitted users). |
+| `announcements` | The customer announcements control. |
+| `impersonation-banner` | The "you are impersonating…" strip with its exit button (shows only while impersonating — always include it in a custom shell). |
+| `footer-resources` | The current page's live stats — a game or Docker server's disk, CPU, memory, network and players — for custom footers. |
+
+### Service building blocks (composed)
+
+The ready-made blocks of the built-in service pages:
+
+| Component | What it adds |
+|---|---|
+| `service-title` | The service's name, icon and address line (updates live). |
+| `service-power` | The Start / Stop / Restart / Kill button strip. |
+| `service-advanced-actions` | The extra action buttons — settings, scripts, reinstall, delete, move. |
+| `service-details` | The service details table. |
+| `service-uptime-tile` | The uptime tile. |
+| `service-cpu-tile` | The live CPU tile. |
+| `service-memory-tile` | The live memory tile. |
+| `service-disk-tile` | The disk usage tile. |
+| `service-recent-logs` | The recent log files panel. |
+| `service-recent-activity` | The recent activity timeline. |
+| `game-status-alert` | The warning shown while a game server's status is unknown. |
+| `game-connection-info` | The connection, FTPS/SFTP and RCON info cards. |
+| `game-players-tile` | The live players tile. |
+| `game-network-tile` | The live network traffic tile. |
+| `game-console` | The game's web console (text or screen capture). |
+| `docker-status-header` | The container status header with uptime, ports and quick settings. |
+| `docker-ports` | The IP and port chips. |
+| `docker-logs-terminal` | The read-only container log terminal. |
+| `docker-exec-terminal` | The interactive container terminal. |
+
+:::warning[Consoles need a fixed height]
+Always give `game-console` and the Docker terminals a **fixed-height** container (for example
+`height: 480px; min-width: 0; overflow: hidden;`), and use `minmax(0, …)` for CSS grid tracks
+around them. In an auto-sized cell, the terminal and the cell resize each other in a loop and the
+browser tab can freeze.
+:::
+
+### Live values (headless)
+
+Bare, self-updating values with **no chrome at all** — you own the tile markup around them. Each
+renders as a small `<span>` whose text refreshes every second; a stat with no data yet shows `--`,
+and a permission-gated stat renders nothing.
+
+| Component | Shows |
+|---|---|
+| `live-name` | The service name (stays live through renames). |
+| `live-status` | The localized status text ("Running", "Stopped", …). |
+| `live-status-orb` | An **empty** span carrying `data-status="started\|stopped\|starting\|stopping\|unknown"` — a styling hook for your own status dot. |
+| `live-uptime` | Compact uptime, e.g. `8h 40m`. |
+| `live-cpu` | CPU percent, including the `%` sign. |
+| `live-memory` | Memory used, humanized (e.g. `1.4 GB`). |
+| `live-memory-limit` | The memory limit, humanized. |
+| `live-disk` | Disk used, humanized. |
+| `live-disk-limit` | The disk quota, humanized (`--` when unlimited). |
+| `live-players` | Current players, bare count (game). |
+| `live-players-max` | Player slots, bare count (game). |
+| `live-network-up` | Bytes sent, humanized (game). |
+| `live-network-down` | Bytes received, humanized (game). |
+
+A live span that represents a percentage also carries [`--pct`](#the-percentage-hook) — so
+a hand-built gauge needs no JavaScript:
+
+```html
+<div class="my-tile">
+  {% component "live-cpu" %}
+  <span class="my-label">{% t 'ServiceHome.CPU', 'CPU' %}</span>
+</div>
+```
+
+```css
+/* The live span fills its own background from the percentage it shows. */
+.my-tile .tca-live-cpu {
+  display: block;
+  background: linear-gradient(90deg, #ff7a2e calc(var(--pct, 0) * 1%), transparent 0);
+}
+```
+
+### Single-purpose atoms
+
+Pieces of the composed blocks, for templates that own all the surrounding chrome:
+
+| Component | What it adds |
+|---|---|
+| `power-start` | The lone Start button (visible while stopped/unknown). |
+| `power-stop` | The lone Stop button (visible while started). |
+| `power-restart` | The lone Restart button (visible while started). |
+| `power-kill` | The lone Kill button (visible while starting/stopping). |
+| `service-icon` | The service's category icon alone. |
+| `game-connection-address` | `host:gameport` plus a copy button, chrome-less (game). |
+| `game-ftps-address` | `host:ftpport` plus a copy button (game). |
+| `game-sftp-address` | `host:sftpport` plus a copy button (game) — renders nothing when the host offers no SFTP. |
+| `game-rcon-address` | `host:rconport` plus a copy button (game). |
+| `service-host-address` | The bare host/IP plus a copy button (both types — the one copyable address on Docker pages). |
+| `service-logs-list` | The recent-logs **list only**, no panel chrome. |
+| `service-activity-list` | The recent-activity **timeline only**, no panel chrome. |
+
+```html
+{% if Permissions.Control %}
+<div class="my-power-row">
+  {% component "power-start" %}
+  {% component "power-restart" %}
+  {% component "power-stop" %}
+  {% component "power-kill" %}
+</div>
+{% endif %}
+```
+
+Each power atom appears and disappears with the service's state on its own — the row above needs no
+conditions beyond the permission around your wrapper.
+
+## Live styling
+
+The pieces that let **plain CSS** produce living pages: restyle the built-in components without
+touching their internals, and make your own markup react when the server starts, stops, or its
+numbers move. Everything in this section is inert markup and CSS — it all works in sandboxed
+templates.
+
+### The `data-part` contract
+
+Every service component marks its outermost element with `data-tca-component="<token>"` and its
+inner elements with `data-part="<role>"` (plus `data-kind="<variant>"` where one role repeats). So
+you restyle by **role**, never by internal class names:
+
+```css
+/* The CPU tile's number, whatever element happens to render it. */
+[data-tca-component="service-cpu-tile"] [data-part="value"] { font-size: 2rem; }
+
+/* Every action button anywhere — and the delete one specifically. */
+[data-part="action"] { border-radius: 10px; }
+[data-part="action"][data-kind="delete"] { color: #ff5470; }
+```
+
+The role vocabulary:
+
+| `data-part` | Meaning |
+|---|---|
+| `label` | The caption of a block ("CPU", "Recent Logs"). |
+| `value` | The primary value the block exists to show. |
+| `unit` | A denominator or suffix qualifying the value ("/ 48 GB", "%"). |
+| `meta` | Secondary supporting text (a timestamp, an identity line). |
+| `icon` | A decorative or semantic icon. |
+| `bar` | A progress / meter element — carries `--pct`. |
+| `media` | An avatar / art / status-orb block. |
+| `status` | An element whose appearance tracks the service status. |
+| `list` | A container of repeated items. |
+| `item` | One entry in a list, or one card in a repeated set. |
+| `row` | One row of a details table. |
+| `action` | Something the user clicks. Usually carries `data-kind`. |
+| `panel` | A secondary region that opens/collapses. |
+| `empty` | The "nothing to show" placeholder a list renders instead of items. |
+
+You may write `data-part` / `data-kind` on **your own** markup too (they're allowed in sandboxed
+templates), so one rule can style your hand-built tiles and the built-in ones together.
+`data-tca-component` is engine identity and can't be written by a template.
+
+### The percentage hook
+
+Any element that stands for a 0–100 percentage — every compiled progress bar
+(`data-part="bar"`) and every live span with a computable percentage — publishes it as the CSS
+custom property `--pct`. Replace a progress bar with your own gradient, ring or gauge without
+naming a single internal class:
+
+```css
+[data-tca-component="service-memory-tile"] [data-part="bar"] {
+  background: linear-gradient(90deg, #3ddc97 calc(var(--pct, 0) * 1%), #222 0);
+}
+```
+
+### The page state bridge
+
+While a service page is open, the panel publishes that service's live state onto the `<html>`
+element — refreshed every second, so **page-wide CSS can react to the service without any
+JavaScript**:
+
+| On `<html>` | Values |
+|---|---|
+| `data-tca-status` | `started` \| `stopped` \| `starting` \| `stopping` \| `unknown` |
+| `data-tca-service-type` | `game` \| `docker` |
+| `data-tca-service-id` | The service id. |
+| `data-tca-blueprint-id` | The blueprint id — per-game styling from one global stylesheet. |
+
+| CSS variable on `<html>` | Value |
+|---|---|
+| `--svc-cpu` | CPU usage, `0`–`100`. |
+| `--svc-memory` | Memory usage as a percentage of the limit, `0`–`100`. |
+| `--svc-disk` | Disk usage as a percentage of the quota, `0`–`100`. |
+| `--svc-players` | Players as a percentage of slots, `0`–`100`. |
+| `--svc-players-count` | Raw player count (not clamped). |
+| `--svc-players-max` | Raw slot count. |
+
+A variable the viewer isn't allowed to see (or that has no data) is **removed**, not zeroed — use
+the `var()` fallback to tell "no data" from "zero": `var(--svc-cpu, 0)`.
+
+The classic use — a connect button that dies and revives with the server, **live**, even though
+Liquid only rendered once:
+
+```html
+{% if Service.ConnectUrl and Service.ConnectUrl != '' %}
+<a class="my-connect" href="{{ Service.ConnectUrl }}">
+  {% t 'ServiceHome.Connect', 'Connect' %} — {{ Service.HostnameOrIp }}
+</a>
+{% endif %}
+```
+
+```css
+.my-connect { transition: opacity .2s; }
+html[data-tca-status="stopped"] .my-connect,
+html[data-tca-status="unknown"] .my-connect {
+  opacity: .35;
+  filter: grayscale(1);
+  pointer-events: none;   /* unclickable until the server is back */
+}
+```
+
+Or tint a hero by state and drive a page-wide meter:
+
+```css
+html[data-tca-status="started"] .my-hero { border-color: #3ddc97; }
+html[data-tca-status="stopped"] .my-hero { border-color: #555; }
+.my-hero-meter { width: calc(var(--svc-players, 0) * 1%); }
+```
+
+:::note[Load-time vs live]
+Liquid decides **structure once, at render time** (which tab is first, whether a section exists at
+all). The bridge and the live components handle everything that changes **while the page is open**.
+Don't use `{{ Service.Status }}` for anything that should react live — it's a snapshot.
+:::
+
+## Sandboxed vs trusted templates
+
+Templates imported from files or a plugin repository always run **sandboxed**. A locally-authored
+theme can be marked **Trusted template** on the theme's settings — a deliberate admin decision.
+
+| | Sandboxed (default for shared) | Trusted |
+|---|---|---|
+| Scripts / event handlers | Stripped. | Allowed (inline `<script>` works). |
+| Links, images, CSS `url(…)` | **Same-origin only** — anything pointing at another site is removed, in HTML and CSS alike. | Any origin (CDNs, fonts, external links). |
+| `<form>` | Not allowed (sign-in is the `login-form` component). | Allowed. |
+| CSS | `@import`, `@media`, `@keyframes`, vendor-prefixed properties and custom properties are filtered — **except `--tca-*`**, which sandboxed authors may define freely (same-origin values only). | Full CSS. |
+| `class` / `id` / inline `style` / `data-part` / `data-kind` | Allowed. | Allowed. |
+
+:::tip[Design for the sandbox]
+Everything in [Live styling](#live-styling) — `data-part`, `--pct`, the state bridge — plus the
+live components, atoms and `{% t %}` work fully sandboxed. Reach for trust
+only when you genuinely need external assets, media queries, keyframe animations or script. For
+responsive behavior in the sandbox, the panel's helper classes still work (`d-none d-md-flex`).
+:::
+
+## Author checklist
+
+- **Empty string is truthy** in Liquid — presence tests are `{% if x and x != '' %}`.
+- **Snapshot vs live** — `{{ Service.* }}` values are render-time; live
+  numbers come from `live-*` components and live behavior from the state bridge.
+- **Consoles and terminals need a fixed-height container**, or the page can freeze.
+- **Don't gate what already gates itself** — service components hide themselves; only wrap them in
+  `{% if %}` when your surrounding chrome must vanish too.
+- **Use single quotes inside attributes** — `title="{% t 'Messages.Open', 'Open' %}"`.
+- **Test both states** — open your design with the server running *and* stopped; the state bridge
+  makes the difference visible immediately.
+- **A broken surface never locks you out** — service surfaces fall back to the built-in page, and
+  `?safeMode=1` rescues the shell and login.
