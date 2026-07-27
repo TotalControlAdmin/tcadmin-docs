@@ -5,9 +5,16 @@
     <link>https://docs.tcadmin.com/3/releases</link>
     <description>Latest TCAdmin v3 release notes</description>
     <language>en</language>
-    <lastBuildDate>Tue, 21 Jul 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 26 Jul 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://docs.tcadmin.com/releases/rss.xml" rel="self" type="application/rss+xml"/>
     <copyright>Copyright © 2026 TCADMIN.COM</copyright>
+    <item>
+      <title>3.14.44.47746</title>
+      <link>https://docs.tcadmin.com/3/releases/3.14.44.47746</link>
+      <guid isPermaLink="true">https://docs.tcadmin.com/3/releases/3.14.44.47746</guid>
+      <description>SFTP file access, Demo mode, Dashboards saved to your account, Layout templates: fully custom service pages, Click-to-connect links, and more.</description>
+      <pubDate>Sun, 26 Jul 2026 00:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>3.13.66.64834</title>
       <link>https://docs.tcadmin.com/3/releases/3.13.66.64834</link>
