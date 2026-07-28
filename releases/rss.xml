@@ -5,9 +5,16 @@
     <link>https://docs.tcadmin.com/3/releases</link>
     <description>Latest TCAdmin v3 release notes</description>
     <language>en</language>
-    <lastBuildDate>Sun, 26 Jul 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 27 Jul 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://docs.tcadmin.com/releases/rss.xml" rel="self" type="application/rss+xml"/>
     <copyright>Copyright © 2026 TCADMIN.COM</copyright>
+    <item>
+      <title>3.15.8.966</title>
+      <link>https://docs.tcadmin.com/3/releases/3.15.8.966</link>
+      <guid isPermaLink="true">https://docs.tcadmin.com/3/releases/3.15.8.966</guid>
+      <description>Database updates applied on Linux and Docker, repeating plugin repository announcements, and outdated variable settings on the create service page.</description>
+      <pubDate>Mon, 27 Jul 2026 00:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>3.14.45.27422</title>
       <link>https://docs.tcadmin.com/3/releases/3.14.45.27422</link>
