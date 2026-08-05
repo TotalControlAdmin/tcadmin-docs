@@ -5,9 +5,16 @@
     <link>https://docs.tcadmin.com/3/releases</link>
     <description>Latest TCAdmin v3 release notes</description>
     <language>en</language>
-    <lastBuildDate>Mon, 27 Jul 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 05 Aug 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://docs.tcadmin.com/releases/rss.xml" rel="self" type="application/rss+xml"/>
     <copyright>Copyright © 2026 TCADMIN.COM</copyright>
+    <item>
+      <title>3.16.24.35948</title>
+      <link>https://docs.tcadmin.com/3/releases/3.16.24.35948</link>
+      <guid isPermaLink="true">https://docs.tcadmin.com/3/releases/3.16.24.35948</guid>
+      <description>Support for multiple CPU sockets, Cancel a running update, CPU usage relative to the service's limits, Keep or clear mods when reinstalling, Option to disable the FTP server, and more.</description>
+      <pubDate>Wed, 05 Aug 2026 00:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>3.15.8.966</title>
       <link>https://docs.tcadmin.com/3/releases/3.15.8.966</link>
