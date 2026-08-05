@@ -114,12 +114,19 @@ language, the inline fallback is shown; with no fallback, the key itself is.
 
 ### Liquid conditions — one warning
 
-In Liquid, **an empty string is truthy** — only `nil` and `false` are falsy. Test presence
-explicitly:
+In Liquid, only `nil` and `false` are falsy. **An empty string and an empty list both pass
+`{% if %}`**, which is the single most common cause of a stray label or an empty row in a template.
+Test presence explicitly:
 
 ```html
+{# Text — compare against an empty string #}
 {% if Service.ConnectUrl and Service.ConnectUrl != '' %}
   <a href="{{ Service.ConnectUrl }}">Connect</a>
+{% endif %}
+
+{# Lists — compare the size #}
+{% if Service.RegionNames.size > 0 %}
+  <span>{{ Service.RegionNames | join: ', ' }}</span>
 {% endif %}
 ```
 
@@ -152,6 +159,9 @@ Available on the four service surfaces (`GameService.Home` / `.Header`, `DockerS
 | `Service.ServiceType` | string | `GameService` (also voice servers) or `DockerService`. |
 | `Service.BlueprintId` | number | The game or Docker blueprint id. |
 | `Service.BlueprintName` | string | The game or Docker blueprint name. |
+| `Service.BlueprintShortName` | string | The blueprint's short name (e.g. `HLL`, `GMOD`) — the compact identifier to key an external system or query platform off. Empty when the blueprint sets none. |
+| `Service.ImageUrl` | string | The blueprint's background artwork, ready to use as an image source. Empty when the blueprint has none. |
+| `Service.IconUrl` | string | The blueprint's icon image, ready to use as an image source. Empty when the blueprint has none. |
 | `Service.IpAddress` | string | The service's IP address. |
 | `Service.Hostname` | string | The service's hostname, when one is set. |
 | `Service.HostnameOrIp` | string | The hostname if set, otherwise the IP address. |
@@ -159,6 +169,16 @@ Available on the four service surfaces (`GameService.Home` / `.Header`, `DockerS
 | `Service.ConnectUrl` | string | The blueprint's click-to-connect link, resolved for this service (e.g. `steam://connect/1.2.3.4:28015`). Empty when the blueprint defines none or a value in it can't be resolved. |
 | `Service.Status` | string | The status name when the page loaded (`Started`, `Stopped`, …) — a snapshot, not live. |
 | `Service.OwnerName` | string | The name of the user who owns the service. |
+| `Service.Priority` | string | The process priority the service runs at — `Normal`, `High`, `BelowNormal`, and so on (game servers). **Only filled in for a viewer allowed to see the service's settings** — see [Restricted values](#restricted-values). |
+| `Service.BillingId` | string | The billing system's identifier for this service. **Restricted** — see below. |
+| `Service.BillingStatus` | string | The billing state — `Active` or `Suspended`. **Restricted** — see below. |
+| `Service.ServerId` | number | The id of the server hosting the service. |
+| `Service.ServerName` | string | The name of the server hosting the service. |
+| `Service.ServerOperatingSystem` | string | The hosting server's operating system — `Windows` or `Linux`. |
+| `Service.DatacenterId` | number | The id of the datacenter the hosting server belongs to. |
+| `Service.DatacenterName` | string | The datacenter's name, e.g. `Dallas, Texas, United States (DFW)`. |
+| `Service.RegionIds` | list | The datacenter's region ids — see below. |
+| `Service.RegionNames` | list | The datacenter's region names — see below. |
 | `Service.DiskSpace` | number | The disk quota in bytes (empty when unlimited). |
 | `Service.DiskUsage` | number | The last known disk usage in bytes. |
 | `Service.Slots` | number | Player slots (game servers). |
@@ -188,6 +208,156 @@ Each entry in `Service.Ports`:
     {% if p.Uri and p.Uri != '' %}<a href="{{ p.Uri }}">Open</a>{% endif %}
   </div>
 {% endfor %}
+```
+
+#### Restricted values
+
+Most `Service.*` values are shown to anyone who can open the page. Three are not — they are filled
+in only for a viewer who is already allowed to see them elsewhere in the panel, and are **empty**
+for everyone else:
+
+| Value | Shown to |
+|---|---|
+| `Service.Priority` | Viewers who can see this service's settings — the same people the built-in Settings page is available to. Also empty for Docker servers, which have no priority. |
+| `Service.BillingId` | Viewers who can manage billing (`Permissions.ManageBilling`). |
+| `Service.BillingStatus` | Viewers who can manage billing (`Permissions.ManageBilling`). |
+
+A template can't reveal a value the panel would otherwise withhold, so always guard the block —
+otherwise a customer sees your "Billing" label with nothing next to it:
+
+```html
+{% if Permissions.ManageBilling %}
+  <div class="my-row">
+    <span>Billing</span>
+    <span class="my-billing my-billing--{{ Service.BillingStatus }}">
+      {{ Service.BillingStatus }}
+    </span>
+  </div>
+  {% if Service.BillingId %}
+    <div class="my-row">
+      <span>Invoice reference</span>
+      <span>{{ Service.BillingId }}</span>
+    </div>
+  {% endif %}
+{% endif %}
+
+{% if Service.Priority %}
+  <div class="my-row">
+    <span>Process priority</span>
+    <span>{{ Service.Priority }}</span>
+  </div>
+{% endif %}
+```
+
+```css
+.my-billing--Active    { color: #22c55e; }
+.my-billing--Suspended { color: #ef4444; }
+```
+
+:::note
+`Service.BillingStatus` is only `Active` or `Suspended`. There is **no renewal or expiry date** on a
+service, so a "days remaining" figure can't be built from it — that number lives in your billing
+system.
+:::
+
+#### Where the service runs
+
+The server, datacenter and region values describe the **machine hosting the service**, which is a
+different thing from the service itself. `Service.Name` is what the customer called their server;
+`Service.ServerName` is the node it happens to run on.
+
+```html
+<div class="my-facts">
+  <div class="row">
+    <span>Game</span>
+    <span>
+      {{ Service.BlueprintName }}
+      {% if Service.BlueprintShortName != '' %}
+        <small>{{ Service.BlueprintShortName }}</small>
+      {% endif %}
+    </span>
+  </div>
+
+  {% if Service.DatacenterId %}
+    <div class="row" data-datacenter="{{ Service.DatacenterId }}">
+      <span>Datacenter</span>
+      <span>{{ Service.DatacenterName }}</span>
+    </div>
+  {% endif %}
+
+  {% if Service.ServerName %}
+    <div class="row">
+      <span>Node</span>
+      <span>{{ Service.ServerName }} ({{ Service.ServerOperatingSystem }})</span>
+    </div>
+  {% endif %}
+</div>
+```
+
+:::note
+`Service.ServerOperatingSystem` is the **hosting server's** operating system, not the game's. They
+can differ: a Windows game running under Wine sits on a Linux server, and a Linux game running
+under WSL sits on a Windows server. Label it accordingly if you show it to customers.
+:::
+
+#### Region lists
+
+A datacenter can belong to more than one region, so `Service.RegionIds` and `Service.RegionNames`
+are **lists** rather than single values. They always have the same length and the same order, so
+position `0` of one matches position `0` of the other, and both are empty when the service has no
+datacenter.
+
+```html
+{# The usual case — one line, all regions #}
+{{ Service.RegionNames | join: ', ' }}
+
+{# Just the first #}
+{{ Service.RegionNames | first }}
+
+{# How many, and one by position #}
+{{ Service.RegionNames.size }}
+{{ Service.RegionNames[0] }}
+
+{# Loop the names #}
+{% for name in Service.RegionNames %}
+  <span class="my-region">{{ name }}</span>
+{% endfor %}
+
+{# Loop both together, paired by position #}
+{% for id in Service.RegionIds %}
+  <span class="my-region" data-region="{{ id }}">
+    {{ Service.RegionNames[forloop.index0] }}
+  </span>
+{% endfor %}
+
+{# Is the service in a particular region? #}
+{% if Service.RegionIds contains 9 %}
+  <span class="my-badge">Central</span>
+{% endif %}
+```
+
+:::warning An empty list is truthy
+Just like an empty string, **an empty list passes `{% if %}`** — so `{% if Service.RegionNames %}`
+is always true and would print an empty line for a service with no regions. Always compare the
+size instead:
+
+```html
+{% if Service.RegionNames.size > 0 %}
+  <div class="my-regions">{{ Service.RegionNames | join: ', ' }}</div>
+{% endif %}
+```
+:::
+
+#### Blueprint artwork
+
+`Service.ImageUrl` and `Service.IconUrl` are ready to use directly as an image source — including
+in sandboxed templates, where an artwork address hosted elsewhere would normally be removed. Both
+are empty when the blueprint has no artwork, so test before using them:
+
+```html
+{% if Service.ImageUrl %}
+  <img class="my-hero" src="{{ Service.ImageUrl }}" alt="{{ Service.BlueprintName }}">
+{% endif %}
 ```
 
 ### `Permissions.*`
@@ -220,6 +390,7 @@ action is re-checked when used. The stat booleans already include `LiveStats`, a
 | `Permissions.ScheduledTasks` | Manage scheduled tasks. |
 | `Permissions.Backups` | Manage backups. |
 | `Permissions.Ftp` | See FTP connection details. |
+| `Permissions.ManageBilling` | See the service's billing identifier and status. Unlike the others this is a **panel-wide** permission rather than a per-service one. |
 
 ### `Features.*`
 
@@ -312,6 +483,57 @@ and a permission-gated stat renders nothing.
 | `live-players-max` | Player slots, bare count (game). |
 | `live-network-up` | Bytes sent, humanized (game). |
 | `live-network-down` | Bytes received, humanized (game). |
+| `live-map` | The map the game reports it is running (game). |
+| `live-game-type` | The game type / gamemode the game reports (game). |
+| `live-query-status` | The localized query state — "Online", "Offline" or "Unknown" (game). |
+| `live-query-orb` | An **empty** span carrying `data-query="online\|offline\|unknown"` — a styling hook for your own query dot (game). |
+
+:::note Query state is not power state
+`live-status` reports the **service**: whether the panel started it. `live-query-status` reports the
+**game**: whether it is answering queries. They disagree on purpose — a server that has just started
+but hasn't finished loading is *Running* and *Offline*, which is the honest answer, because nobody
+can join it yet. Show both if your customers care about whether the server is joinable.
+
+"Unknown" means the game has never answered — not the same as offline.
+:::
+
+The map and game type show `--` when the game reports no value for them — some games report neither.
+For a viewer who isn't allowed to see live stats they render **nothing at all**, which would leave
+the label you wrote sitting next to a blank. Put the label and the value in one wrapper and hide the
+wrapper when the value didn't render:
+
+```html
+<div class="my-row my-row--optional">
+  <span>Map</span>
+  <span>{% component "live-map" %}</span>
+</div>
+```
+
+```css
+/* No live value inside → drop the whole labelled row. */
+.my-row--optional:not(:has(.tca-live)) { display: none; }
+```
+
+This is worth doing around **any** component that can hide itself — the FTP and SFTP addresses
+listed under [Single-purpose atoms](#single-purpose-atoms) behave the same way.
+
+A query dot needs no JavaScript — the empty orb carries the state and your CSS does the rest:
+
+```html
+<span class="my-query">
+  {% component "live-query-orb" %}
+  {% component "live-query-status" %}
+</span>
+```
+
+```css
+.my-query .tca-live-query-orb {
+  display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  background: #6b7280;                                     /* unknown */
+}
+.my-query .tca-live-query-orb[data-query="online"]  { background: #22c55e; }
+.my-query .tca-live-query-orb[data-query="offline"] { background: #ef4444; }
+```
 
 A live span that represents a percentage also carries [`--pct`](#the-percentage-hook) — so
 a hand-built gauge needs no JavaScript:

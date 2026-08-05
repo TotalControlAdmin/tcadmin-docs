@@ -1,0 +1,35 @@
+---
+sidebar_label: 3.16.24.35948
+date: 2026-08-05
+authors: [tcadmin]
+---
+
+import ReleaseDate from '@site/src/components/ReleaseDate';
+
+# Version 3.16.24.35948
+
+<ReleaseDate />
+
+### New Features
+
+- **Support for multiple CPU sockets** — On machines with more than one CPU socket, a game server can now be assigned to a specific socket. TCAdmin detects the machine's socket layout automatically, and the assignment keeps the server's processing and memory together on that socket for more consistent performance. The CPU affinity list then picks CPUs within the chosen socket. Works on both Windows and Linux.
+- **Cancel a running update** — The System Update page now has a *Cancel update* button while an update is rolling out. Servers that have not started updating yet are skipped and the rollout stops waiting on the rest; servers that already finished stay updated, and you can retry the update afterwards.
+- **CPU usage relative to the service's limits** — A service's CPU usage is now shown as a percentage of what it is allowed to use — its CPU affinity and CPU limit — instead of the whole machine. A server limited to 2 of 16 cores now reads 100% when it maxes out its two cores, instead of 12.5%.
+- **Keep or clear mods when reinstalling** — Reinstalling a service now asks whether to clear its installed mods list (blueprint mods, Steam Workshop, CurseForge, Nexus and uMod). Clearing is the default and fixes mods still showing as installed after a reinstall had deleted their files; untick *Clear installed mods* to keep the list.
+- **Option to disable the FTP server** — A new `TCAdmin:Ftp:Enabled` setting in a machine's `appsettings.json` turns off its built-in FTP server, matching the existing SFTP switch. When disabled, services on that machine no longer show FTP connection details and FTPS is not offered when moving a service.
+- **More layout template variables** — Service home templates can now show the blueprint's short name and artwork (`Service.BlueprintShortName`, `Service.ImageUrl`, `Service.IconUrl`), where the service is hosted (`Service.ServerName`, `Service.DatacenterName`, `Service.RegionNames`, `Service.ServerOperatingSystem`), and — for users with the matching permissions — `Service.Priority`, `Service.BillingId` and `Service.BillingStatus`. A template can also check `TrustedTemplate` to detect whether its theme allows full-trust content and adjust, or show a notice, when it doesn't.
+- **Service variables API** — New `GET /api/Service/{serviceId}/Variables` and `GET /api/Service/{serviceId}/Variables/{name}` endpoints return a service's variable values, filtered to the variables the caller is allowed to see.
+- **Script editor improvements** — Code completion, hover help and error squiggles in the script editor are smarter and more reliable, and the visual script editor's header now takes much less vertical space, leaving more room for the flowchart.
+
+### Bug Fixes
+
+- **Console not showing output when a service was started** — The console could stay blank when it was open while the service started. It now attaches and reconnects reliably.
+- **FTP/SFTP uploads failing on Windows** — Uploading several files at once over FTP or SFTP could fail with *"The security identifier is not allowed to be the owner of this object"*.
+- **Breadcrumb not updating after switching themes** — The navigation breadcrumb stopped updating after the theme was changed.
+- **Error when saving pages without a validator** — Saving some edit pages, themes and layout templates among them, failed with an error.
+- **Error when a blueprint variable was missing from the service** — Creating a service could fail when a variable such as the Steam branch had not been added to the service's variables yet; the blueprint's default value is now used.
+- **Error when creating a new game or Docker blueprint** — Creating a brand-new blueprint failed, and validation problems are now reported clearly instead of silently discarded.
+- **Batch workshop actions** — Bulk actions on selected Steam Workshop items did not run.
+- **Error opening a config file that did not exist** — A service's Configuration page showed an error when one of its config files had not been created on disk yet.
+- **SFTP server crash on shutdown** — The monitor could report an error from the SFTP server while shutting down.
+- **Import IPs missing addresses** — On Windows, *Import IPs* only found addresses registered in DNS and missed secondary addresses; it now imports every address on every network adapter.
