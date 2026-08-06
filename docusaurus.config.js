@@ -125,6 +125,16 @@ const config = {
 
   plugins: [
     "./plugins/releases-data-plugin",
+    [
+      "@docusaurus/plugin-client-redirects",
+      {
+        redirects: [
+          // The V3 intro lives at /3/intro (slug: /intro), so the bare /3/
+          // route would otherwise 404. Emit a static redirect page for it.
+          { from: "/3", to: "/3/intro" },
+        ],
+      },
+    ],
   ],
 
   themes: ["docusaurus-theme-search-typesense"],
