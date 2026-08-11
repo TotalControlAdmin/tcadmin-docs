@@ -5,9 +5,16 @@
     <link>https://docs.tcadmin.com/3/releases</link>
     <description>Latest TCAdmin v3 release notes</description>
     <language>en</language>
-    <lastBuildDate>Wed, 05 Aug 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 11 Aug 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://docs.tcadmin.com/releases/rss.xml" rel="self" type="application/rss+xml"/>
     <copyright>Copyright © 2026 TCADMIN.COM</copyright>
+    <item>
+      <title>3.17.27.35844</title>
+      <link>https://docs.tcadmin.com/3/releases/3.17.27.35844</link>
+      <guid isPermaLink="true">https://docs.tcadmin.com/3/releases/3.17.27.35844</guid>
+      <description>Docker management page, Install Docker from the panel, Windows containers, Linux and Windows containers on the same server, Backups for Docker services, and more.</description>
+      <pubDate>Tue, 11 Aug 2026 00:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>3.16.24.35948</title>
       <link>https://docs.tcadmin.com/3/releases/3.16.24.35948</link>
