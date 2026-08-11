@@ -1,0 +1,32 @@
+---
+sidebar_label: 3.17.27.35844
+date: 2026-08-11
+authors: [tcadmin]
+---
+
+import ReleaseDate from '@site/src/components/ReleaseDate';
+
+# Version 3.17.27.35844
+
+<ReleaseDate />
+
+### New Features
+
+- **Docker management page** — Every server now has a *Docker* page that shows the state of its Docker installation, lets you manage the images downloaded on the machine, and holds the server's Docker settings.
+- **Install Docker from the panel** — If Docker is not installed, the Docker page offers to install it for you. Windows servers can choose between *Windows Containers* (Docker's native Windows engine) and *Linux Containers* (Docker Engine inside WSL2); Linux servers install Docker Engine directly. The installer lists the steps it will take and can reboot the server automatically when a step requires it — some installs need more than one reboot, and running the install again simply continues where it left off.
+- **Windows containers** — Docker services can now run Windows containers. On a Windows server running Docker's native engine in Windows-containers mode, blueprints built on Windows images work like any other Docker blueprint.
+- **Linux and Windows containers on the same server** — A server can be connected to two Docker engines at once — for example native Windows containers plus Docker Engine inside WSL2 for Linux containers. Each blueprint automatically uses the engine that matches its image, and when creating a service only the blueprints the chosen server can actually run are offered.
+- **Backups for Docker services** — Docker services now support the same backup system as game services: enable backups on the blueprint, then create, restore and delete backups from the service's Backups page, with the same retention limits.
+- **Log viewer for Docker services** — Docker services now have the same Logs page as game services for browsing the container's log output.
+- **Clearer status while an image downloads** — A Docker service's status shows *Starting* while its image is being downloaded, so a start that has to pull a large image doesn't look like the service failed to start.
+- **Live network usage** — A service's live statistics now include network usage on Linux as well as Windows, and the Windows collection is more reliable. Sent and received traffic is shown alongside CPU and memory usage. The stat is hidden on machines where traffic can't be measured for an individual service.
+- **Enterprise license key password** — If your enterprise license key is password protected, the password can now be stored with the key in the global or datacenter configuration, so servers inheriting the key activate without asking for it.
+
+### Bug Fixes
+
+- **Steam updates** — Clicking a service's Steam update icon responded with a noticeable delay, and running the update could fail with an error.
+- **Parent variable settings could not be edited** — A variable's *Parent Variable* and *Parent Value* settings could not be changed in the variable edit page, and a variable's visibility now follows its parent's value as soon as the page loads.
+- **Environment variables lost when importing a Docker configuration** — Importing a Docker blueprint configuration skipped its environment variables.
+- **Duplicate connection messages** — The *API Disconnected* and *Re-connected* notifications could appear twice.
+- **Error streaming logs from a remote Windows server** — Viewing a service's live logs on a remote Windows server showed an error.
+- **Empty log in the task popup** — The task progress popup's *View Log* button could show an empty log.
