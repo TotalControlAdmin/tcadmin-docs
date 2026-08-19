@@ -1,0 +1,203 @@
+---
+sidebar_label: AI Assistant
+sidebar_position: 5
+---
+
+# AI Assistant
+
+TCAdmin includes a built-in AI assistant, available from a floating chat window
+on every page of the panel. You can ask it questions about TCAdmin or your game
+servers, have it investigate a problem, or ask it to make a change for you. It
+knows which page you are looking at, so questions like *"why is this service
+offline?"* just work.
+
+The assistant never changes anything on its own. Every action it proposes —
+starting a service, editing a file, changing a setting — is shown in a
+confirmation card and only runs after you approve it. It also works within your
+own account's permissions, so it can never see or do anything your account
+couldn't do itself.
+
+:::warning AI can make mistakes
+Like any AI, the assistant can be wrong. Review each confirmation card
+carefully before approving it, and keep backups of anything important —
+especially blueprint configurations before letting it change scripts or
+settings.
+:::
+
+## Enabling and configuring the assistant
+
+The assistant is configured at **System → Settings → AI Assistant**. Changes
+take effect immediately — no restart is needed.
+
+| Setting | Description |
+|---|---|
+| **Enabled** | Turns the assistant on or off for the whole panel. When off, the chat button disappears for everyone. |
+| **Display name** | The name the assistant goes by in the panel (default **Tico**). Leave it blank to use the generic "AI Assistant" label. |
+| **Custom instructions** | Instructions applied to every conversation — see [Custom instructions](#custom-instructions) below. |
+| **Daily credit limits** | How many credits a single user may spend per day. There are separate limits for regular users and for sub-administrators (your staff). Full administrators are never limited. |
+| **Help improve the assistant** | Lets users rate the assistant's replies with thumbs up/down and optionally say why. Feedback is anonymous and is analyzed automatically to improve the assistant. Turning this off hides the rating buttons and stops all feedback collection. |
+
+The same page shows your **credit balance and usage** and the AI providers
+enabled for your license — see [Credits and usage](#credits-and-usage).
+
+## Who can use it
+
+Access is controlled with regular role permissions, granted per role under
+**User Management → Roles** in the **AI Assistant** module:
+
+| Permission | What it allows |
+|---|---|
+| **Use** | Open the chat window and talk to the assistant. |
+| **Configure** | Open the AI Assistant settings page. Intended for administrators. |
+| **View Chat Logs** | Open the AI chat log viewer. Can be granted to support staff without giving them full administrator access. |
+
+Full administrators always have access to the assistant. On new installations
+the built-in **Sub Administrators** and **Users** roles are granted **Use** by
+default; custom roles must be granted the permission explicitly. Users without
+it simply don't see the chat button.
+
+Whatever the role, the assistant can only work with what that user's account
+can already see and do in the panel. An administrator gets the full management
+toolset; a customer is limited to their own services; a sub-user is further
+limited to the permissions the service owner granted them.
+
+## Using the assistant
+
+Click the assistant's button in the top bar (next to the dark/light mode
+switch) to open the chat window. It floats over the page you are on and can be
+maximized from its header; on phones it opens full screen. The window can be
+closed and reopened while you browse the panel without losing the
+conversation, and every reply can be rated with thumbs up/down.
+
+A chip above the input shows the page being sent along as context with your
+next message. This is what lets you ask "what's wrong with this service?"
+without naming it. You can turn the page context off from the chip if you
+don't want the current page shared.
+
+The assistant replies in your panel language.
+
+### What it can do
+
+The assistant can do almost anything you can do from the web interface — if
+your account can see it or change it in the panel, you can ask the assistant
+to look at it or do it for you. Some examples:
+
+- **Answer questions** — it has built-in knowledge of the TCAdmin
+  documentation and general game/Docker hosting concepts, and it can look up
+  live information from your panel.
+- **Investigate problems** — read service status and query results, console
+  output, log files, configuration files and variables, the activity log, and
+  the status and progress of tasks, and search a service's files by name and
+  content.
+- **Manage services** — start/stop/restart, edit configuration files and
+  variables, manage command lines, install mods, run Steam updates, switch
+  game builds, send console and RCON commands, schedule tasks, and repair a
+  service.
+- **Administer the panel** — create and configure game and Docker blueprints,
+  register new servers and virtual servers, install Docker on a server, move
+  services between servers, import services from TCAdmin V2, edit layout
+  templates, manage sub-users, and update TCAdmin itself — across the whole
+  cluster or on a single outdated server.
+- **Write scripts** — it can create and edit custom scripts for your games and
+  Docker blueprints. Scripts are checked against your installation's actual
+  scripting objects before they are proposed. When you open a script imported
+  from TCAdmin V2, a *Convert to C# with AI* button in the script editor asks
+  the assistant to rewrite it as a V3-compatible C# script.
+
+These lists are examples, not limits — just ask for what you need. A few
+things are deliberately out of reach even for administrators, such as running
+arbitrary shell commands on your servers.
+
+### Confirmation cards
+
+Reading never requires approval. Any action that would **change** something
+pauses the conversation and shows a confirmation card with the action and a
+plain-language summary — file and configuration edits include a diff of
+exactly what will change. Nothing runs until you press approve, and a card
+left unanswered is treated as denied.
+
+Every executed action is written to the activity log, attributed to the user
+who approved it and marked as performed via the AI assistant.
+
+## Custom instructions
+
+You can teach the assistant about your setup in two places. Instructions can
+steer what the assistant says and recommends, but they can never unlock
+actions a user couldn't perform or skip the confirmation step.
+
+- **General instructions** — the *Custom instructions* field on the AI
+  Assistant settings page applies to every conversation. Use it for house
+  rules, tone, and knowledge about your company ("open a ticket at …", "our
+  voice servers are managed elsewhere").
+- **Per-blueprint instructions** — each game and Docker blueprint has an **AI
+  Assistant** tab on its edit page. Instructions written there apply whenever
+  a conversation involves a service of that blueprint — ideal for
+  game-specific quirks, known issues, and preferred fixes.
+
+:::warning
+Custom instructions are sent to the AI provider together with the
+conversation. Don't put passwords or other secrets in them.
+:::
+
+## Credits and usage
+
+The assistant runs on prepaid credits. Each request debits credits based on
+the AI model used and the size of the conversation. Credits are held on your
+TCAdmin client account, so all licenses on the same account share one balance.
+
+- **Buying credits** — credit packs are purchased through the client area at
+  [https://clients.tcadmin.com](https://clients.tcadmin.com). The new balance
+  is available immediately.
+- **Balance and usage report** — the AI Assistant settings page shows your
+  current balance and a day-by-day usage report (newest day first). Each day
+  shows its total requests and credits spent and can be expanded to a
+  per-user breakdown, biggest spender first — so you can always see who is
+  using the credits.
+- **Daily limits** — the per-user daily limits from the settings page protect
+  the balance from any single account. A user who reaches their limit is
+  politely refused until the next day; full administrators are never limited.
+- **Running out** — when the balance reaches zero, new conversations are
+  refused and the assistant is shown as unavailable until you top up. A reply
+  that is already in progress is allowed to finish.
+
+## Chat logs and auditing
+
+Everything the assistant does is recorded in two places:
+
+- **AI chat logs** — **System → AI Chat Logs** lists every conversation across
+  all users. Opening a session shows the full transcript, the actions that
+  were approved or denied, and any thumbs feedback left on the replies. The
+  page is gated by the **View Chat Logs** permission, so it can be given to
+  support staff.
+- **Activity log** — every executed action also appears in the regular
+  activity log, attributed to the user with a "via AI Assistant" marker, and
+  is linked to the conversation that caused it.
+
+Stored conversations are cleaned up according to your panel's data retention
+settings.
+
+## Privacy and data
+
+In short, three things happen to a conversation:
+
+1. **It is visible to your panel's administrators.** The full chat history is
+   stored in your own TCAdmin database and appears in the chat log viewer.
+2. **It is processed and stored by TCAdmin.** Each request passes through
+   TCAdmin's hosted AI gateway, where message content is kept for 90 days for
+   support and abuse handling, and usage details (tokens, model, credits) are
+   kept for billing. TCAdmin staff access to transcripts is itself logged.
+   When feedback collection is enabled, thumbs ratings and their optional
+   comments are also stored and used to improve the assistant's responses —
+   feedback is anonymous and is not linked to a name or email address.
+3. **It is sent to an AI provider.** To generate replies, the conversation —
+   including the page context and whatever the tools read, such as file
+   contents and console output — is sent to one of the AI providers enabled
+   for your license. Each provider processes it under its own terms.
+
+Values flagged as secrets — restricted variables, password-type blueprint
+variables, and known secret patterns such as RCON passwords — are masked
+before tool results ever leave your installation, so they don't reach the
+chat logs or the AI provider.
+
+An administrator can erase a user's conversations on request; this clears both
+the copy on your server and the copy held by TCAdmin.
