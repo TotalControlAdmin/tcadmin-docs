@@ -1,12 +1,12 @@
 ---
-sidebar_label: 3.18.25.49903
-date: 2026-08-19
+sidebar_label: 3.18.29.37648
+date: 2026-08-20
 authors: [tcadmin]
 ---
 
 import ReleaseDate from '@site/src/components/ReleaseDate';
 
-# Version 3.18.25.49903
+# Version 3.18.29.37648
 
 <ReleaseDate />
 
@@ -31,3 +31,5 @@ import ReleaseDate from '@site/src/components/ReleaseDate';
 - **Service list flicker** — Switching the services page from the table to the grid view caused a visible flicker.
 - **Batch scripts on Linux** — Starting a batch script on a Linux server failed with the error *"Cannot start process because a file name has not been provided"*.
 - **IPv4 addresses in the activity log** — Connections from IPv4 clients could be logged with an IPv6 `::ffff:` prefix; they now always appear as plain IPv4 addresses.
+- **Script errors reading input values** — Custom scripts could fail with *"Unable to cast object of type 'System.Text.Json.JsonElement' to type 'System.IConvertible'"* when reading values from input dialogs or script parameters. Values now arrive as plain text, numbers and booleans, so existing scripts work without changes.
+- **File ownership on Linux** — Saving a file could set its owner from the parent folder's owner instead of the service's user, so a file saved into a folder owned by root could become inaccessible to the game server. Files saved through the panel and FTP now always belong to the service's user, and re-saving an affected file repairs its ownership.
