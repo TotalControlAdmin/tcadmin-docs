@@ -5,15 +5,15 @@
     <link>https://docs.tcadmin.com/3/releases</link>
     <description>Latest TCAdmin v3 release notes</description>
     <language>en</language>
-    <lastBuildDate>Wed, 19 Aug 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 20 Aug 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://docs.tcadmin.com/releases/rss.xml" rel="self" type="application/rss+xml"/>
     <copyright>Copyright © 2026 TCADMIN.COM</copyright>
     <item>
-      <title>3.18.25.49903</title>
-      <link>https://docs.tcadmin.com/3/releases/3.18.25.49903</link>
-      <guid isPermaLink="true">https://docs.tcadmin.com/3/releases/3.18.25.49903</guid>
+      <title>3.18.29.37648</title>
+      <link>https://docs.tcadmin.com/3/releases/3.18.29.37648</link>
+      <guid isPermaLink="true">https://docs.tcadmin.com/3/releases/3.18.29.37648</guid>
       <description>AI Assistant, AI script writing, Convert V2 scripts to C# with AI, Custom AI instructions, New theme wizard, and more.</description>
-      <pubDate>Wed, 19 Aug 2026 00:00:00 GMT</pubDate>
+      <pubDate>Thu, 20 Aug 2026 00:00:00 GMT</pubDate>
     </item>
     <item>
       <title>3.17.27.35844</title>
