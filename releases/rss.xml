@@ -5,9 +5,16 @@
     <link>https://docs.tcadmin.com/3/releases</link>
     <description>Latest TCAdmin v3 release notes</description>
     <language>en</language>
-    <lastBuildDate>Thu, 20 Aug 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 31 Aug 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://docs.tcadmin.com/releases/rss.xml" rel="self" type="application/rss+xml"/>
     <copyright>Copyright © 2026 TCADMIN.COM</copyright>
+    <item>
+      <title>3.19.25.27856</title>
+      <link>https://docs.tcadmin.com/3/releases/3.19.25.27856</link>
+      <guid isPermaLink="true">https://docs.tcadmin.com/3/releases/3.19.25.27856</guid>
+      <description>Automatic blueprint content sync, Modrinth mod support, Updated Minecraft configuration, Support for servers with more than 64 CPUs, NUMA node binding, and more.</description>
+      <pubDate>Mon, 31 Aug 2026 00:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>3.18.29.37648</title>
       <link>https://docs.tcadmin.com/3/releases/3.18.29.37648</link>
