@@ -7,9 +7,9 @@
   <updated>2026-08-31T00:00:00.000Z</updated>
   <rights>Copyright © 2026 TCADMIN.COM</rights>
   <entry>
-    <title>3.19.25.27856</title>
-    <link href="https://docs.tcadmin.com/3/releases/3.19.25.27856"/>
-    <id>https://docs.tcadmin.com/3/releases/3.19.25.27856</id>
+    <title>3.19.26.40953</title>
+    <link href="https://docs.tcadmin.com/3/releases/3.19.26.40953"/>
+    <id>https://docs.tcadmin.com/3/releases/3.19.26.40953</id>
     <updated>2026-08-31T00:00:00.000Z</updated>
     <summary>Automatic blueprint content sync, Modrinth mod support, Updated Minecraft configuration, Support for servers with more than 64 CPUs, NUMA node binding, and more.</summary>
   </entry>
