@@ -336,7 +336,7 @@ datacenter.
 {% endif %}
 ```
 
-:::warning An empty list is truthy
+:::warning[An empty list is truthy]
 Just like an empty string, **an empty list passes `{% if %}`** — so `{% if Service.RegionNames %}`
 is always true and would print an empty line for a service with no regions. Always compare the
 size instead:
@@ -488,7 +488,7 @@ and a permission-gated stat renders nothing.
 | `live-query-status` | The localized query state — "Online", "Offline" or "Unknown" (game). |
 | `live-query-orb` | An **empty** span carrying `data-query="online\|offline\|unknown"` — a styling hook for your own query dot (game). |
 
-:::note Query state is not power state
+:::note[Query state is not power state]
 `live-status` reports the **service**: whether the panel started it. `live-query-status` reports the
 **game**: whether it is answering queries. They disagree on purpose — a server that has just started
 but hasn't finished loading is *Running* and *Offline*, which is the honest answer, because nobody
@@ -704,6 +704,52 @@ all). The bridge and the live components handle everything that changes **while 
 Don't use `{{ Service.Status }}` for anything that should react live — it's a snapshot.
 :::
 
+### Nav-item identity — `data-tca-nav`
+
+Every entry in the panel's nav menus — the main drawer and every sub-nav (service, server, game,
+user, docker blueprint, plugins, security settings) — carries `data-tca-nav="<slug>"`, so CSS can
+hide or restyle individual nav entries without matching localized link text — e.g. a host that
+replaced the built-in config-files page with its own:
+
+```css
+/* Hide for every blueprint… */
+[data-tca-nav="config-files"], [data-tca-nav="command-lines"] { display: none; }
+/* …or only for one, scoped through the state bridge. */
+html[data-tca-blueprint-id="123"] [data-tca-nav="file-manager"] { display: none; }
+/* Main-menu entries and whole menus work too. */
+[data-tca-nav="main-databases"] { display: none; }
+[data-tca-nav^="docker-blueprint-"] { display: none; }
+```
+
+**Service sub-nav** (bare slugs, same for game and docker services): `home` (the sub-nav title
+link — every sub-nav's home link wears this), `config-files`, `command-lines`, `console`,
+`scheduled-tasks`, `file-manager`, `steam-update`, `custom-mods`, `updates`, `mods`, `fastdl`,
+`stats`, `logs`, `backups`, `activity`. Repeated entries append their id: `script-{scriptId}`,
+`custom-link-{customLinkId}`, `custom-mods-{providerId}` (prefix-match with
+`[data-tca-nav^="custom-mods"]`).
+
+**Every other menu prefixes its slugs with its menu name**, so a rule can't accidentally hit two
+menus, and a prefix selector (`[data-tca-nav^="game-"]`) covers a whole menu:
+
+| Menu | Prefix | Entries |
+|---|---|---|
+| Main drawer | `main-` | `dashboard`, `users`, `roles`, `new-service`, `databases`, `settings`, `announcements`, `activity-logs`, `ai-chat-logs`, `system-update`, `messages`, `profile`, `logout`; groups `user-management`, `service-management`, `system` (hiding a group hides its children); service-category links `main-category-{categorySlug}` |
+| Server | `server-` | `ips`, `docker`, `configuration`, `license-info`, `game-services`, `docker-services` |
+| Game (blueprint admin) | `game-` | `feature-permissions`, `file-system-permissions`, `config-files`, `query-monitoring`, `mods`, `custom-mods`, `updates`, `scripts`, `links`, `variables`, `environment-variables`, `backups`, `fastdl`, `servers` |
+| Docker blueprint | `docker-blueprint-` | `feature-permissions`, `file-system-permissions`, `config-files`, `scripts`, `links`, `variables`, `mods`, `backups`, `fastdl`, `services` |
+| User | `user-` | `activity`, `roles`, `permissions`, `api-keys`, `sub-users`, `game-services`, `docker-services`, `oauth-links` |
+| Plugins | `plugins-` | `repositories`, `credentials` |
+| Security settings | `security-` | `overview`, `password`, `oauth-providers`, `activity-log` |
+
+You may write `data-tca-nav` on **your own** markup too (allowed in sandboxed templates, like
+`data-part`), so a hand-built link to the same page obeys the same rule. Hiding is **cosmetic
+only** — the page and its API stay reachable by URL; to actually block access, remove the feature
+permission instead (which also disables the matching API).
+
+These rules don't need a layout template at all — they work just as well from a theme's own CSS.
+The [Themes](../themes.mdx#customizing-the-menu) page has the copy-and-paste recipes, including
+how to **rename** a menu entry.
+
 ## Sandboxed vs trusted templates
 
 Templates imported from files or a plugin repository always run **sandboxed**. A locally-authored
@@ -715,7 +761,7 @@ theme can be marked **Trusted template** on the theme's settings — a deliberat
 | Links, images, CSS `url(…)` | **Same-origin only** — anything pointing at another site is removed, in HTML and CSS alike. | Any origin (CDNs, fonts, external links). |
 | `<form>` | Not allowed (sign-in is the `login-form` component). | Allowed. |
 | CSS | `@import`, `@media`, `@keyframes`, vendor-prefixed properties and custom properties are filtered — **except `--tca-*`**, which sandboxed authors may define freely (same-origin values only). | Full CSS. |
-| `class` / `id` / inline `style` / `data-part` / `data-kind` | Allowed. | Allowed. |
+| `class` / `id` / inline `style` / `data-part` / `data-kind` / `data-tca-nav` | Allowed. | Allowed. |
 
 :::tip[Design for the sandbox]
 Everything in [Live styling](#live-styling) — `data-part`, `--pct`, the state bridge — plus the
