@@ -5,9 +5,16 @@
     <link>https://docs.tcadmin.com/3/releases</link>
     <description>Latest TCAdmin v3 release notes</description>
     <language>en</language>
-    <lastBuildDate>Mon, 31 Aug 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 08 Sep 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://docs.tcadmin.com/releases/rss.xml" rel="self" type="application/rss+xml"/>
     <copyright>Copyright © 2026 TCADMIN.COM</copyright>
+    <item>
+      <title>3.20.34.48879</title>
+      <link>https://docs.tcadmin.com/3/releases/3.20.34.48879</link>
+      <guid isPermaLink="true">https://docs.tcadmin.com/3/releases/3.20.34.48879</guid>
+      <description>Search the settings page, Ports tab on the service page, Fast Downloads URL for a single service, Change a Docker service's image, Theme logos in layout templates, and more.</description>
+      <pubDate>Tue, 08 Sep 2026 00:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>3.19.26.40953</title>
       <link>https://docs.tcadmin.com/3/releases/3.19.26.40953</link>
