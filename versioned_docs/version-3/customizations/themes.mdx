@@ -1,0 +1,197 @@
+---
+sidebar_label: Themes
+sidebar_position: 1.5
+---
+
+# Themes
+
+A theme decides how the control panel looks: the colors for light and dark mode, the logos and browser icon, the navigation drawer and top bar, the login page, the loading screen, and any extra CSS you want applied. Themes are managed at **Settings → Themes**. You can keep several themes enabled at once and let users choose between them, or bind a theme to a hostname so a white-labeled address always gets its own look.
+
+:::info[Themes and layout templates]
+A **theme** sets colors, logos and other visual options. A **layout template** changes page *structure* — the login page, the shell around every page, or the pages of a game or Docker server. A theme can use one layout template (chosen on its **Advanced** tab), and several themes can share the same template. Most branding needs only a theme; see [Layout Templates](./layout-templates/index.mdx) when you want to rebuild pages.
+:::
+
+## Creating a theme
+
+There are four ways to get a new theme:
+
+| Method | When to use it |
+|---|---|
+| **Create with wizard** | The quickest way to an on-brand theme. Answer a few questions and get a complete light and dark palette. |
+| **Add** | Start from the built-in defaults in the full editor. Best when you know exactly which colors and options you want. |
+| **Import** | Load a theme file (`.json`) that was exported from another panel. |
+| **Browse Repos** | Install a ready-made theme from a [plugin repository](../getting-started/initial-configuration/plugin-repository.mdx). |
+
+### The theme wizard
+
+The wizard asks only for the essentials and derives everything else:
+
+1. **Basics** — a name, an optional browser tab title, the large and small logos, a login background image and the loading screen text (one message per line).
+2. **Brand colors** — pick a primary, secondary and tertiary color, or **upload a screenshot** of your website and choose from the colors the wizard finds in it. The image is analyzed in your browser and is never uploaded.
+3. **Light & dark** — a side-by-side preview of the light and dark schemes built from your colors. Text colors are chosen automatically so they stay readable.
+4. **Review & create** — the theme is created enabled but not as the default, and the full editor opens so you can fine-tune it.
+
+## How users get a theme
+
+- The **default theme** is what everyone sees unless they choose otherwise. Exactly one theme is the default; to change it, open another theme and switch on **Default Theme**.
+- When more than one theme is **enabled**, the login page shows a **Theme** selector. The choice is remembered in that browser.
+- A theme with a **Hostname** is applied automatically to anyone who opens the panel through that address, and the selector is hidden for them. This is how you give a reseller or a second brand its own look on its own domain.
+- **Light and dark mode** is a separate switch in the top bar (and on the login page). Every theme carries both a light and a dark palette; the panel follows the browser's preference until the user picks one.
+- While editing a theme, **Apply Theme** switches your own session to it so you can check the result. Saving a theme you are currently using applies the changes right away.
+
+## Theme settings
+
+The editor is split into tabs. The tables below list what each one controls.
+
+### General
+
+| Setting | What it does |
+|---|---|
+| **Theme Name** | The name shown in the theme list and the login selector. |
+| **Title Prefix / Title Postfix** | Text added before and after the page name in the browser tab, e.g. `Acme - Game Services`. |
+| **Hostname** | Apply this theme automatically when the panel is opened through this hostname. |
+| **Logout Redirect URL** | Where users are sent after signing out, for example your website. |
+| **Enabled** | A disabled theme is hidden from users but kept for later. |
+| **Default Theme** | Make this the theme everyone gets unless they choose another. |
+
+### Palette
+
+Every color the panel uses, grouped into brand colors, semantic colors (info, success, warning, error), text, surfaces and backgrounds, navigation, interactive states, lines and dividers, and grays. Switch between **Light** and **Dark** at the top of the tab — each mode has its own complete palette. Each group shows a strip of swatches so you can check the combination at a glance.
+
+### Console
+
+The colors of the game console: background, text, cursor and selection, plus the eight standard ANSI colors games use for colored output. A live preview shows sample output as you change them. Light and dark mode are set separately here too.
+
+### Layout
+
+| Setting | What it does |
+|---|---|
+| **Appbar Height** | The height of the top bar. Accepts CSS units such as `px` or `rem`. |
+| **Default Border Radius** | The rounding of cards, buttons and inputs. |
+| **Left / Right Drawer Width** | The width of the navigation drawers when expanded. |
+| **Left / Right Drawer Mini Width** | The width of the drawers when collapsed to icons. |
+
+### Nav Menu
+
+| Setting | What it does |
+|---|---|
+| **Elevation** | The shadow depth of the drawer, `0` to `12`. |
+| **Drawer Variant** | How the drawer behaves: collapsible to icons, responsive, always open, or overlaid. |
+| **Clip Mode** | Whether the drawer runs under the top bar or starts below it. |
+| **Show Logo** | Show or hide the logo at the top of the drawer. |
+| **Enable Logo Filter** | Recolor a black logo image to match the theme, so one logo works in light and dark mode. Turn it off for a full-color logo. |
+| **Large Logo URL** | The logo shown while the drawer is expanded. |
+| **Small Logo URL** | The logo shown while the drawer is collapsed. Also used on the login card. |
+| **Favicon URL** | The browser tab icon. |
+
+Logo and icon addresses can point to a file uploaded to your panel or to any image on the web. The tab shows a preview of both logos.
+
+### Bars & Content
+
+| Setting | What it does |
+|---|---|
+| **Show Breadcrumbs** | Show the page trail in the top bar. |
+| **Dense Mode** | A shorter top bar. |
+| **Elevation** (top bar, bottom bar) | Shadow depth, `0` to `12`. |
+| **Max Width** | Limit how wide the page content grows on large screens. |
+| **Extra CSS Classes** | Spacing or utility classes applied to the content area. |
+| **Bottom bar Enabled** | Show or hide the footer bar. |
+| **Show Powered By / Show Version** | What the footer displays. |
+| **Footer Icon URL** | The icon shown in the footer. |
+
+### Login Screen
+
+| Setting | What it does |
+|---|---|
+| **Background Image URL** | The image behind the login card. Leave empty for the default. |
+| **Background Overlay Opacity** | How much the image is darkened so the card stays readable. |
+| **Show Footer** | Show the footer on the login page. |
+| **Title / Subtitle** | The text on the login card. Leave empty for the defaults, which are translated into the user's language. |
+
+The login card uses the **Small Logo** from the Nav Menu tab.
+
+### Advanced
+
+| Setting | What it does |
+|---|---|
+| **Layout Template** | The template that changes page structure for this theme. Leave empty for the built-in layout. See [Layout Templates](./layout-templates/index.mdx). |
+| **Trusted template** | Render the selected layout template without the safety filter. Leave it off unless you wrote the template yourself and it needs scripts, external assets or advanced CSS. Never enable it for a template you imported. |
+| **Loading Screen** | Give this theme its own boot screen (see below), or use the global one. |
+| **Custom CSS** | Extra styles applied on every page while this theme is active. See [Custom CSS](#custom-css). |
+| **Custom JavaScript** | Script run on every page while this theme is active. |
+
+:::warning
+Custom CSS and JavaScript run on every page, for every user of this theme, exactly as you enter them. Only paste in code you wrote yourself or fully understand. Code copied from an unknown source could break the panel or steal your users' information.
+:::
+
+## Loading screen
+
+The loading screen is the branded page shown for a moment while the panel starts. There is one global loading screen, set with the **Loading Title** button on the Themes page, and any theme can override it from its **Advanced** tab. A theme without its own loading screen uses the global one. Changes apply on the next page load — no restart is needed.
+
+| Setting | What it does |
+|---|---|
+| **Titles** | Messages shown under the logo. One is picked at random on each load; remove them all to show only the logo. A theme can also **use the default titles** from the global loading screen. |
+| **Logo URL** | The image shown above the title. |
+| **Background Image URL**, **Overlay Color**, **Overlay Opacity** | The backdrop and how much it is dimmed. |
+| **Text Color**, **Card Background**, **Progress Bar Color** | The colors of the loading card. |
+| **Custom CSS** | Extra styles for the loading screen only. |
+
+## Custom CSS
+
+The **Custom CSS** box on the **Advanced** tab is the place for small visual changes that the settings don't cover. It applies on every page while the theme is active, and it doesn't need a layout template. Save the theme to apply it; if you are using that theme, the change shows immediately.
+
+:::tip
+Prefer the built-in palette variables over hard-coded colors so a rule works in both light and dark mode — for example `color: var(--mud-palette-primary);`.
+:::
+
+### Customizing the menu
+
+Every entry in the navigation menu carries a stable identifier, `data-tca-nav`, that names the entry regardless of the language the panel is displayed in. While a game or Docker server's pages are open, the page also carries the blueprint's id as `data-tca-blueprint-id`. Together they let plain CSS hide or change individual menu entries, for every game or for just one.
+
+The identifiers for the service menu are the feature's name with dashes: `config-files`, `command-lines`, `console`, `scheduled-tasks`, `file-manager`, `steam-update`, `custom-mods`, `updates`, `mods`, `fastdl`, `stats`, `logs`, `backups`, `activity`. The [Layout Template Reference](./layout-templates/reference.mdx#nav-item-identity--data-tca-nav) lists the identifiers for every other menu. To find a blueprint's id, open the game or Docker blueprint under **Settings** and read the number from the address bar.
+
+**Hide a menu entry for every blueprint** — for example when you have built your own configuration pages and want the built-in ones out of the way:
+
+```css
+[data-tca-nav="config-files"],
+[data-tca-nav="command-lines"] { display: none; }
+```
+
+**Hide a menu entry for one blueprint only** — here the file manager is hidden for the blueprint with id `3`:
+
+```css
+html[data-tca-blueprint-id="3"] [data-tca-nav="file-manager"] { display: none; }
+```
+
+**Rename a menu entry.** CSS cannot edit text directly, so the recipe hides the original label and draws a replacement in its place. Both rules are needed — with only the second one, the new text is added after the original instead of replacing it. This example renames **Mods** to **Mod Files** for the blueprint with id `3`; drop the `html[data-tca-blueprint-id="3"]` part to rename it everywhere:
+
+```css
+html[data-tca-blueprint-id="3"] [data-tca-nav="mods"] > .mud-nav-link-text {
+  visibility: hidden; position: relative;
+}
+html[data-tca-blueprint-id="3"] [data-tca-nav="mods"] > .mud-nav-link-text::after {
+  content: "Mod Files"; visibility: visible; position: absolute; left: 0; top: 0;
+}
+```
+
+:::note[Hiding is cosmetic]
+A hidden menu entry is still reachable by typing its address, and the feature keeps working. To actually take a feature away from users, remove the feature permission on the game or Docker blueprint instead. When the drawer is collapsed to icons, the tooltip on a renamed entry still shows the original name.
+:::
+
+## Sharing themes
+
+- **Export** (on a theme) downloads it as a `.json` file; **Export All** on the Themes page downloads every theme in one archive.
+- **Import** loads a `.json` file as a new theme, or, if you pick an existing theme in the import dialog, replaces that theme's settings. An imported theme is never marked as trusted; an administrator has to switch that on locally.
+- **Share** publishes a theme to a plugin repository so other panels can install it. If the theme uses a layout template, the template is included and the two are published together as a **theme bundle**.
+
+:::warning[Only import themes from sources you trust]
+A theme file carries the theme's own Custom CSS and Custom JavaScript, and those are applied as written once the theme is active. Look at a theme's **Advanced** tab after importing it if you are unsure where it came from.
+:::
+
+:::note
+Updating a theme from a plugin repository overwrites your local changes to it. Export the theme first if you have customized it.
+:::
+
+## Locked out by a theme?
+
+If a theme's layout template ever breaks the panel, add `?safeMode=1` to the panel's address. The built-in layout is used for that visit so you can reach **Settings → Themes** and fix or disable the theme. Safe mode does not switch off a theme's own Custom CSS or JavaScript; if those are the problem, pick a different theme on the login page and edit the broken one from there.
