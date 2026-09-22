@@ -25,7 +25,7 @@ Make sure you have:
 
 - A working **master server** (completed the [Master Server Configuration](master-server-configuration.mdx) guide)
 - A second server (the remote) that meets the [System Requirements](../system-requirements.mdx)
-- The remote server must be able to connect to the master server's **MySQL database** and **Redis** service over the network
+- The remote server must be able to connect to the master server's **MySQL database** and **Redis** service over the network — Step 1 below shows how
 
 :::note[Is your master running in the Docker appliance?]
 The all-in-one Docker image only publishes the web panel ports by default. Because a remote connects directly to the master's database and Redis, **publish those ports** on the master's container: recreate it adding `-p 3306:3306 -p 6379:6379` (or run it with `--network host` on Linux). The data volumes persist, so recreating is safe. Only open ports 3306 and 6379 to your remote servers — never to the public internet.
@@ -36,18 +36,78 @@ You don't need to copy any passwords — the deployment token delivers them. If 
 - Redis password: `docker exec tcadmin cat /tcadmin/app/config/appsettings.global.json` (look for `TCAdmin:Redis:Password`) — it's also printed once in the container's first-boot logs.
 :::
 
-## Step 1: Configure the Master to Share Its Database
+## Step 1: Let Remote Servers Reach the Master's Database and Redis
 
-:::tip[Using the Flash Token method? You can usually skip this step]
-A remote installed with a deployment token (the recommended method in Step 4) pulls the master's database **and Redis** connection details — passwords included — automatically, and connects to both at whichever master address answered when it joined. Skip straight to [Step 2](#step-2-add-the-remote-server-in-the-panel) unless you need to **pin explicit addresses**: for example, your database lives at a hostname only some machines can resolve, or your remotes reach the database over a dedicated network.
+This is one-time work on the master. The first remote you add needs both the database and Redis open to it; every remote after that inherits this setup, and only needs a grant of its own if you're granting database access per IP rather than with a wildcard. The deployment token (recommended in Step 4) hands a remote its connection details — passwords included — automatically, but it can't open a firewall port or create a database grant for you.
+
+### Allow Remote Connections to MySQL
+
+Linux MariaDB/MySQL packages bind to `127.0.0.1` by default, and the database user from the master guide only allows logins from the master itself. Until both are changed, a first remote gets a refused connection or "Host ... is not allowed to connect".
+
+**Linux:** set `bind-address = 0.0.0.0` in the server config, then restart the service.
+- Debian/Ubuntu (MariaDB): `/etc/mysql/mariadb.conf.d/50-server.cnf`
+- RHEL family (MariaDB): `/etc/my.cnf.d/mariadb-server.cnf`
+
+**Windows:** the equivalent setting is in `my.ini`, but MySQL/MariaDB installers on Windows usually listen on all interfaces already, so this step is often unnecessary.
+
+Then grant the remote's IP access to the database, using the same password the master already connects with (the deployment token sends the master's password, so the two must match):
+
+```sql
+CREATE USER 'tcadmin3'@'203.0.113.10' IDENTIFIED BY 'SameDatabasePassword';
+GRANT ALL PRIVILEGES ON tcadmin3.* TO 'tcadmin3'@'203.0.113.10';
+FLUSH PRIVILEGES;
+```
+
+Using `'%'` instead of an IP allows a connection from any host, which is only reasonable when your firewall already restricts who can reach port 3306.
+
+:::note[Granting per IP? Each extra remote needs its own grant]
+An IP-scoped grant like the one above only covers that one address — repeat the `CREATE USER`/`GRANT` pair for every additional remote. A `'%'` grant already covers every future remote, so there's nothing more to do there.
 :::
+
+### Open the Firewall
+
+| Port | Service | Open to |
+|------|---------|---------|
+| `3306` | MySQL / MariaDB | Remote server IPs only |
+| `6379` | Redis | Remote server IPs only |
+
+Never open either port to the public internet.
+
+**Linux (ufw):**
+```bash
+sudo ufw allow from 203.0.113.10 to any port 3306 proto tcp
+sudo ufw allow from 203.0.113.10 to any port 6379 proto tcp
+```
+
+**Linux (firewalld):**
+```bash
+sudo firewall-cmd --permanent --add-rich-rule='rule family="ipv4" source address="203.0.113.10" port protocol="tcp" port="3306" accept'
+sudo firewall-cmd --permanent --add-rich-rule='rule family="ipv4" source address="203.0.113.10" port protocol="tcp" port="6379" accept'
+sudo firewall-cmd --reload
+```
+
+**Windows:** the TCAdmin installer already adds firewall rules for the monitor and web executables, which covers Redis (it runs inside the TCAdmin monitor process) — but not MySQL, which is a separate program. Add an inbound rule for it:
+
+```powershell
+netsh advfirewall firewall add rule name="MySQL for TCAdmin remotes" dir=in action=allow protocol=TCP localport=3306 remoteip=203.0.113.10
+```
+
+Running the master in the Docker appliance instead? See the [note above](#before-you-begin) about publishing `3306`/`6379` from the container.
+
+### Redis
+
+The embedded Redis already listens on all interfaces (`0.0.0.0`) by default, and the deployment token delivers its password automatically, so beyond the firewall rule above there's nothing else to configure. If you previously locked Redis down to `127.0.0.1` yourself, change it back to the master's IP or `0.0.0.0` so remotes can reach it.
+
+### Pin Explicit Addresses (Optional)
+
+A remote installed with a deployment token pulls the master's database **and Redis** connection details — passwords included — automatically, and connects to both at whichever master address answered when it joined. This section is only needed if you want to **pin explicit addresses** instead: for example, your database lives at a hostname only some machines can resolve, or your remotes reach it over a dedicated network.
 
 The settings below override what remote servers are sent automatically. You only do this once, on the master, and they apply to every remote.
 
 1. Log in to your TCAdmin control panel
 2. Go to **Settings** > **Global Server Configuration**
 
-### Set Up the Database Connection
+#### Set Up the Database Connection
 
 On the **Common Settings** tab, fill in the database connection fields and click **Save**. You don't need to add the individual `TCAdmin:Database:*` keys by hand — these fields do that for you.
 
@@ -63,7 +123,7 @@ On the **Common Settings** tab, fill in the database connection fields and click
 Remote servers can't connect to `localhost` — that refers to their own machine. Use your master server's actual IP address (e.g., `192.168.1.100` or your public IP).
 :::
 
-### Set Up the Redis Connection
+#### Set Up the Redis Connection
 
 Redis doesn't have dedicated fields on the Common Settings tab, so add it on the **Advanced** tab. Click **Add Option** and create each of the following:
 

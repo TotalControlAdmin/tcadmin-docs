@@ -68,15 +68,12 @@ Plugins can contain scripts that **run on your server**. Only add repositories f
 
 ## Syncing Repositories
 
-Repositories automatically sync their content from the Git source. If a repository shows **"Not Synced"**:
+Repositories sync their content from the Git source automatically. The **Status** column on **Settings** > **Plugin Repositories** tells you where each one stands:
 
-1. Open the repository
-2. Click **Sync Repository**
-3. Wait for it to finish
-
-Status meanings:
 - **Synced** — up to date, everything is good
-- **Not Synced** — needs to pull the latest changes (may show how many commits behind)
+- **Not Synced** — needs to pull the latest changes (the **Commits** column shows how many commits behind)
+
+A repository that is not synced gets an extra **Sync** button in its **Actions** column. Click it and wait for the status to turn green.
 
 ## Managing Credentials for Private Repositories
 
@@ -120,7 +117,12 @@ Custom visual designs for the control panel — different colors, layouts, and s
 
 Translation packs that let you (and your users) view the control panel in different languages.
 
+## Sharing Your Own Plugins
+
+Anything you build in TCAdmin — a game, a Docker blueprint, a theme, a layout template, a script or a language pack — can be published back to a plugin repository, either the public community one or a private repository of your own. See [Sharing Plugins](../../using-tcadmin/common/sharing-plugins.mdx).
+
 ## What's Next?
 
+- [Sharing Plugins](../../using-tcadmin/common/sharing-plugins.mdx) — publish your own plugins
 - [Remote Server Configuration](remote-server-configuration.mdx) — add more machines to host game servers on
 - [Web Certificate](web-certificate.mdx) — set up HTTPS with a trusted certificate
