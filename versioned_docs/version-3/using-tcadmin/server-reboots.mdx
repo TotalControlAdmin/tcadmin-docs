@@ -1,0 +1,125 @@
+---
+sidebar_label: Server Reboots
+sidebar_position: 6
+---
+
+# Server Reboots
+
+When a server's operating system restarts — whether you triggered it from the panel or it happened
+some other way — TCAdmin stops every running game and Docker service through its normal stop path
+first, so nothing is killed mid-save. Once the server is back up, those same services start again on
+their own.
+
+## Rebooting from the panel
+
+Open a server and use **Tools → Reboot**. TCAdmin:
+
+1. Stops every running service on that server **gracefully, all at once** — the same stop command,
+   power events and script events as if you had stopped each service by hand.
+2. Marks each stopped service so it knows to come back.
+3. Restarts the operating system.
+4. Starts the marked services again automatically once the server has booted.
+
+You don't need to stop services yourself before rebooting — the panel takes care of it.
+
+## Rebooting from outside TCAdmin
+
+The same graceful stop happens even when the reboot doesn't come from the panel at all — an RDP or
+SSH session, a `shutdown` or `reboot` command typed directly on the server, or a power cycle from
+your hosting provider's or cloud platform's control panel. The monitor notices the operating system
+shutting down and stops every running service exactly as it would for a panel-initiated reboot, then
+lets the services come back after boot.
+
+For this to work, the monitor needs to have been given the ability to notice the shutdown in time:
+
+- **Windows** — the monitor must have been started at least once on TCAdmin version 3.21 or newer.
+  You can confirm this from a command prompt on the server:
+
+  ```
+  sc query TCA3Monitor
+  ```
+
+  Look for `ACCEPTS_PRESHUTDOWN` in the list of accepted controls. If it isn't there, start (or
+  restart) the monitor service once and check again.
+
+- **Linux** — the server needs the updated monitor service definition, which is installed
+  automatically the next time you run `tca update` on that server.
+
+:::note
+Until the monitor has picked up the updated service definition (Windows) or unit file (Linux), an
+external reboot behaves the old way: services are stopped by the operating system itself rather than
+by TCAdmin, so they may not shut down cleanly.
+:::
+
+## Stopping the monitor is not a reboot
+
+Stopping just the monitor service — `net stop` on Windows, `systemctl stop` on Linux, the **Restart
+Monitor** tool, or installing a TCAdmin update — is not treated as a reboot. Game servers are left
+running on purpose, and the monitor picks their status back up as soon as it returns. This is what
+makes monitor restarts and TCAdmin updates zero-downtime for the games themselves.
+
+## Docker appliance
+
+On the Docker appliance, rebooting a server restarts its **container** rather than the machine
+underneath it — see the "Rebooting the Server" section of
+[Docker Installation](../getting-started/Installation/docker-installation.mdx#rebooting-the-server)
+for how that works. A plain `docker stop` on the container counts as a shutdown too, and triggers the
+same graceful stop of every running service before the container goes down.
+
+For that to happen, Docker has to give the container enough time to finish stopping services before
+it force-kills it — by default, Docker only allows **10 seconds**, which is nowhere near enough. Make
+sure the container is run with a longer stop timeout:
+
+```
+docker run --stop-timeout 180 …
+```
+
+or, in a Compose file:
+
+```yaml
+stop_grace_period: 180s
+```
+
+:::note
+In the **all-in-one** appliance — where the database runs in the same container as the panel and
+monitor — the database may be stopped at the same time as the game services, so some services may not
+manage to stop cleanly before the container goes down. Nodes and split installs (where the database
+runs elsewhere) are not affected.
+:::
+
+## Settings
+
+Two settings under `TCAdmin:OsShutdown` in the monitor's `appsettings.json` control the graceful
+stop. There's no panel UI for these — they're for advanced/troubleshooting use only.
+
+| Setting | Default | What it does |
+|---|---|---|
+| `GraceSeconds` | `180` | How long the monitor is allowed to spend stopping services once the operating system starts shutting down. |
+| `StopConcurrency` | `0` | `0` stops every service at once. A small number stops that many services at a time instead — useful on servers with slow disks, where dozens of services saving at the same moment can thrash. |
+
+:::note
+On Linux, raising `GraceSeconds` above `180` also requires raising `TimeoutStopSec` in the
+`tca3monitor.service` unit file to match, or the operating system will still cut the monitor off at
+its old limit.
+:::
+
+## Scripting
+
+No new script events are involved. The normal **Before Service Stopped** and **After Service
+Stopped** events fire for each service exactly as they would for a manual stop — see
+[Script Objects](../customizations/scripts/script-objects.mdx) for the full list of events and
+variables available to scripts.
+
+## Troubleshooting
+
+**Services came back stopped abruptly instead of gracefully.** Open the monitor's log on that server
+and look for a line containing `OS shutdown detected`:
+
+- **Missing entirely** — the shutdown wasn't detected at all. On Windows, confirm the monitor accepts
+  preshutdown notifications (see [Rebooting from outside TCAdmin](#rebooting-from-outside-tcadmin)
+  above). On Linux, confirm the server has picked up the current monitor service unit by running
+  `tca update`.
+- **Present, followed by `still stopping at the deadline`** — the monitor ran out of time before it
+  finished stopping every service. This means either `GraceSeconds` is too small for how many
+  services (or how slow a stop) the server has, or a particular service's stop command is hanging and
+  never completes.

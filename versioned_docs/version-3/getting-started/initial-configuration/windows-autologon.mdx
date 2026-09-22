@@ -17,7 +17,7 @@ Most game servers work fine **without** auto-logon. You only need it if a specif
 
 ## What Auto-Logon Does
 
-Normally, after a Windows server reboots, it sits at the login screen waiting for someone to type in a password. If a game server needs desktop access to run, it can't start until someone logs in.
+Normally, after a Windows server reboots, it sits at the login screen waiting for someone to type in a password. If a game server needs desktop access to run, it can't start until someone logs in. (See [Server Reboots](../../using-tcadmin/server-reboots.mdx) for what happens to your running services during the reboot itself.)
 
 Auto-logon solves this by automatically logging in a Windows user account every time the server starts up. The game server can then start normally without anyone needing to manually log in.
 

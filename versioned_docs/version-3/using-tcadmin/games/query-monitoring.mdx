@@ -15,7 +15,7 @@ Query Monitoring applies to **game blueprints only** — it is not available for
 
 TCAdmin queries each running game service on a schedule. When a check fails, TCAdmin can **restart**, **stop**, or **disable** the service automatically, **email the service's owner**, and (optionally) write an entry to the activity log so there's a record of what happened.
 
-Monitoring is **off by default**. You turn it on per game from the game blueprint's **Query Monitoring** page.
+Monitoring is **off by default**. You turn it on per game from the game blueprint's **Monitoring** page.
 
 ## What it can detect
 
@@ -31,7 +31,7 @@ Each detection has its own on/off switch and its own action, so you can (for exa
 
 ## Settings
 
-On the game blueprint's **Query Monitoring** page:
+On the game blueprint's **Monitoring** page, **Query Failure** tab:
 
 | Setting | What it does |
 |---|---|
@@ -48,9 +48,9 @@ An action is a small set of choices: at most one power action — **Restart**, *
 
 ### Per-service settings
 
-Some options live on the individual service's settings page, in the **Query Monitoring** section:
+Some options live on the individual service's settings page, in the **Monitoring** section:
 
-- **Disable monitoring** — exclude this one service from monitoring.
+- **Disable query monitoring** — exclude this one service from query monitoring. Does not affect automatic restarts after an unexpected exit.
 - **Private** — opt this service in to *Went public* detection.
 - **Branded** — opt this service in to *Branding removed* detection.
 - **Slots** — the allowed slot count that *Slot overage* detection compares against.
@@ -58,6 +58,22 @@ Some options live on the individual service's settings page, in the **Query Moni
 :::note
 These per-service options require the **Service Settings** permission, so customers can't change them on their own services.
 :::
+
+## Unexpected exit
+
+On the **Unexpected Exit** tab, TCAdmin can restart a game server that exits on its own — a crash, a quit from the console or RCON, or a kill — without waiting for a query check to notice.
+
+| Setting | What it does |
+|---|---|
+| **Restart automatically after an unexpected exit** | Turns the feature on. Default: on. |
+| **Restart delay (seconds)** | How long TCAdmin waits before restarting. Default: 5. |
+| **Maximum restarts** | How many restarts are allowed within the window. Default: 3. |
+| **Within (minutes)** | The sliding window the restart count is measured against. Default: 5. |
+| **Log unexpected exits to the activity log** | Writes an activity entry for each exit and for a reached limit. Default: on. |
+
+Once the maximum is reached within the window, TCAdmin leaves the server stopped and writes a **Restart Limit Reached** activity entry instead of restarting again.
+
+This tab works independently of the Query Failure tab's **Enabled** switch and the per-service **Disable query monitoring** setting — automatic restart runs even when query monitoring is off.
 
 ## Owner emails
 

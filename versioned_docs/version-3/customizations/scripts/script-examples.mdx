@@ -344,3 +344,74 @@ await EmailService.SendTemplateAsync(templateKey, owner, context);
 
 ScriptConsole.WriteLine($"Sent '{templateKey}' to {owner.Email}.");
 ```
+
+## Refuse to Save a Config File While the Service Is Running
+
+This script runs on the `BeforeServiceConfigFileWritten` event and refuses the write while the server is up, so nobody overwrites a file the running server will clobber or reload mid-session. Administrators are still let through. Add the event to the script and attach the script to the game or Docker blueprint.
+
+`ThisUser` is `null` when the operation has no user behind it, so it is always null-checked. Setting `Globals.ReturnValue` to boolean `false` denies the write — see [Config files](./script-events.mdx#config-files) for what the user sees on each surface.
+
+```csharp
+//refAssemblies: TCAdmin.SDK.dll, TCAdmin.GameHosting.SDK.dll, TCAdmin.Scripting.dll, TCAdmin.Monitor.dll
+using TCAdmin.SDK.Database.Entities;             // User
+using TCAdmin.Web.Shared.Models.Enums;           // EServiceStatus
+
+var Globals = new TCAdmin.Scripting.Engines.Addons.CSharpGameGlobals(); // DO NOT MODIFY THIS LINE
+
+var relativePath = Variables["ConfigFileRelativePath"] as string;
+var source = Variables["Source"] as string;
+
+// null when the operation has no user behind it (UserId is 0) — always check.
+var user = Variables["ThisUser"] as User;
+var isAdmin = user != null && user.IsAdminOrTopLevelSubAdmin;
+
+if (isAdmin)
+{
+    ScriptConsole.WriteLine($"Allowing {user.Username} to save '{relativePath}' via {source}.");
+}
+else if (ThisService.Status == EServiceStatus.Started)
+{
+    ScriptConsole.WriteLine($"Refusing to save '{relativePath}': the server is running.");
+
+    // Boolean false denies the write. The user is told the save was denied by a script.
+    Globals.ReturnValue = false;
+}
+```
+
+:::warning
+Saving a config file also fires `BeforeServiceConfigFileRead` (the panel reads the current file first) as well as `BeforeServiceConfigFileWritten`. A script that denies reads or writes therefore blocks saves of that file too.
+:::
+
+## Restart the Service After a Config File Changes
+
+This script runs on the `AfterServiceConfigFileWritten` event. It records who changed the file and how, then restarts the service so the new settings take effect. The event fires after the file is on disk and its variables have been synced, no matter which surface wrote it — the panel, FTP, SFTP or an upload.
+
+:::info
+`ServiceManagerService` requires the **Run Impersonated** option to be unchecked on the script.
+:::
+
+```csharp
+//refAssemblies: TCAdmin.SDK.dll, TCAdmin.GameHosting.SDK.dll, TCAdmin.Scripting.dll, TCAdmin.Monitor.dll
+using TCAdmin.SDK.Database.Entities;             // User
+using TCAdmin.Web.Shared.Models.Enums;           // EServiceStatus
+
+var Globals = new TCAdmin.Scripting.Engines.Addons.CSharpGameGlobals(); // DO NOT MODIFY THIS LINE
+
+var relativePath = Variables["ConfigFileRelativePath"] as string;
+var source = Variables["Source"] as string;
+var user = Variables["ThisUser"] as User;
+var who = user?.Username ?? "an automated task";
+
+ScriptConsole.WriteLine($"'{relativePath}' was changed by {who} via {source}.");
+
+// Only restart for the settings file we care about.
+if (relativePath == "server/cfg/server.cfg")
+{
+    var status = await ServiceManagerService.GetServiceStatus(ThisService.ServiceId);
+    if (status.Status == EServiceStatus.Started)
+    {
+        ScriptConsole.WriteLine("Restarting the service to apply the new settings...");
+        await ServiceManagerService.RestartService(ThisService.ServiceId);
+    }
+}
+```

@@ -1,0 +1,386 @@
+---
+sidebar_position: 1.5
+sidebar_label: Script Events
+---
+
+# Script Events
+
+A **script event** decides *when* a script runs, picked from the editor's **Script Events** list. A script can bind several at once — e.g. `AfterServiceCreated` and `AfterServiceReinstalled`.
+
+Which events a script can bind depends on where it lives:
+
+| Script | Where you create it | Events it can bind |
+|---|---|---|
+| **Blueprint script** | On a game or Docker blueprint | Every applicable event on this page. |
+| **Global script** | *System → Settings → Global Game/Docker Scripts* | The same events, for the blueprints the admin selects on the script: all of them, or one or more. |
+| **Service script** | On a single service, by owner or admin | Only `ScheduledTask`, `CustomServiceAction` and `CustomServiceIcon`. |
+
+Every event gets the **standard script objects** — `ThisService`, `ThisServer`, `ThisGame`/`ThisDockerBlueprint`, `ScriptConsole`, `Variables`, the managers (see [Script Objects](script-objects.mdx)). **Extra variables** below is what an event adds on top.
+
+In C#, extra variables are read with `Variables["Name"]` or `Dynamic.Name`; other engines get them as ordinary globals.
+
+:::note
+Event names are case-sensitive. A script's **Operating System** setting means the OS of the **hosting server**, not of a container image.
+:::
+
+## Service lifecycle
+
+| Event | Fires when | Extra variables |
+|---|---|---|
+| `BeforeServiceCreated` | Before a new game service creates. | — |
+| `AfterServiceCreated` | After it creates and registers. | — |
+| `BeforeServiceDeleted` | Before deletion (also before a Docker reinstall's delete half). | — |
+| `AfterServiceDeleted` | After files and registration are removed. | — |
+| `BeforeServiceReinstalled` | Before a game service reinstalls. | — |
+| `AfterServiceReinstalled` | After a game service reinstalls. | — |
+| `BeforeServiceMoved` | **Source** server, before the move (incl. host↔VS). Not fired for copies. | — |
+| `AfterServiceMoved` | **Target** server, after the moved service registers. Not fired for copies. | — |
+
+Delete and move apply to game **and** Docker services. Create/reinstall are **game**-only; a Docker reinstall runs delete instead.
+
+## Power (start, stop, kill)
+
+These apply to game and Docker services. An `After*` event fires only once the action succeeds — a failed start never reaches `AfterServiceStarted`.
+
+| Event | Fires when | Extra variables |
+|---|---|---|
+| `BeforeServiceStarted` | Before the service is started. | — |
+| `AfterServiceStarted` | After the service has started. | — |
+| `BeforeServiceStopped` | Before the service is stopped. | — |
+| `AfterServiceStopped` | After the service is stopped. | — |
+| `BeforeServiceKilled` | Before the service process is force-killed. | — |
+| `AfterServiceKilled` | After the service process is force-killed. | — |
+
+:::note
+**Stop service** stops the service before the script, restarts after; ignored for the events above.
+:::
+
+## Unexpected exit
+
+Game services only. Fires within a few seconds of a game server ending on its own — an RCON `quit`, a crash, an out-of-memory kill, an in-game shutdown. Stopping, killing or restarting from the panel, an OS shutdown and query-monitoring actions do not fire it. The panel also writes an *Exited Unexpectedly* entry to the service's activity log.
+
+| Event | Fires when | Extra variables |
+|---|---|---|
+| `ServiceExitedUnexpectedly` | After a running service exited without TCAdmin asking it to. | `ExitCode` (`int?`), `ExitReason` (`string?`), `ExitTime` (`DateTime`, UTC), `ProcessId` (`int`), `ServiceIOProcessId` (`int`), `RestartScheduled` (`bool`) |
+
+The game blueprint's Monitoring page controls whether TCAdmin schedules an automatic restart.
+
+:::warning
+`ExitCode` is **null** when the panel could not read it — for example when the game was force-killed by the OS or the service helper process crashed before the code was captured. Always null-check it. `ProcessId` is `0` in the same case. On Windows, closing the server's console window kills the server immediately and records `ExitReason = "ConsoleClosed"` alongside the exit code.
+:::
+
+Example — start the server again unless it exited cleanly (`ServiceManagerService` requires **Run Impersonated** to be unchecked on the script):
+
+```csharp
+var exitCode = Variables["ExitCode"] as int?;
+ScriptConsole.WriteLine(exitCode.HasValue
+    ? $"Server exited with code {exitCode}"
+    : "Server exited, exit code unknown");
+
+if (exitCode != 0)
+    await ServiceManagerService.StartService(ThisService.ServiceId);
+```
+
+## Scheduled and on demand
+
+The only events a **service script** can bind, for game and Docker services.
+
+| Event | Fires when | Extra variables |
+|---|---|---|
+| `ScheduledTask` | On the task's recurring schedule. | The script's own input variables, with the values stored on the schedule. |
+| `CustomServiceAction` | On clicking the script's action button. | The script's own input variables, with the values the operator filled in. |
+| `CustomServiceIcon` | When the panel draws the custom status icon. | The script's own input variables. |
+| `VisualScriptBlock` | **Never fires as a trigger.** Publishes the script as a reusable *Run Script* block in the [Visual Script Editor](visual-script-editor.mdx). | — |
+
+Access is role-based: no roles means admin-only; otherwise a sub-user needs the per-service *Script → Execute* permission and a regular user needs one of the script's roles.
+
+## Mods
+
+Admin-curated per-blueprint mods, shared by game and Docker services. See [Mods](../../using-tcadmin/common/mods.mdx).
+
+| Event | Fires when | Extra variables |
+|---|---|---|
+| `BeforeModInstall` | Before a mod's files install. | `ModName` (`string`), `ModId` (`long`), `BlueprintMod` (`BlueprintMod`) |
+| `AfterModInstall` | After install and recording. | `ModName`, `ModId`, `BlueprintMod` |
+| `BeforeModUpdate` | Before an in-place update. | `ModName`, `ModId`, `BlueprintMod` |
+| `AfterModUpdate` | After an in-place update. | `ModName`, `ModId`, `BlueprintMod` |
+| `BeforeModUninstall` | Before tracked files are removed. | `ModName`, `ModId`, `BlueprintMod` |
+| `AfterModUninstall` | After removal. | `ModName`, `ModId`, `BlueprintMod` |
+
+:::note
+Adding this makes a script only **eligible** — also attach it to the mod in the mod editor's *Scripts* list.
+:::
+
+An in-place update needs update scripts attached; otherwise the mod fully uninstalls and reinstalls. `AfterModInstall` files aren't tracked, so uninstall won't remove them — pair it with an uninstall script that reverts the work.
+
+## Fast Downloads
+
+See [Fast Downloads](../../using-tcadmin/common/fast-downloads.mdx).
+
+| Event | Fires when | Extra variables |
+|---|---|---|
+| `BeforeFastDLSync` | Before the service's files are mirrored to the Fast Downloads origin. | — |
+| `AfterFastDLSync` | After the mirror sync finishes. | — |
+
+## Game updates
+
+Game services only. See [Game Updates](../../using-tcadmin/games/updates.mdx).
+
+| Event | Fires when | Extra variables |
+|---|---|---|
+| `BeforeUpdateInstall` | Before the update's files are placed. | `GameUpdate` (`GameUpdate`), `UpdateId` (`long`), `UpdateName` (`string`) |
+| `AfterUpdateInstall` | After the files are placed and the installed-update is recorded. | `GameUpdate`, `UpdateId`, `UpdateName` |
+
+:::note
+Like mods: this only makes a script eligible — attach it in the update editor's *Update scripts* list.
+:::
+
+## Blueprint content sync
+
+Fires per **blueprint**, not per service — a script refreshes the blueprint's **mods** and **game updates** from an external catalog automatically.
+
+| Event | Fires when | Extra variables |
+|---|---|---|
+| `SyncBlueprintContent` | Daily, per blueprint with a bound script (time set under *Data Retention & Maintenance → Sync Blueprint Content*), or on demand via *Run sync now*. | `ThisBlueprint`, plus `ThisGame` (`Game`) or `ThisDockerBlueprint` (`DockerBlueprint`) |
+
+:::warning
+**No service in scope** — `ThisService` is `null`, and so is everything derived from it. **Run Impersonated** and **Stop service** are ignored.
+:::
+
+- Runs on the **master server** — **Operating System** must include it. Select both if unsure.
+- A failing script logs and the pass continues. A missed day catches up in one run; a mid-run request is dropped, not queued.
+- Blueprints with no bound script are skipped.
+- New mods/updates start with **no roles** (admin-only) — assign roles in the script.
+
+## Steam updates
+
+Game services only. They fire around the Steam download — on create (when configured), reinstall, a manual update, and scheduled auto-updates.
+
+| Event | Fires when | Extra variables |
+|---|---|---|
+| `BeforeSteamUpdate` | Before the Steam download starts. The service may still be running. | — |
+| `AfterSteamUpdate` | After the download finishes, before restart — re-apply anything it overwrote (e.g. a config file). | — |
+
+## Custom mods
+
+Game services only — the per-service Custom Mod flow (Steam Workshop, CurseForge, Modrinth, Nexus, uMod, modpacks), separate from the blueprint **Mods** above.
+
+| Event | Fires when | Extra variables |
+|---|---|---|
+| `BeforeCustomModInstalled` | Before install on the service. | `ModName` (`string`), `ModId` (`long`), `ProviderId` (`long`), `ModDetails` |
+| `AfterCustomModInstalled` | After install. | Same as above. |
+| `BeforeCustomModUpdated` | Before update. | Same as above. |
+| `AfterCustomModUpdated` | After update. | Same as above. |
+| `BeforeCustomModUninstalled` | Before removal. | Same as above. |
+| `AfterCustomModUninstalled` | After removal. | Same as above. |
+
+Each provider adds a few of its own — e.g. a mod version, a file id, or the install path used.
+
+## Download game files
+
+| Event | Fires when | Extra variables |
+|---|---|---|
+| `DownloadGameFiles` | Only when a game has **no local files** and a script must fetch them. Never for Steam-backed games. | — |
+
+:::warning
+A `DownloadGameFiles` script must have **Run Impersonated** turned **off** — the panel refuses to save it otherwise.
+:::
+
+## Query and RCON protocols
+
+Game services only. The script *is* the protocol — bind one per event; if several, the first by **Order** wins.
+
+| Event | Fires when | Extra variables |
+|---|---|---|
+| `CustomQueryProtocol` | Each `custom_script` query. Set `Globals.ReturnValue` to a `GameQueryResponse`-shaped object; throw or return nothing for **offline**. 10s timeout. | `Address` (`string`), `Port` (`int`) |
+| `CustomRconProtocol` | Each `custom_script` RCON command. Set `Globals.ReturnValue` to the console text (printed output isn't the reply); throw to fail it. 15s timeout. | `Address` (`string`), `Port` (`int`), `Password` (`string`), `Command` (`string`) |
+
+## Query monitoring
+
+Game services only. See [Query Monitoring](../../using-tcadmin/games/query-monitoring.mdx) for the detection model and variable list.
+
+| Event | Fires when | Extra variables |
+|---|---|---|
+| `ServiceQueried` | Once per check interval, for every running monitored service with a bound script — online or offline. | `Query` (`GameQueryResponse`), `QueryStatus` (`string`), `QueryOnline` (`bool`), `NumPlayers` (`int`), `MaxPlayers` (`int`), `NumSpectators` (`int`), `MaxSpectators` (`int`) |
+| `BeforeServiceMonitoringDetection` | On every **confirmed** detection (after the re-check), before the action runs. | `DetectionType` (`EMonitoringDetectionType`), `MonitoringAction` (`EQueryMonitoringAction`), `ConsecutiveFailures` (`int`), `FailureThreshold` (`int`), `ThresholdReached` (`bool`), `QueryStatus` (`string`), plus detection-specific extras |
+| `AfterServiceMonitoringDetection` | After a confirmed detection's action completes. | Same as above. |
+| `BeforeServiceQueryFailed` | Only a confirmed **offline-query** detection, before the action. | Same as above. |
+| `AfterServiceQueryFailed` | Only a confirmed offline-query detection, after the action. | Same as above. |
+
+:::tip
+Prefer the generic `*MonitoringDetection` pair and branch on `DetectionType`. Binding both pairs runs a script twice on failure. There is no recovery event.
+:::
+
+:::warning
+These variables exist **only while a query-monitoring event fires** — absent elsewhere (custom actions, icons, scheduled tasks, power events). For an on-demand count, call `GameServiceManager.QueryService(ThisService)`.
+:::
+
+## Repair
+
+| Event | Fires when | Extra variables |
+|---|---|---|
+| `AfterServiceRepaired` | After the *Repair* action has ensured the run-as user and re-applied file permissions on a game service. | — |
+
+## Config files
+
+These three events let a blueprint script watch — and **refuse** — every config-file touch. They work for game **and** Docker blueprints.
+
+| Event | Fires when | Extra variables |
+|---|---|---|
+| `BeforeServiceConfigFileRead` | Before a registered config file reads. **A script can deny the read.** | `ConfigFile`, `ConfigFileId`, `ConfigFilePath`, `ConfigFileRelativePath`, `Source`, `UserId`, `ThisUser` |
+| `BeforeServiceConfigFileWritten` | Immediately before a registered config file writes. **A script can deny the write.** | Same as above. |
+| `AfterServiceConfigFileWritten` | After it lands on disk **and** variables sync. Never denies — already saved. | Same as above. |
+
+### Only registered config files
+
+Fires only for a **config file registered on the blueprint** (its *Config Files* tab), after path tokens expand. Everything else — logs, saves, mod files, bulk uploads — is ignored. No bound script means nothing runs.
+
+### What triggers a read
+
+`BeforeServiceConfigFileRead` fires on any of these reads (a folder download/compress does **not** count — it isn't per-file):
+
+| Where | Action |
+|---|---|
+| **File Manager** | Opening or downloading it. |
+| **Config Files page** | Opening the raw or structured editor. |
+| **FTP / FTPS** | Downloading it. |
+| **SFTP** | Downloading it. |
+| **AI Assistant** | Reading it. |
+| **Saving** | Any save — the panel reads the file first to check permissions (see note below). |
+
+### What triggers a write
+
+The same list of surfaces fires **two** events: `BeforeServiceConfigFileWritten` immediately before the write (a script can deny it), then `AfterServiceConfigFileWritten` once the file is on disk and synced:
+
+| Where | Action |
+|---|---|
+| **Config Files page** | Saving either editor. |
+| **File Manager** | Saving, uploading, renaming/moving onto the path, or extracting an archive containing it. |
+| **FTP / FTPS and SFTP** | Uploading, or renaming onto its path. |
+| **Visual Script Editor** | A *Create File* block that writes it. |
+
+### Available variables
+
+All three events also provide:
+
+| Variable | Type | Description |
+|---|---|---|
+| `ConfigFile` | `ConfigFile` | The matched blueprint entry — `Name`, `Template`, `Editor`, relative path. |
+| `ConfigFileId` | `long` | That entry's id. |
+| `ConfigFilePath` | `string` | The file's full path on the hosting server. |
+| `ConfigFileRelativePath` | `string` | Path relative to the service root, forward-slashed, tokens expanded. |
+| `Source` | `string` | `Web`, `Ftp` or `Sftp`. Panel, REST API, visual editor and archive extraction all report `Web`. |
+| `UserId` | `long` | The attributed user; `0` means no user was behind it. |
+| `ThisUser` | `User` | That user — **`null` when `UserId` is `0`**; always null-check it. |
+
+Both come from the blueprint entry, not the caller's path, so they match regardless of surface.
+
+### Denying a read or a write
+
+`BeforeServiceConfigFileRead` and `BeforeServiceConfigFileWritten` refuse; `AfterServiceConfigFileWritten` never does — it's already saved. A bound script denies by:
+
+- setting `Globals.ReturnValue` to boolean `false` (reason: *denied by script*), or
+- **failing** with an error (reason: the error message).
+
+Only a real boolean counts — `"false"` or `0` does **not** deny. With several scripts bound, a failure outranks a mere `false`, since its message says what actually broke.
+
+The user sees, per surface:
+
+| Surface | Read denied | Write denied |
+|---|---|---|
+| Panel (File Manager, Config Files page) | `Reading '<file>' was denied by a script: <reason>`. | `Saving '<file>' was denied by a script: <reason>`. |
+| FTP / FTPS | A `550` reply with the reason. | A `550` reply with the reason. |
+| SFTP | A permission-denied error with the reason. | A permission-denied error with the reason. |
+
+:::warning
+**A save fires all three events in order.** The panel reads the file first to check permissions (`BeforeServiceConfigFileRead`), then fires `BeforeServiceConfigFileWritten` immediately before writing — either can refuse: a denying read script blocks the save before anything runs, a denying write script leaves the file untouched. Only once the write and variable sync finish does `AfterServiceConfigFileWritten` fire, and it cannot deny.
+:::
+
+:::note
+**Ignore Errors is how a deny gate fails open.** Ticked, a crash in the script lets the read or write through instead of refusing it. It does not soften an explicit `false`, or cover another bound script's failure.
+:::
+
+### Notes for all three events
+
+- `AfterServiceConfigFileWritten` never fails the operation — errors are logged on the hosting server and the file stays saved.
+- All three are **awaited**: a slow script slows the read/save/upload; `AfterServiceConfigFileWritten` always sees the final content with variables already synced.
+- **Stop service** behaves as for any other event — stops before the script, restarts after. Rarely wanted on a read.
+
+### Example: refuse to save a config file while the service is running
+
+Bind to `BeforeServiceConfigFileWritten` on the blueprint. Admins pass through; everyone else is refused from saving while the server runs — the point is that nobody overwrites a file the running server will clobber or reload mid-session.
+
+:::info
+`ServiceManagerService` requires the **Run Impersonated** option to be unchecked on the script.
+:::
+
+```csharp
+//refAssemblies: TCAdmin.SDK.dll, TCAdmin.GameHosting.SDK.dll, TCAdmin.Scripting.dll, TCAdmin.Monitor.dll
+using TCAdmin.SDK.Database.Entities;             // User
+using TCAdmin.Web.Shared.Models.Enums;           // EServiceStatus
+
+var Globals = new TCAdmin.Scripting.Engines.Addons.CSharpGameGlobals(); // DO NOT MODIFY THIS LINE
+
+var relativePath = Variables["ConfigFileRelativePath"] as string;
+var source = Variables["Source"] as string;
+
+// null when the operation has no user behind it (UserId is 0) — always check.
+var user = Variables["ThisUser"] as User;
+var isAdmin = user != null && user.IsAdminOrTopLevelSubAdmin;
+
+if (isAdmin)
+{
+    ScriptConsole.WriteLine($"Allowing {user.Username} to save '{relativePath}' via {source}.");
+}
+else if ((await ServiceManagerService.GetServiceStatus(ThisService.ServiceId)).Status == EServiceStatus.Started)
+{
+    ScriptConsole.WriteLine($"Refusing to save '{relativePath}': the server is running.");
+
+    // Boolean false denies the write. The user is told the save was denied by a script.
+    Globals.ReturnValue = false;
+}
+```
+
+### Example: restart the service after a config file changes
+
+Bind to `AfterServiceConfigFileWritten`. Logs who changed what, then restarts the service to apply the new settings.
+
+:::info
+`ServiceManagerService` requires the **Run Impersonated** option to be unchecked on the script.
+:::
+
+```csharp
+//refAssemblies: TCAdmin.SDK.dll, TCAdmin.GameHosting.SDK.dll, TCAdmin.Scripting.dll, TCAdmin.Monitor.dll
+using TCAdmin.SDK.Database.Entities;             // User
+using TCAdmin.Web.Shared.Models.Enums;           // EServiceStatus
+
+var Globals = new TCAdmin.Scripting.Engines.Addons.CSharpGameGlobals(); // DO NOT MODIFY THIS LINE
+
+var relativePath = Variables["ConfigFileRelativePath"] as string;
+var source = Variables["Source"] as string;
+var user = Variables["ThisUser"] as User;
+var who = user?.Username ?? "an automated task";
+
+ScriptConsole.WriteLine($"'{relativePath}' was changed by {who} via {source}.");
+
+// Only restart the settings file we care about.
+if (relativePath == "server/cfg/server.cfg")
+{
+    var status = await ServiceManagerService.GetServiceStatus(ThisService.ServiceId);
+    if (status.Status == EServiceStatus.Started)
+    {
+        ScriptConsole.WriteLine("Restarting the service to apply the new settings...");
+        await ServiceManagerService.RestartService(ThisService.ServiceId);
+    }
+}
+```
+
+## Docker
+
+| Event | Fires when | Extra variables |
+|---|---|---|
+| `ConfigureContainer` | On **every** service start — the container is deleted and recreated each time. Runs after the spec is built from the blueprint and service, just before creation. | `ThisContainerStartParameters` (`CreateContainerParameters`) |
+
+The container is created with whatever the script sets on `ThisContainerStartParameters`; nothing re-applies afterward. It's also the place for one-time per-service setup — e.g. generating a value and storing it in the service's variables before the container uses it. `ScriptConsole.WriteLine()` output appears in the service console and task output.
+
+See [Script Objects](script-objects.mdx) for the `//refAssemblies` header and `Globals.ReturnValue`.

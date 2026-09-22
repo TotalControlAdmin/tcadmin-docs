@@ -1,0 +1,58 @@
+---
+sidebar_label: 3.21.80.55215
+date: 2026-09-22
+authors: [tcadmin]
+---
+
+import ReleaseDate from '@site/src/components/ReleaseDate';
+
+# Version 3.21.80.55215
+
+<ReleaseDate />
+
+### New Features
+
+- **Panel Settings** — A new Panel Settings page in System Settings offers three presets — Classic, Advanced and Custom — that hide whole feature areas (Games, Docker, Regions, Activity Logs, Announcements) from the panel at once. Classic gives a V2-like panel without Docker, Regions, Activity Logs and Announcements; Custom picks any subset. Hiding a feature is a simplification, not a permission: pages, data and the API keep working underneath, and Docker and Games can never both be hidden.
+- **Server reboots stop services gracefully** — Rebooting a server, from the panel's Tools menu or from outside TCAdmin (RDP/SSH, a cloud console, `docker stop` on the appliance), now stops every running service the normal way before the operating system goes down, then starts them again once it's back up. Before 3.21 an external reboot simply killed every service outright. See [Server Reboots](../using-tcadmin/server-reboots.mdx).
+- **Automatic restart after a crash** — A game server that exits on its own — a crash, a `quit` from the console or RCON, or a kill — is now started again after a short delay, without waiting for query monitoring to notice. The new Unexpected Exit tab on a game blueprint's Monitoring page (previously Query Monitoring) sets the delay, a restart limit that stops a crash loop (by default 3 restarts in 5 minutes, after which the server is left stopped and a "Restart limit reached" entry is logged), and whether each exit is written to the activity log with its exit code. Scripts can react through the new `ServiceExitedUnexpectedly` event. See [Query Monitoring](../using-tcadmin/games/query-monitoring.mdx#unexpected-exit).
+- **Game files from another server** — A server can now fetch a game's files from another TCAdmin server instead of keeping its own copy, over a one-time read-only credential and the built-in SFTP server. Turn on "Share game files with other servers" on the server holding the library, then pick it as the source elsewhere.
+- **Keep a local copy of downloaded compressed files** — For a server fetching game files over SFTP, FTP, S3 or the provider above, this switch caches the downloaded archive and only re-downloads it once the source file's size or date changes.
+- **Docker: use the service IP for outgoing traffic** — Linux nodes only. A Docker service on its own secondary IP used to send outgoing traffic from the node's primary address instead, so games that advertise the address they connect from — Steam, EOS, most anti-cheat backends — showed the wrong IP. A new switch, on the blueprint and per-service, fixes that.
+- **A scheduled task's run history** — Every task on a service's Scheduled Tasks page gained a History icon showing its past runs, with a status filter, a date range, and a link to each run's log — so "did my nightly backup actually run" has an answer.
+- **Update Existing Services** — The game editor's Command Lines tab gained an Update Existing Services button that applies the blueprint's current command-line settings to every existing service of that game at once — at each service's next start, or with an immediate restart. Before 3.21 the only way was to reinstall or edit each service by hand.
+- **A Tools menu for every server, and Restart All Monitors** — The Servers list and a server's page gained a Tools menu collecting connection tests, logs, console sessions and power actions in one place, plus a Restart All Monitors action that restarts every enabled non-master server's monitor at once — the master is never included.
+- **File System Permission options** — A blueprint's File System Permissions page gained four panel-wide switches: skip owner and symlink checks on very large folder listings for speed, hide Linux files carrying the executable bit, check that a file's owner matches the service's own user, and block symbolic links pointing outside the service's folder. All four are on by default.
+- **Tasks no longer leave root- or Administrator-owned files behind** — When a game update, Steam download, mod install or script writes into a service's folder as the system account, every file it touches is now handed back to the service's own user automatically, on both Windows and Linux, without a manual Repair afterward.
+- **New config file scripting events** — Scripts can now run before a blueprint config file is read or written, and can refuse the read or the write, plus a third event after a write completes: `BeforeServiceConfigFileRead`, `BeforeServiceConfigFileWritten` and `AfterServiceConfigFileWritten`. Available to game and Docker blueprint scripts alike.
+- **Change a service's owner** — A service's Settings page gained the ability to reassign the service to a different customer, for game and Docker services alike.
+- **Repair works on more services** — Repair now also works on Docker services (Linux nodes), re-owning a container's file tree to fix files it left owned by the wrong user. For a running game or Docker service, Repair can now also run without stopping it first, instead of forcing a stop.
+- **Announcements can target a server or virtual server, and visual scripts speak your language** — Announcements gained two new scopes, targeting everyone on a specific server or virtual server, not just by blueprint, region or datacenter. Separately, the visual (flowchart) script editor's labels and help text now follow the panel's own language instead of always showing in English. See [Announcements](../using-tcadmin/announcements.mdx) and the [Visual Script Editor](../customizations/scripts/visual-script-editor.mdx).
+- **Failed service creation cleans up after itself** — If creating a service fails before or during the step that creates it, the panel now removes the partial service — its files, its run-as user, its container — instead of leaving a broken one in the list. A failure afterward, such as a failed Steam download, keeps the service so the install can be retried.
+- **The real client IP behind Cloudflare or a reverse proxy** — The panel now trusts a visitor IP forwarded by a proxy (`CF-Connecting-IP`, `X-Forwarded-For`, `X-Real-IP`) only when the connecting machine is a known one: localhost, Cloudflare's edge network, or an address an admin explicitly lists. Until then, the activity log, logins and API-key records show the proxy's own address for every user.
+- **Smaller improvements** — Granting a sub-user Config Files, Command Lines, File Manager or FTP access now selects every variable for them automatically when none was picked, and leaving the sub-user permissions page with unsaved changes now asks first; game dropdowns show an OS icon and label so the Windows and Linux copies of a game can be told apart; a service's Information tab now links to its blueprint; blueprint variables TCAdmin relies on can no longer be renamed or deleted; language imports from the plugin repository default to removing translations not in the import; mod and other icons can now be an SVG file or a hosted image URL; a license set at the datacenter or global level can no longer be edited on a server's own License page; a disabled server now shows as disabled in the Servers list and blocks Test Connection; Configure Container script output now reaches the web console and task log; the user editor shows a colour-coded chip for Admin / Sub-Admin / User / Sub-User, and changing an account's type is now admin/sub-admin only; demo mode blocks the new write actions above; and Scripts > New and the file manager (checkboxes, tooltips) got general polish.
+- **Updated AI assistant** — Its reference material and tools were updated for everything new in 3.21, and it now says plainly when a question isn't covered instead of guessing at a page or button that doesn't exist. The default per-session token limit was doubled so long conversations run out of room less often; the limit stays adjustable in the assistant's settings.
+
+### Bug Fixes
+
+- **Searching services by port or connection info** — Typing a port number or a `host:port` address into the Services list search found nothing; both now match, and the Port column sorts correctly.
+- **Scheduled task creation with a cron schedule** — Creating a scheduled task using a cron expression failed with an error.
+- **Combobox display and duplicate labels** — Some dropdown fields showed the wrong text for the selected value, or listed the same label twice.
+- **Sub-user FTP access** — Some sub-users lost FTP access to services they were granted access to.
+- **Sub-user login blocked by billing status** — A sub-user could be silently blocked from logging in by their parent account's billing status, with no way to tell why.
+- **Saving a new plugin repository** — Saving a newly created plugin repository failed with a not-found error.
+- **Plugin-import activity log** — Importing a plugin and viewing the import in the activity log showed an untranslated entry.
+- **Recent Activity panel on a service's home page** — This panel required the full Activity Logs feature to work, even for admins who only had the narrower per-service activity permission.
+- **Files uploaded over FTP on Linux** — Files uploaded through FTP on a Linux node could end up owned by the wrong user instead of the service's own user.
+- **Redis hang and high CPU on a busy master** — A master hosting many populated game servers could overload its built-in Redis, causing high monitor CPU and, in the worst case, the monitor or web service restarting.
+- **Minecraft MOTD colour codes** — A Minecraft service's message of the day could show unreadable colour codes instead of plain text.
+- **Starting a service's console** — Could fail with a database error.
+- **Required message when saving a variable** — Blueprint variables showed an undismissable "required" message even with the Required option off.
+- **CPU usage reporting on Linux** — A Linux server's reported CPU usage was frozen near its since-boot average instead of showing live usage.
+- **A memory leak in the web panel** — Fixed a gradual memory leak affecting the web panel over time.
+- **Config file access-denied messages** — Showed one generic error instead of saying why access was denied.
+- **Console connection errors** — Game console connection issues were logged as errors instead of warnings.
+- **A web console error** — Resizing a service's console shortly after opening it could throw a "second operation" database error.
+- **Opening a direct config file link** — Could throw a browser error instead of opening the file.
+- **Empty plugin repositories** — Fixed cases where a newly shared plugin repository appeared empty.
+- **An offline server slowing down other connections** — An unreachable server could slow down the panel's connections to unrelated servers.
+- **Duplicate servers list on the health page** — The System Health page listed servers twice.

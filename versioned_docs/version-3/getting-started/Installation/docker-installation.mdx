@@ -304,7 +304,7 @@ Pulling a newer image only refreshes the underlying operating system and databas
 
 ## Rebooting the Server
 
-The panel's server **Reboot** action works in Docker too — it restarts the **container** (a container has no operating system of its own to reboot). Game servers that were running come back automatically once the container is up again, just like after a real server reboot.
+The panel's server **Reboot** action works in Docker too — it restarts the **container** (a container has no operating system of its own to reboot). Game servers that were running come back automatically once the container is up again, just like after a real server reboot. See [Server Reboots](../../using-tcadmin/server-reboots.mdx) for what happens to those services during the restart, and why the container needs a longer stop timeout.
 
 TCAdmin picks whichever of these is available, automatically:
 
@@ -333,7 +333,7 @@ Two common shapes:
 - **Split containers on one machine** — run the master with `TCADMIN_ROLE=monitor` so it doesn't serve the panel itself, and the web container serves it. The ready-made Compose file below sets this up in one command.
 
 :::info[The web machine must reach the master]
-A web panel container connects to the master's database and Redis directly, exactly like a remote server does. On a different machine, publish `3306` and `6379` on the master (see [Ports](#ports)) and open them **only** to the web machine. The configuration takes care of itself: the token delivers the database and Redis connection details, passwords included, and the web container connects to both at **whichever master address answered its join request**. Follow [Step 1 of Remote Server Configuration](../initial-configuration/remote-server-configuration.mdx#step-1-configure-the-master-to-share-its-database) only if you need to pin explicit addresses — for example, a database on its own network. (You do **not** need Step 2's deployment token — the web panel token below is a different token.)
+A web panel container connects to the master's database and Redis directly, exactly like a remote server does. On a different machine, publish `3306` and `6379` on the master (see [Ports](#ports)) and open them **only** to the web machine. The configuration takes care of itself: the token delivers the database and Redis connection details, passwords included, and the web container connects to both at **whichever master address answered its join request**. Follow [the Pin Explicit Addresses section of Remote Server Configuration](../initial-configuration/remote-server-configuration.mdx#pin-explicit-addresses-optional) only if you need to pin explicit addresses — for example, a database on its own network. (You do **not** need Step 2's deployment token — the web panel token below is a different token.)
 :::
 
 **1. Turn on the web panel token on the master.** Add `-e WEB_TOKEN=true` to the master's `docker run` command. For a master that's already running, remove and re-run the container with the extra variable — the volumes keep all of your data. On the next start the master creates the token (once) and prints it in `docker logs`; you can also read it at any time afterward:

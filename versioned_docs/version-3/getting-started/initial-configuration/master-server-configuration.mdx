@@ -76,6 +76,8 @@ CREATE DATABASE tcadmin3;
 GRANT ALL PRIVILEGES ON tcadmin3.* TO 'tcadmin3'@'localhost';
 FLUSH PRIVILEGES;
 ```
+
+That user only allows logins from the master itself; when you add remote servers, you'll create a second grant for their IPs (see [Step 1 of Remote Server Configuration](remote-server-configuration.mdx#step-1-let-remote-servers-reach-the-masters-database-and-redis)).
 :::
 
 ### 5. Add to PATH
