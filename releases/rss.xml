@@ -5,9 +5,16 @@
     <link>https://docs.tcadmin.com/3/releases</link>
     <description>Latest TCAdmin v3 release notes</description>
     <language>en</language>
-    <lastBuildDate>Tue, 08 Sep 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 22 Sep 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://docs.tcadmin.com/releases/rss.xml" rel="self" type="application/rss+xml"/>
     <copyright>Copyright © 2026 TCADMIN.COM</copyright>
+    <item>
+      <title>3.21.80.55215</title>
+      <link>https://docs.tcadmin.com/3/releases/3.21.80.55215</link>
+      <guid isPermaLink="true">https://docs.tcadmin.com/3/releases/3.21.80.55215</guid>
+      <description>Panel Settings, Server reboots stop services gracefully, Automatic restart after a crash, Game files from another server, Keep a local copy of downloaded compressed files, and more.</description>
+      <pubDate>Tue, 22 Sep 2026 00:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>3.20.34.48879</title>
       <link>https://docs.tcadmin.com/3/releases/3.20.34.48879</link>
