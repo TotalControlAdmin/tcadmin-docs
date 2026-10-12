@@ -1,0 +1,35 @@
+---
+sidebar_position: 3
+sidebar_label: View the Screen Console over SSH
+---
+
+# View the Screen Console over SSH
+
+Game services whose blueprint's console **Output source** is **Screen**, on a **native Linux** server, run inside a detached GNU `screen` session named `svc<id>`. The `<id>` is the number in the service's panel URL. You can attach to that session over SSH and watch or use the console directly.
+
+This does not apply to Windows servers, WSL-hosted services, or the Terminal, Log File, Console Wrapper and Memory Wrapper output sources.
+
+## Attach to the Session
+
+The session's sockets live in the service's own folder, so `screen -ls` shows nothing unless you point the `SCREENDIR` environment variable there. The **service root** is shown on the service's settings page.
+
+1. Connect to the server over SSH.
+2. Switch to the service's run-as user, shown in the service settings. Screen refuses to attach as another user, including root.
+3. Set `SCREENDIR`, list the sessions, and attach:
+
+```bash
+su -s /bin/bash <user>
+export SCREENDIR=<service root>/.tca/screen
+screen -ls
+screen -r svc<id>
+```
+
+Use the `-s /bin/bash` option only if the user has no login shell. Commands you type go to the game exactly like the panel's console. The panel's console keeps working while you are attached, and the output is also written to `.tca/console.log`.
+
+:::warning[Detach with Ctrl+A, then D]
+Closing the session stops the service. Do not press Ctrl+C or type `exit` or `quit` unless you mean to stop the game.
+:::
+
+## No Session Found
+
+If `screen -ls` shows no session while the service is running, `screen` is either not installed on the server or older than version 4.06. In both cases TCAdmin captures the console through a pipe instead, so there is no session to attach to. Install or update `screen`, then restart the service.

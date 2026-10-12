@@ -1,0 +1,171 @@
+---
+sidebar_label: Login Protection
+sidebar_position: 7
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Login Protection
+
+Login Protection counts failed logins per IP address and temporarily blocks an address that fails too often. The same counter covers the web login, single sign-on links, two-factor codes, the forgot-password form, API keys, FTP and SFTP. Accounts are never locked, only addresses, so nobody can lock a real user out by guessing their username. You can also add a CAPTCHA to the login form. Everything is configured at **System Settings → Security Settings → Login Protection**.
+
+## Locked out? Getting back in
+
+A wrong CAPTCHA key or an IP ban can keep you out of the panel. Find your case below.
+
+### The CAPTCHA will not load or always fails
+
+This happens when the site key or secret key is wrong, your panel's domain is not allowed on the provider's side, or the provider cannot be reached. Use the kill switch in the web server's configuration file:
+
+| Operating system | File |
+|---|---|
+| Windows | `C:\Program Files\TCAdmin3\config\web\appsettings.Production.json` |
+| Linux | `/opt/tcadmin3/config/web/appsettings.Production.json` |
+
+The installer writes this file with the switch already present and set to `false`:
+
+```json
+{
+  "AllowedHosts": "*",
+  "TCAdmin": {
+    "Type": "Web",
+    "Web": {
+      "Port": 31000,
+      "SecurePort": 31001,
+      "Prerender": true,
+      "UseHsts": false
+    },
+    "Security": {
+      "TrustedProxies": [],
+      "TrustCloudflare": true,
+      "DisableCaptcha": false
+    }
+  }
+}
+```
+
+Set `DisableCaptcha` to `true`:
+
+```json
+"Security": {
+  "TrustedProxies": [],
+  "TrustCloudflare": true,
+  "DisableCaptcha": true
+}
+```
+
+A panel upgraded from an older version may not have the `Security` block yet. Add it under `TCAdmin` as shown.
+
+Restart the web service, then log in.
+
+<Tabs>
+  <TabItem value="windows" label="Windows">
+
+```powershell
+Restart-Service TCA3Web
+```
+
+  </TabItem>
+  <TabItem value="linux" label="Linux">
+
+```bash
+sudo systemctl restart tca3web
+```
+
+  </TabItem>
+</Tabs>
+
+While the switch is on, the CAPTCHA is off for everyone regardless of the settings page, and the Login Protection page shows a warning. Then:
+
+1. Open **Login Protection**.
+2. Either choose no CAPTCHA provider, or enter the correct keys. Saving changed keys opens a dialog where you solve the CAPTCHA with the new keys, which proves they work.
+3. Set `DisableCaptcha` back to `false` and restart the web service again.
+
+:::note[Several web nodes]
+If you run more than one web node, make the change on every node.
+:::
+
+### An alternative without touching files
+
+Add your own IP address to **Never block these addresses** before you need it, ideally as soon as you configure a CAPTCHA. Allow-listed addresses never see the CAPTCHA in any mode and are never banned.
+
+If you are already locked out, an administrator on a different address can open the Login Protection page and switch the provider to none. An administrator with an API key can do the same, because API logins never show a CAPTCHA.
+
+### Your IP address is banned
+
+A banned address sees "too many attempts". You have these options:
+
+- Wait for the block to end, 30 minutes by default.
+- Ask another administrator to click **Unblock** in the **Blocked IP addresses** table.
+- Ask another administrator to add your address to **Never block these addresses**, which lifts the block at once.
+- Log in from another address.
+
+Turning Login Protection off on the page also stops enforcing existing blocks at once.
+
+:::warning[Behind a reverse proxy or Cloudflare]
+If the proxy is not trusted, every visitor appears to come from the proxy's address, and one attacker can block everyone. Under `TCAdmin` > `Security` in the same configuration file, list your proxy's addresses in `TrustedProxies`, and keep `TrustCloudflare` on if you use Cloudflare.
+:::
+
+## Brute-force protection
+
+| Setting | Description |
+|---|---|
+| Block IP addresses after repeated failed logins | The master switch, on by default. |
+| Failed attempts before block | How many failures within the counting window block an address, 10 by default. |
+| Counting window | How long failures are counted from the first one, 15 minutes by default. |
+| Block duration | How long a blocked address stays blocked, 30 minutes by default. |
+| Attempts per FTP/SFTP connection | How many wrong passwords close a single connection, 3 by default. |
+| Never block these addresses | One IP address or range per line, never counted and never blocked. |
+
+A successful login clears the address's failure count. Put billing systems, monitoring and office networks on the allow list. Changes reach remote servers within about a minute.
+
+A blocked address gets an error on the web login, an HTTP 429 response on API calls (even with a valid key), and a disconnect on FTP and SFTP. Sessions that are already signed in keep working.
+
+:::info
+If the Redis service is down, protection pauses instead of locking anyone out.
+:::
+
+## Blocked IP addresses
+
+This table lists every address blocked right now across the whole cluster.
+
+| Column | Meaning |
+|---|---|
+| IP Address | The blocked IP address. |
+| Failures | How many failures triggered the block. |
+| Blocked until | When the block ends. |
+| Last failure via | The login method that failed last: web, sso, 2fa, api, ftp or sftp. |
+
+**Unblock** lifts the block and clears the address's failure count. Blocks and unblocks are recorded in **System → Activity Logs** as `IpBlocked` and `IpUnblocked` entries. No e-mails or dashboard alerts are sent.
+
+## CAPTCHA
+
+Choose **Cloudflare Turnstile** or **Google reCAPTCHA v2** (the checkbox) and enter the site key and secret key from the provider. The secret is stored encrypted and never shown again.
+
+| Mode | When the CAPTCHA appears |
+|---|---|
+| After failed logins | Once the visitor's address has failed a set number of times, 3 by default. |
+| Always | On every login. |
+
+The CAPTCHA appears on the login form, including custom login themes, and on the forgot-password page. If the provider cannot be reached, the login is refused rather than let through.
+
+**New keys are verified before they are saved.** When you change the provider or either key and click Save, a dialog shows the CAPTCHA with the new keys, and the settings are saved only if the provider accepts your answer. If the widget does not load, the site key is wrong or does not allow your domain. If it loads but the save is refused, the secret key is wrong. **Test CAPTCHA** runs the same check without saving.
+
+:::warning[Test keys]
+Switching provider can fill in the provider's public test keys. Test keys let every visitor pass, so the page warns until you replace them with your own.
+:::
+
+## SSH keys for SFTP
+
+Users can log in to SFTP with an SSH key instead of a password.
+
+- Users add their own keys under **Profile → Security → SSH Keys**.
+- Administrators can manage a user's keys from the user editor.
+- Supported keys are RSA of 2048 bits or more, and ECDSA. Ed25519 is not supported.
+
+To require keys, select the user types under **File transfer authentication**. Those users can no longer log in to FTP or SFTP with a password, and because FTP has no key login they lose FTP entirely. Their password still works on the website. Transfer accounts are exempt. Register keys for these users before turning this on.
+
+## Failed-login entries in the activity log
+
+Repeated failed logins from one address over the same method inside the counting window are grouped into one activity log entry with an attempt count, instead of one row per attempt.
