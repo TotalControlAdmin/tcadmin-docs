@@ -10,6 +10,10 @@ import ReleaseDate from '@site/src/components/ReleaseDate';
 
 <ReleaseDate />
 
+:::info[AI credits for V3 testers]
+Every active V3 tester receives **2,500 AI credits** with this release to use with the AI assistant.
+:::
+
 ### New Features
 
 - **Login protection** — TCAdmin now counts failed logins per IP address and temporarily blocks an address that fails too often. The same protection covers the web login, single sign-on links, two-factor codes, forgot-password, API keys, FTP and SFTP, and accounts themselves are never locked. A new Login Protection page in Security Settings sets the limits, an allow-list of trusted addresses, and an optional Cloudflare Turnstile or Google reCAPTCHA check on the login form. Failed-login entries in the activity log are also grouped, so one attacker no longer fills it with thousands of rows. See [Login Protection](../using-tcadmin/login-protection.mdx).
