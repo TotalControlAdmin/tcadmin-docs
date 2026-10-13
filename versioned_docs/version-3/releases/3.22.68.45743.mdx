@@ -1,0 +1,70 @@
+---
+sidebar_label: 3.22.68.45743
+date: 2026-10-13
+authors: [tcadmin]
+description: Login protection, SSH keys for SFTP, UPnP port forwarding, announcement history, a Docker image pull policy, and more.
+---
+
+import ReleaseDate from '@site/src/components/ReleaseDate';
+
+# Version 3.22.68.45743
+
+<ReleaseDate />
+
+<video
+  controls
+  preload="none"
+  poster="https://v3.tcafiles.com/AutomaticUpdates/Beta/3.22.68.45743/3.22.68.45743.jpg"
+  style={{ width: '100%', maxWidth: '960px', display: 'block', margin: '0 auto 1.5rem', borderRadius: '8px' }}
+>
+  <source src="https://v3.tcafiles.com/AutomaticUpdates/Beta/3.22.68.45743/3.22.68.45743.mp4" type="video/mp4" />
+  Your browser does not support the video tag. [Download the video](https://v3.tcafiles.com/AutomaticUpdates/Beta/3.22.68.45743/3.22.68.45743.mp4).
+</video>
+
+:::info[AI credits for V3 testers]
+Every active V3 tester receives **2,500 AI credits** with this release to use with the AI assistant.
+:::
+
+### New Features
+
+- **Login protection** — TCAdmin now counts failed logins per IP address and temporarily blocks an address that fails too often. The same protection covers the web login, single sign-on links, two-factor codes, forgot-password, API keys, FTP and SFTP, and accounts themselves are never locked. A new Login Protection page in Security Settings sets the limits, an allow-list of trusted addresses, and an optional Cloudflare Turnstile or Google reCAPTCHA check on the login form. Failed-login entries in the activity log are also grouped, so one attacker no longer fills it with thousands of rows. See [Login Protection](../using-tcadmin/login-protection.mdx).
+- **SSH keys for SFTP** — Users can add their own public SSH keys under Profile > Security and use them to sign in over SFTP. An admin can mark whole user types as key-only, so a correct password alone no longer gets them into FTP or SFTP.
+- **UPnP port forwarding** — A panel hosted at home or in a small office can now ask the router to open its own ports and the ports of every running game or Docker server, and close them again when the server stops. It is off by default and only matters behind a consumer router. See [UPnP Port Forwarding](../getting-started/initial-configuration/upnp-port-forwarding.mdx).
+- **Announcement history** — Customers now get an Announcements page listing every announcement addressed to them, including ones that have expired or that they already acknowledged. Click a row to read it again. See [Announcements](../using-tcadmin/announcements.mdx).
+- **Docker image pull policy** — Docker blueprints, and each service individually, can now choose "If newer" (check the registry on every start, as before) or "If not present" (use the copy already on the node and skip the download).
+- **Dropdown variables filled from the service's folder** — A dropdown variable can now list the files or folders found in the service itself, for example every map file in a maps folder, instead of a fixed list typed by the admin.
+- **Scheduled Steam updates remember the installed version** — TCAdmin now records which Steam build each service has. The "Only execute if a new version is available" option on a scheduled Steam update compares against that record and skips the stop, download and restart when the service is already current.
+- **FTP and SFTP settings in Server Configuration** — The Common Settings tab of Server Configuration gained FTP Server and SFTP Server sections for switching each on or off and setting ports, connection limits and the inactivity timeout, without editing configuration files.
+- **Server IPs can share a hostname** — Several IP addresses, even on different servers, can now use the same public hostname, which suits servers sitting behind one NAT. The panel shows a warning that names the other servers instead of refusing to save. The same IP address still cannot be added twice to one server.
+- **Ports in the custom link variable picker** — The variable picker in the custom link editor now lists the blueprint's own ports, so links such as a web admin page can use `${PortName}` without guessing the name.
+- **Official plugin repository themes are trusted by default** — Themes installed from the official TCAdmin plugin repository can now use full templates straight away. Themes from any other source still start sandboxed.
+- **My profile permissions** — Two new permissions, Get My Profile and Update My Profile, control whether a user can see and edit their own profile. They are granted by default, and a user without the second one sees the profile as read-only.
+- **API permission hardening** — API keys now follow only the permissions they were given instead of quietly falling back to their owner's. Searches such as the game list in Create Service only return what the caller may actually use, and creating a service now checks the owner, the location and the API key's create permission.
+- **Scheduled backups** — A service's scheduled tasks can now create a backup, and a blueprint can turn on "Stop service before backup" so a running server is stopped for the backup and started again afterwards. Users only see the backup task type when the blueprint gives them the backup feature.
+- **Scheduled tasks follow permissions** — The task types offered when creating a scheduled task now match what the user is allowed to do on that service, and tasks that were already saved keep running. Backup and script tasks, and the existing power and Steam update tasks, also have an "If players are connected" choice: skip, force, or wait until the server is empty. The Configuration tab is hidden when a task has nothing to configure.
+- **Databases per blueprint** — Database access is now one Databases feature granted per blueprint, and sub-users can have it too as long as the service owner has it. The old separate database permissions are converted automatically.
+- **Custom root folder per role** — A role can be confined to a folder inside the service, and an owner can confine a sub-user further. That folder appears as the top level in the file manager, FTP and SFTP. Restoring a database backup can no longer read files outside the service folder.
+- **Install the panel as an app** — Browsers can now install the panel to a phone or desktop. Each theme sets its own App Name and App Icon URL, and the name falls back to the company name in Company Information. There is no offline mode.
+- **Light-only or dark-only themes** — A theme can now offer Light only, Dark only, or let the user choose. When one palette is forced, the light/dark switch is hidden.
+- **Add or remove ports on a single service** — Administrators can add a missing blueprint port or a custom-named port to one existing service from its Settings page, and delete ports the blueprint does not define.
+- **AI assistant improvements** — The assistant is better at building game and Docker blueprints from a description, and a bug that cut some replies off before they finished is fixed. Administrators can also ask it to read and change the master's own configuration settings.
+- **Smaller improvements** — The built-in roles now get permissions on a game's default variables; the Create Service wizard only lists Docker blueprints allowed on the chosen server; the Create button is disabled while a service is being created; commands run directly on Linux nodes that do not have sudo installed; the Security Settings icon now shows for the right users; and the Global Server Configuration icon moved to Server Management.
+
+### Bug Fixes
+
+- **Slow built-in Redis** — A slow built-in Redis could stall the whole control panel; it no longer does.
+- **Redis storage on Linux** — Fixed the built-in Redis hanging on some Linux systems, which could leave the master looking offline.
+- **WSL service creation** — Creating a service that runs through WSL failed and now works.
+- **Remote install with a flash token** — Installing a remote server with a flash token could fail with a database connection error.
+- **Steam download failures** — A failed Steam download is now retried, and a running service that was stopped for an update is started again if the update fails.
+- **Monitor crash from FTP** — Updated the FTP server component to fix a Monitor crash.
+- **Linux CPU and memory limits** — Limits were not applied to services using the Screen, Console Wrapper or Memory Wrapper output modes on Linux.
+- **BattlEye RCON** — Commands sent to a BattlEye server (DayZ, Arma) were built with the wrong packet size, and a server that did not answer could hang the connection instead of reporting an error.
+- **Deleting a service** — Deleting a service could fail with a collection error.
+- **Extracted archive ownership** — Files extracted from an archive could be owned by the wrong user.
+- **Slow uploads** — The free-space check ran for every uploaded chunk and slowed large uploads.
+- **Scripts run at the same time** — A C# script started twice at once could fail with an error.
+- **Workshop dependencies** — A Workshop item's dependencies were not saved.
+- **Docker console input** — Sending a command to a Docker service's console could hang or time out; it now times out cleanly instead.
+- **Docker memory usage** — A Docker service's memory usage was reported higher than the container actually used.
+- **Config files without a template** — Saving a service config file that has no template no longer fails.
