@@ -3,39 +3,37 @@ sidebar_position: 1
 slug: /intro
 ---
 
+import { IntroHero, SectionGrid, LatestReleases, SupportCards } from '@site/src/components/DocsIntro';
+import { FeaturedGames } from '@site/src/components/SupportedGames';
+
 # TCAdmin v3 Documentation
 
-:::info[Work in Progress]
-The documentation for TCAdmin v3 is currently in development.
-:::
+<IntroHero version="3" />
 
-## v3 Preview
+## Explore the docs
 
+<SectionGrid version="3" />
 
-:::info[Licensing]
+## Supported games
+
+Ready-made game configs from the official and community plugin repositories, installable straight from the panel.
+
+<FeaturedGames />
+
+## Licensing
+
+:::info[Use your v2 license]
 You can use your existing TCAdmin **v2** master license to activate TCAdmin **v3** on the same machine. This lets you install TCAdmin v3 alongside TCAdmin v2 so you can run both versions at the same time, or install only v3 on that server and use your v2 license there.
 
 If you want to install TCAdmin v3 on a different machine, you can create a dev license for your existing master or remote license. In the [client area](https://clients.tcadmin.com/), go to **Services > Order New Services > Product Addons**.
 :::
 
-## What's New in v3
+## Latest releases
 
-Documentation for the new features and improvements in TCAdmin v3 will be available here soon.
+Every build ships with release notes covering its new features, improvements, and bug fixes.
 
-For a complete list of new features, improvements, and bug fixes in each version, check out the [Release Notes](releases/index.mdx).
+<LatestReleases />
 
-## Community
+## Community and support
 
-Have questions, feedback, or want to connect with other TCAdmin users? Join the conversation on our [**Discord server**](https://discord.gg/587HrWCG).
-
-## Issue Tracker
-
-Found a bug or have a feature request? Submit it on our public issue tracker:
-
-- [**Browse Issues**](https://github.com/TotalControlAdmin/TCAdminV3-Issues/issues)
-- [**Report a Bug**](https://github.com/TotalControlAdmin/TCAdminV3-Issues/issues/new?template=bug_report.yml)
-- [**Request a Feature**](https://github.com/TotalControlAdmin/TCAdmin-V3-Issues-and-Feedback/discussions)
-
----
-
-**Stay tuned for updates!**
+<SupportCards version="3" />

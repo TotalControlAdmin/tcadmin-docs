@@ -4,24 +4,36 @@ sidebar_label: Introduction
 slug: /intro
 ---
 
+import { IntroHero, SectionGrid, GameList, SupportCards } from '@site/src/components/DocsIntro';
+
 # Introduction
 
-TCAdmin is the leading game server control panel designed to streamline the management of game servers. Developed with advanced features and user-friendly interfaces, TCAdmin offers comprehensive control over game server hosting. With its robust architecture, TCAdmin ensures secure and efficient server management, providing a seamless experience for both administrators and users. Why wait any longer? Elevate your platform by incorporating TCAdmin and make game servers a top priority for your community.
+<IntroHero version="2" />
 
-## Games Supported
+TCAdmin is the leading game server control panel, built to streamline game server hosting. It gives you comprehensive control over every server through a secure, efficient architecture and an interface that works for administrators and end users alike.
 
-TCAdmin is a versatile game hosting platform that provides support for a wide range of games, making it suitable for hosting virtually any game you desire.
+## Explore the docs
 
-Officially, TCAdmin supports the following popular games:
+<SectionGrid version="2" />
 
-- Ark Survival Evovled
-- Minecraft
-- Rust
-- 7 Days to Die
-- Valheim
-- Counter-Strike: Global offensive
-- Fivem
+## Games supported
 
-However, this is just a small selection from the extensive list of games supported. For a comprehensive list of supported games, you can visit our official website [here](https://www.tcadmin.com/features/)
+TCAdmin is a versatile hosting platform that supports a wide range of games, so you can host virtually any game you want. Officially supported titles include:
 
-Furthermore, TCAdmin offers a vibrant community that has contributed numerous game configurations and templates. These community-made resources can be found [here](https://community.tcadmin.com/files/category/1-game-configs) providing even more options to enhance your game hosting experience.
+<GameList
+  games={[
+    "ARK: Survival Evolved",
+    "Minecraft",
+    "Rust",
+    "7 Days to Die",
+    "Valheim",
+    "Counter-Strike: Global Offensive",
+    "FiveM",
+  ]}
+/>
+
+That's only a small selection. See the full list of supported games on the [TCAdmin website](https://www.tcadmin.com/features/), or browse the [community game configs](https://community.tcadmin.com/files/category/1-game-configs) for templates contributed by other hosts.
+
+## Community and support
+
+<SupportCards version="2" />

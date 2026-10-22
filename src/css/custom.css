@@ -1,174 +1,970 @@
-/* Tailwind v3 — no base/preflight so Docusaurus/Infima styles stay intact */
-@tailwind components;
-@tailwind utilities;
+/* Tailwind v4 — no base/preflight so Docusaurus/Infima styles stay intact.
+   Utilities are imported unlayered so they can still override Infima, which
+   is unlayered too (layered rules always lose to unlayered ones). */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" source(none);
+@source "../../src";
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));  /* match Docusaurus theme attribute */
 
-/**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
- */
+/* =====================================================================
+   TCADMIN — Total Control, ported from the panel's theme bundle
+   (TCA3PluginRepo: manifests/theme-bundles/TCADMIN  Total Control/1.0.0).
+   Palette values come from its light/dark MudBlazor palettes; the
+   --tca-* tokens, type system and HUD primitives mirror its template CSS.
+   Fonts (Saira Condensed / IBM Plex Sans / JetBrains Mono) are loaded in
+   docusaurus.config.js.
+   ===================================================================== */
 
-/* You can override the default Infima variables here. */
+/* ---- Tokens: light (the page stays white; panel light palette for everything else) ---- */
 :root {
-  --ifm-color-primary: #099dff;
-  --ifm-color-primary-dark: #008fee;
-  --ifm-color-primary-darker: #0087e0;
-  --ifm-color-primary-darkest: #006fb9;
-  --ifm-color-primary-light: #23a8ff;
-  --ifm-color-primary-lighter: #31adff;
-  --ifm-color-primary-lightest: #58bdff;
+  --tca-bg: #ffffff;
+  --tca-bg-deep: #e6ecf5;
+  --tca-surface: #ffffff;
+  --tca-surface-2: #eaf0f8;
+  --tca-drawer: #ffffff;
+  --tca-chrome: #f2f5fa;
+  --tca-line: #c9d5e5;
+  --tca-line-soft: #dce4ef;
+  --tca-text: #0a1a30;
+  --tca-text-dim: #3f5473;
+  --tca-text-faint: #5a6d89;
+  --tca-accent: #0072b0;
+  --tca-accent-hot: #005f94;
+  --tca-brand: #004b82;
+  --tca-online: #0f8a52;
+  --tca-offline: #c9303a;
+  --tca-starting: #a86a12;
+  --tca-console: #071a33;
+
+  --tca-grid-line: rgb(0 75 130 / 0.05);
+  --tca-glow-accent: 7%;
+  --tca-glow-brand: 8%;
+  --tca-glow-text: none;
+  --tca-shadow-pop: 0 24px 50px -24px rgb(10 26 48 / 0.35);
+  --tca-bar-bg: color-mix(in srgb, var(--tca-bg) 90%, transparent);
+  --tca-well: color-mix(in srgb, var(--tca-bg-deep) 45%, var(--tca-surface));
+  --tca-tip-bg: #0a1a30;
+  --tca-tip-fg: #eaf1fa;
+  --tca-scroll: #b4c3d8;
+
+  --tca-font-display: 'Saira Condensed', 'Arial Narrow', sans-serif;
+  --tca-font-body: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --tca-font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+
+  --tca-r: 3px;
+  --tca-cut-sm: 7px;
+  --tca-cut: 10px;
+  --tca-cut-lg: 14px;
+  --tca-fast: 0.15s;
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
-[data-theme='dark'] {
-  --ifm-color-primary: #099dff;
-  --ifm-color-primary-dark: #008fee;
-  --ifm-color-primary-darker: #0087e0;
-  --ifm-color-primary-darkest: #006fb9;
-  --ifm-color-primary-light: #23a8ff;
-  --ifm-color-primary-lighter: #31adff;
-  --ifm-color-primary-lightest: #58bdff;
-  --ifm-background-color: #0f1114;
+/* ---- Tokens: dark (the panel's default look) ---- */
+html[data-theme='dark'] {
+  --tca-bg: #051327;
+  --tca-bg-deep: #030c1d;
+  --tca-surface: #091f3c;
+  --tca-surface-2: #0d2a4f;
+  --tca-drawer: #040f22;
+  --tca-chrome: #020916;
+  --tca-line: #1a3a64;
+  --tca-line-soft: #102a4a;
+  --tca-text: #eaf1fa;
+  --tca-text-dim: #a3b6cf;
+  --tca-text-faint: #7189aa;
+  --tca-accent: #01a5df;
+  --tca-accent-hot: #2bbcf0;
+  --tca-online: #1fc77e;
+  --tca-offline: #f0454f;
+  --tca-starting: #f5a524;
+  --tca-console: #020916;
+
+  --tca-grid-line: rgb(120 170 230 / 0.045);
+  --tca-glow-accent: 13%;
+  --tca-glow-brand: 45%;
+  --tca-glow-text: 0 0 48px color-mix(in srgb, var(--tca-accent) 28%, transparent);
+  --tca-shadow-pop: 0 24px 50px -20px rgb(0 0 0 / 0.7);
+  --tca-bar-bg: color-mix(in srgb, var(--tca-bg) 88%, transparent);
+  --tca-well: color-mix(in srgb, var(--tca-bg-deep) 55%, transparent);
+  --tca-tip-bg: var(--tca-chrome);
+  --tca-tip-fg: var(--tca-text);
+  --tca-scroll: #1f4372;
 }
 
-[data-theme='light'] .DocSearch {
-  /* --docsearch-primary-color: var(--ifm-color-primary); */
-  /* --docsearch-text-color: var(--ifm-font-color-base); */
-  --docsearch-muted-color: var(--ifm-color-secondary-darkest);
-  --docsearch-container-background: rgba(94, 100, 112, 0.7);
-  /* Modal */
-  --docsearch-modal-background: var(--ifm-color-secondary-lighter);
-  /* Search box */
-  --docsearch-searchbox-background: var(--ifm-color-secondary);
-  --docsearch-searchbox-focus-background: var(--ifm-color-white);
-  /* Hit */
-  --docsearch-hit-color: var(--ifm-font-color-base);
-  --docsearch-hit-active-color: var(--ifm-color-white);
-  --docsearch-hit-background: var(--ifm-color-white);
-  /* Footer */
-  --docsearch-footer-background: var(--ifm-color-white);
+/* ---- Tokens → Infima ---- */
+:root {
+  --ifm-color-primary: #0072b0;
+  --ifm-color-primary-dark: #005f94;
+  --ifm-color-primary-darker: #004b82;
+  --ifm-color-primary-darkest: #003a66;
+  --ifm-color-primary-light: #0a8bd1;
+  --ifm-color-primary-lighter: #1f9be0;
+  --ifm-color-primary-lightest: #45ade6;
+
+  --ifm-color-emphasis-0: #ffffff;
+  --ifm-color-emphasis-100: #f2f5fa;
+  --ifm-color-emphasis-200: #e6ecf5;
+  --ifm-color-emphasis-300: #c9d5e5;
+  --ifm-color-emphasis-400: #b4c3d8;
+  --ifm-color-emphasis-500: #8a9bb5;
+  --ifm-color-emphasis-600: #5a6d89;
+  --ifm-color-emphasis-700: #3f5473;
+  --ifm-color-emphasis-800: #24385a;
+  --ifm-color-emphasis-900: #0a1a30;
+  --ifm-color-emphasis-1000: #000000;
+
+  --ifm-color-success: var(--tca-online);
+  --ifm-color-warning: var(--tca-starting);
+  --ifm-color-danger: var(--tca-offline);
+  --ifm-color-info: var(--tca-accent);
+
+  --ifm-background-color: var(--tca-bg);
+  --ifm-background-surface-color: var(--tca-surface);
+  --ifm-font-color-base: var(--tca-text);
+  --ifm-font-color-secondary: var(--tca-text-dim);
+  --ifm-heading-color: var(--tca-text);
+  --ifm-toc-border-color: var(--tca-line-soft);
+  --ifm-hr-background-color: var(--tca-line-soft);
+  --ifm-card-background-color: var(--tca-surface);
+  --ifm-dropdown-background-color: var(--tca-surface);
+  --ifm-table-border-color: var(--tca-line-soft);
+  --ifm-table-head-background: color-mix(in srgb, var(--tca-bg-deep) 45%, var(--tca-surface));
+  --ifm-table-stripe-background: color-mix(in srgb, var(--tca-brand) 2.5%, transparent);
+
+  --ifm-font-family-base: var(--tca-font-body);
+  --ifm-font-family-monospace: var(--tca-font-mono);
+  --ifm-heading-font-family: var(--tca-font-display);
+  --ifm-heading-font-weight: 800;
+  --ifm-h1-font-size: 2.75rem;
+  --ifm-h2-font-size: 1.875rem;
+  --ifm-h3-font-size: 1.375rem;
+  --ifm-h4-font-size: 1.125rem;
+  --ifm-global-radius: var(--tca-r);
+  --ifm-code-border-radius: var(--tca-r);
+  --ifm-code-background: var(--tca-surface-2);
+  --ifm-code-font-size: 88%;
+
+  --ifm-navbar-background-color: var(--tca-bar-bg);
+  --ifm-navbar-shadow: none;
+  --ifm-navbar-link-color: var(--tca-text-dim);
+  --ifm-menu-color: var(--tca-text-dim);
+  --ifm-menu-color-active: var(--tca-accent);
+  --ifm-menu-color-background-hover: color-mix(in srgb, var(--tca-surface-2) 70%, transparent);
+  --ifm-menu-color-background-active: color-mix(in srgb, var(--tca-accent) 9%, transparent);
+  --ifm-breadcrumb-item-background-active: transparent;
+  --ifm-breadcrumb-color-active: var(--tca-text);
+  --ifm-footer-background-color: var(--tca-chrome);
+  --ifm-transition-fast: var(--tca-fast);
 }
 
-[data-theme='dark'] .DocSearch {
-  --docsearch-text-color: var(--ifm-font-color-base);
-  --docsearch-muted-color: var(--ifm-color-secondary-darkest);
-  --docsearch-container-background: rgba(47, 55, 69, 0.7);
-  /* Modal */
-  --docsearch-modal-background: var(--ifm-background-color);
-  /* Search box */
-  --docsearch-searchbox-background: var(--ifm-background-color);
-  --docsearch-searchbox-focus-background: var(--ifm-color-black);
-  /* Hit */
-  --docsearch-hit-color: var(--ifm-font-color-base);
-  --docsearch-hit-active-color: var(--ifm-color-white);
-  --docsearch-hit-background: var(--ifm-color-emphasis-100);
-  /* Footer */
-  --docsearch-footer-background: var(--ifm-background-surface-color);
-  --docsearch-key-gradient: linear-gradient(
-    -26.5deg,
-    var(--ifm-color-emphasis-200) 0%,
-    var(--ifm-color-emphasis-100) 100%
-  );
+html[data-theme='dark'] {
+  --ifm-color-primary: #01a5df;
+  --ifm-color-primary-dark: #0186b7;
+  --ifm-color-primary-darker: #0177a3;
+  --ifm-color-primary-darkest: #006187;
+  --ifm-color-primary-light: #2bbcf0;
+  --ifm-color-primary-lighter: #5fd0f7;
+  --ifm-color-primary-lightest: #7fdcff;
+
+  --ifm-color-emphasis-0: #051327;
+  --ifm-color-emphasis-100: #0b2244;
+  --ifm-color-emphasis-200: #102a4a;
+  --ifm-color-emphasis-300: #1a3a64;
+  --ifm-color-emphasis-400: #26497a;
+  --ifm-color-emphasis-500: #4a6a93;
+  --ifm-color-emphasis-600: #7189aa;
+  --ifm-color-emphasis-700: #a3b6cf;
+  --ifm-color-emphasis-800: #c7d4e5;
+  --ifm-color-emphasis-900: #eaf1fa;
+  --ifm-color-emphasis-1000: #ffffff;
+
+  /* Reading colours: white headings, neutral light-grey body copy. */
+  --ifm-heading-color: #ffffff;
+  --ifm-font-color-base: #dedede;
+
+  --ifm-table-stripe-background: rgb(120 170 230 / 0.025);
 }
 
-.footer--dark {
-  --ifm-footer-background-color: var(--ifm-navbar-background-color);
+/* ---- Base ---- */
+html {
+  background-color: var(--tca-bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  scrollbar-color: var(--tca-scroll) transparent;
+}
+body { background: transparent; }
+* { scrollbar-width: thin; }
+::selection { background: color-mix(in srgb, var(--tca-accent) 35%, transparent); }
+a { text-underline-offset: 3px; }
+
+/* Blueprint grid + brand glows behind everything (panel Shell backdrop). A fixed
+   pseudo-layer rather than background-attachment:fixed: no full repaint on scroll. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-color: var(--tca-bg);
+  background-image:
+    radial-gradient(42% 52% at 12% 0%, color-mix(in srgb, var(--tca-accent) var(--tca-glow-accent), transparent), transparent 70%),
+    radial-gradient(38% 50% at 94% 0%, color-mix(in srgb, var(--tca-brand) var(--tca-glow-brand), transparent), transparent 70%),
+    linear-gradient(to right, var(--tca-grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--tca-grid-line) 1px, transparent 1px);
+  background-size: auto, auto, 64px 64px, 64px 64px;
+  background-position: 0 0, 0 0, center top, center top;
+  background-repeat: no-repeat, no-repeat, repeat, repeat;
+}
+
+/* ---- Headings: condensed, uppercase display voice ---- */
+h1, h2 {
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 1.02;
+}
+h1 { text-shadow: var(--tca-glow-text); }
+h3, h4, h5, h6 { font-weight: 700; letter-spacing: 0.01em; }
+.markdown h1:first-child { --ifm-h1-font-size: 3rem; }
+
+/* ---- HUD cut corners (top-left + bottom-right) with the 1px edge redrawn
+   across each cut as two background layers. Targets set --tca-cutk / --tca-edge. */
+.pagination-nav__link,
+.release-card,
+.button {
+  --tca-corner: linear-gradient(to bottom right, transparent calc(50% - 0.8px), var(--tca-edge) calc(50% - 0.8px), var(--tca-edge) calc(50% + 0.8px), transparent calc(50% + 0.8px));
+  clip-path: polygon(var(--tca-cutk) 0, 100% 0, 100% calc(100% - var(--tca-cutk)), calc(100% - var(--tca-cutk)) 100%, 0 100%, 0 var(--tca-cutk));
+  background-image: var(--tca-corner), var(--tca-corner);
+  background-size: var(--tca-cutk) var(--tca-cutk);
+  background-position: 0 0, 100% 100%;
+  background-repeat: no-repeat;
+  background-origin: border-box;
+  border-radius: 0;
+}
+
+/* ---- Top bar (panel app bar): 64px translucent bar, blur, 1px soft rule ---- */
+:root {
+  --ifm-navbar-height: 4rem;
+  --ifm-navbar-padding-horizontal: 1rem;
+}
+.navbar {
+  padding-top: 0;
+  padding-bottom: 0;
+  backdrop-filter: blur(10px) saturate(1.15);
+  -webkit-backdrop-filter: blur(10px) saturate(1.15);
+  border-bottom: 1px solid var(--tca-line-soft);
+}
+.navbar__inner, .navbar__items { height: 100%; }
+.navbar__logo { height: 2.25rem; }
+.navbar__link {
+  font-family: var(--tca-font-display);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.navbar__link:hover, .navbar__link--active { color: var(--tca-accent); }
+.navbar__toggle { color: var(--tca-text-dim); }
+
+/* Docs pages on desktop: the brand becomes the drawer header, exactly as wide as the
+   sidebar column below it (panel layout). Folds back to a plain logo while the sidebar
+   is collapsed. */
+@media (min-width: 997px) {
+  html.docs-wrapper .navbar__brand {
+    align-self: stretch;
+    width: var(--doc-sidebar-width);
+    margin: 0 1rem 0 calc(-1 * var(--ifm-navbar-padding-horizontal));
+    padding: 0 1.25rem;
+    background-color: var(--tca-drawer);
+    border-right: 1px solid var(--tca-line-soft);
+  }
+  html.docs-wrapper:has([class*='docSidebarContainerHidden']) .navbar__brand {
+    width: auto;
+    margin-right: 0.5rem;
+    background-color: transparent;
+    border-right: 0;
+  }
+}
+
+/* Version switcher: a cut-corner control with a mono "Docs" prefix. */
+.navbar__items:not(.navbar__items--right) .dropdown > .navbar__link {
+  --tca-cutk: var(--tca-cut-sm);
+  --tca-edge: var(--tca-line);
+  --tca-corner: linear-gradient(to bottom right, transparent calc(50% - 0.8px), var(--tca-edge) calc(50% - 0.8px), var(--tca-edge) calc(50% + 0.8px), transparent calc(50% + 0.8px));
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.75rem;
+  color: var(--tca-text);
+  border: 1px solid var(--tca-edge);
+  background-color: var(--tca-well);
+  background-image: var(--tca-corner), var(--tca-corner);
+  background-size: var(--tca-cutk) var(--tca-cutk);
+  background-position: 0 0, 100% 100%;
+  background-repeat: no-repeat;
+  background-origin: border-box;
+  clip-path: polygon(var(--tca-cutk) 0, 100% 0, 100% calc(100% - var(--tca-cutk)), calc(100% - var(--tca-cutk)) 100%, 0 100%, 0 var(--tca-cutk));
+  transition: border-color var(--tca-fast), color var(--tca-fast);
+}
+.navbar__items:not(.navbar__items--right) .dropdown > .navbar__link::before {
+  content: 'Docs';
+  font-family: var(--tca-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--tca-text-faint);
+}
+.navbar__items:not(.navbar__items--right) .dropdown > .navbar__link::after { margin-left: 0.1rem; opacity: 0.6; }
+.navbar__items:not(.navbar__items--right) .dropdown:hover > .navbar__link {
+  --tca-edge: var(--tca-accent);
+  color: var(--tca-accent);
+}
+
+/* Right cluster: link icons | colour mode | search, split by hairlines like the panel's tray. */
+.navbar__items--right { gap: 0.125rem; }
+.navbar__items--right > [class*='colorModeToggle'] {
+  display: flex;
+  align-items: center;
+  margin-left: 0.5rem;
+  padding-left: 0.625rem;
+  border-left: 1px solid var(--tca-line-soft);
+}
+.navbar__items--right > [class*='colorModeToggle'] .clean-btn {
+  width: 38px;
+  height: 38px;
+  color: var(--tca-text-dim);
+  border-radius: var(--tca-r);
+  transition: color var(--tca-fast), background-color var(--tca-fast);
+}
+.navbar__items--right > [class*='colorModeToggle'] .clean-btn:hover {
+  color: var(--tca-accent);
+  background-color: color-mix(in srgb, var(--tca-accent) 10%, transparent);
+}
+@media (min-width: 997px) {
+  .navbar__items--right > [class*='searchBox'] {
+    margin-left: 0.5rem;
+    padding-left: 0.75rem;
+    padding-right: 0;
+    border-left: 1px solid var(--tca-line-soft);
+  }
+}
+
+/* Mobile drawer */
+.navbar-sidebar { background-color: var(--tca-drawer); }
+.navbar-sidebar__brand { border-bottom: 1px solid var(--tca-line-soft); }
+.navbar-sidebar__back {
+  font-family: var(--tca-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tca-text-dim);
+  background: transparent;
+  border-bottom: 1px solid var(--tca-line-soft);
+  border-radius: 0;
+}
+
+.dropdown__menu {
+  border: 1px solid var(--tca-line);
+  border-radius: var(--tca-r);
+  box-shadow: var(--tca-shadow-pop);
+}
+.dropdown__link { font-size: 0.9375rem; }
+.dropdown__link--active {
+  color: var(--tca-accent);
+  background-color: color-mix(in srgb, var(--tca-accent) 10%, transparent);
+  box-shadow: inset 2px 0 0 var(--tca-accent);
+}
+
+/* ---- Search box: a recessed cut-corner well with mono keycaps ----
+   DocSearch's own stylesheet loads lazily (on first hover/focus) and its rules use the
+   `background` shorthand, so everything here is navbar-scoped to out-rank it and the
+   corner layers are restated on every state. */
+.navbar .DocSearch-Button,
+.navbar .DocSearch-Button:hover,
+.navbar .DocSearch-Button:active,
+.navbar .DocSearch-Button:focus {
+  --tca-cutk: var(--tca-cut-sm);
+  --tca-corner: linear-gradient(to bottom right, transparent calc(50% - 0.8px), var(--tca-edge) calc(50% - 0.8px), var(--tca-edge) calc(50% + 0.8px), transparent calc(50% + 0.8px));
+  background: var(--tca-corner) 0 0 / var(--tca-cutk) var(--tca-cutk) no-repeat border-box,
+    var(--tca-corner) 100% 100% / var(--tca-cutk) var(--tca-cutk) no-repeat border-box,
+    var(--tca-well);
+  clip-path: polygon(var(--tca-cutk) 0, 100% 0, 100% calc(100% - var(--tca-cutk)), calc(100% - var(--tca-cutk)) 100%, 0 100%, 0 var(--tca-cutk));
+  border: 1px solid var(--tca-edge);
+  border-radius: 0;
+  box-shadow: none;
+}
+.navbar .DocSearch-Button {
+  --tca-edge: var(--tca-line);
+  height: 38px;
+  margin: 0;
+  padding: 0 0.5rem 0 0.75rem;
+  color: var(--tca-text-faint);
+  transition: border-color var(--tca-fast), color var(--tca-fast);
+}
+.navbar .DocSearch-Button:hover,
+.navbar .DocSearch-Button:focus-visible {
+  --tca-edge: var(--tca-accent);
+  color: var(--tca-text-dim);
+}
+.navbar .DocSearch-Button .DocSearch-Search-Icon {
+  width: 16px;
+  height: 16px;
+  color: var(--tca-text-faint);
+  transition: color var(--tca-fast);
+}
+.navbar .DocSearch-Button:hover .DocSearch-Search-Icon { color: var(--tca-accent); }
+.navbar .DocSearch-Button-Placeholder {
+  padding: 0 1.25rem 0 0.6rem;
+  font-family: var(--tca-font-body);
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+@media (min-width: 1200px) {
+  .navbar .DocSearch-Button { width: 15rem; }
+  .navbar .DocSearch-Button-Container { flex: 1; }
+}
+.navbar .DocSearch-Button-Keys { min-width: 0; gap: 3px; }
+
+/* Keycaps (button + modal footer): squared, mono, with a 2px base (panel .settings-keycap). */
+.DocSearch-Button-Key,
+.DocSearch-Commands-Key {
+  min-width: 20px;
+  width: auto;
+  height: 18px;
+  margin: 0;
+  padding: 0 4px;
+  font-family: var(--tca-font-mono);
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--tca-text-dim);
+  background: var(--tca-surface-2);
+  border: 1px solid var(--tca-line);
+  border-bottom-width: 2px;
+  border-radius: var(--tca-r);
+  box-shadow: none;
+  top: 0;
+}
+.DocSearch-Button-Key svg, .DocSearch-Commands-Key svg { width: 11px; height: 11px; }
+
+/* ---- Breadcrumbs: mono route readout, last segment lit (panel top bar) ---- */
+.breadcrumbs .breadcrumbs__link {
+  font-family: var(--tca-font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tca-text-faint);
+  padding-left: 0;
+  padding-right: 0;
+}
+.breadcrumbs a.breadcrumbs__link { color: var(--tca-text-dim); }
+.breadcrumbs a.breadcrumbs__link:hover { color: var(--tca-accent); background: none; }
+.breadcrumbs .breadcrumbs__item--active .breadcrumbs__link { color: var(--tca-text); }
+.breadcrumbs__item:not(:last-child)::after {
+  content: '/';
+  background: none;
+  filter: none;
+  width: auto;
+  height: auto;
+  margin: 0 0.6rem;
+  opacity: 1;
+  color: var(--tca-line);
+  font-family: var(--tca-font-mono);
+  font-size: 0.75rem;
+}
+
+/* ---- Sidebar (panel nav drawer) ----
+   Top-level rows carry an icon and read in full text colour; nested rows are dimmer and
+   indented with padding (not list offsets) so the hover wash and the active accent rail
+   run the full drawer width, with 1px tree guides under each open group. */
+:root {
+  --sb-icon-intro: url("data:image/svg+xml,%3Csvg stroke='black' fill='none' stroke-width='2' viewBox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 7v14'%3E%3C/path%3E%3Cpath d='M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z'%3E%3C/path%3E%3C/svg%3E");
+  --sb-icon-start: url("data:image/svg+xml,%3Csvg stroke='black' fill='none' stroke-width='2' viewBox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z'%3E%3C/path%3E%3Cpath d='m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z'%3E%3C/path%3E%3Cpath d='M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0'%3E%3C/path%3E%3Cpath d='M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5'%3E%3C/path%3E%3C/svg%3E");
+  --sb-icon-using: url("data:image/svg+xml,%3Csvg stroke='black' fill='none' stroke-width='2' viewBox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='20' height='8' x='2' y='2' rx='2' ry='2'%3E%3C/rect%3E%3Crect width='20' height='8' x='2' y='14' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='6' x2='6.01' y1='6' y2='6'%3E%3C/line%3E%3Cline x1='6' x2='6.01' y1='18' y2='18'%3E%3C/line%3E%3C/svg%3E");
+  --sb-icon-misc: url("data:image/svg+xml,%3Csvg stroke='black' fill='none' stroke-width='2' viewBox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z'%3E%3C/path%3E%3Cpath d='m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65'%3E%3C/path%3E%3Cpath d='m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65'%3E%3C/path%3E%3C/svg%3E");
+  --sb-icon-database: url("data:image/svg+xml,%3Csvg stroke='black' fill='none' stroke-width='2' viewBox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cellipse cx='12' cy='5' rx='9' ry='3'%3E%3C/ellipse%3E%3Cpath d='M3 5V19A9 3 0 0 0 21 19V5'%3E%3C/path%3E%3Cpath d='M3 12A9 3 0 0 0 21 12'%3E%3C/path%3E%3C/svg%3E");
+  --sb-icon-custom: url("data:image/svg+xml,%3Csvg stroke='black' fill='none' stroke-width='2' viewBox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72'%3E%3C/path%3E%3Cpath d='m14 7 3 3'%3E%3C/path%3E%3Cpath d='M5 6v4'%3E%3C/path%3E%3Cpath d='M19 14v4'%3E%3C/path%3E%3Cpath d='M10 2v2'%3E%3C/path%3E%3Cpath d='M7 8H3'%3E%3C/path%3E%3Cpath d='M21 16h-4'%3E%3C/path%3E%3Cpath d='M11 3H9'%3E%3C/path%3E%3C/svg%3E");
+  --sb-icon-api: url("data:image/svg+xml,%3Csvg stroke='black' fill='none' stroke-width='2' viewBox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 22v-5'%3E%3C/path%3E%3Cpath d='M9 8V2'%3E%3C/path%3E%3Cpath d='M15 8V2'%3E%3C/path%3E%3Cpath d='M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z'%3E%3C/path%3E%3C/svg%3E");
+  --sb-icon-faq: url("data:image/svg+xml,%3Csvg stroke='black' fill='none' stroke-width='2' viewBox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpath d='M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3'%3E%3C/path%3E%3Cpath d='M12 17h.01'%3E%3C/path%3E%3C/svg%3E");
+  --sb-icon-billing: url("data:image/svg+xml,%3Csvg stroke='black' fill='none' stroke-width='2' viewBox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z'%3E%3C/path%3E%3Cpath d='M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8'%3E%3C/path%3E%3Cpath d='M12 17.5v-11'%3E%3C/path%3E%3C/svg%3E");
+  --sb-icon-releases: url("data:image/svg+xml,%3Csvg stroke='black' fill='none' stroke-width='2' viewBox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z'%3E%3C/path%3E%3Ccircle cx='7.5' cy='7.5' r='.5' fill='black'%3E%3C/circle%3E%3C/svg%3E");
+  --sb-icon-update: url("data:image/svg+xml,%3Csvg stroke='black' fill='none' stroke-width='2' viewBox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8'%3E%3C/path%3E%3Cpath d='M21 3v5h-5'%3E%3C/path%3E%3Cpath d='M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16'%3E%3C/path%3E%3Cpath d='M8 16H3v5'%3E%3C/path%3E%3C/svg%3E");
+  --sb-icon-trouble: url("data:image/svg+xml,%3Csvg stroke='black' fill='none' stroke-width='2' viewBox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z'%3E%3C/path%3E%3C/svg%3E");
+  --sb-icon-fallback: url("data:image/svg+xml,%3Csvg stroke='black' fill='none' stroke-width='2' viewBox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='m9 18 6-6-6-6'%3E%3C/path%3E%3C/svg%3E");
+  --sb-icon-collapse: url("data:image/svg+xml,%3Csvg stroke='black' fill='none' stroke-width='2' viewBox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='18' height='18' x='3' y='3' rx='2'%3E%3C/rect%3E%3Cpath d='M9 3v18'%3E%3C/path%3E%3Cpath d='m16 15-3-3 3-3'%3E%3C/path%3E%3C/svg%3E");
+}
+.theme-doc-sidebar-container {
+  background-color: var(--tca-drawer);
+  border-right-color: var(--tca-line-soft) !important;
+}
+.theme-doc-sidebar-container .menu,
+.navbar-sidebar .menu { padding: 0.75rem 0 !important; }
+.theme-doc-sidebar-container .menu__list .menu__list,
+.navbar-sidebar .menu__list .menu__list { margin-top: 0; padding-left: 0; }
+.menu__list-item:not(:first-child) { margin-top: 0; }
+
+.menu__link {
+  --sb-pad: 1rem;
+  gap: 0.75rem;
+  padding: 0.45rem 1rem 0.45rem var(--sb-pad);
+  font-size: 0.875rem;
+  border-radius: 0;
+  transition: color var(--tca-fast), background-color var(--tca-fast), box-shadow var(--tca-fast);
+}
+.menu__link:hover { color: var(--tca-text); }
+.menu__list-item-collapsible { border-radius: 0; }
+.menu__list-item-collapsible--active { background-color: transparent; }
+.menu__caret { padding: 0 0.75rem; border-radius: 0; }
+.menu__link--sublist-caret::after, .menu__caret::before { opacity: 0.55; }
+
+/* Depth: text of each level starts where the parent's label (after its icon) starts. */
+[class*='-level-2'] > .menu__link, [class*='-level-2'] > .menu__list-item-collapsible > .menu__link { --sb-pad: 2.875rem; }
+[class*='-level-3'] > .menu__link, [class*='-level-3'] > .menu__list-item-collapsible > .menu__link { --sb-pad: 3.875rem; }
+[class*='-level-4'] > .menu__link, [class*='-level-4'] > .menu__list-item-collapsible > .menu__link { --sb-pad: 4.875rem; }
+[class*='-level-5'] > .menu__link, [class*='-level-5'] > .menu__list-item-collapsible > .menu__link { --sb-pad: 5.875rem; }
+
+/* Tree guides under open groups (x = centre of the parent's icon / start of its label). */
+.theme-doc-sidebar-item-category > .menu__list { position: relative; }
+.theme-doc-sidebar-item-category > .menu__list::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  bottom: 4px;
+  width: 1px;
+  background-color: var(--tca-line-soft);
+  pointer-events: none;
+}
+.theme-doc-sidebar-item-category-level-1 > .menu__list::before { left: calc(1rem + 8.5px); }
+.theme-doc-sidebar-item-category-level-2 > .menu__list::before { left: 2.375rem; }
+.theme-doc-sidebar-item-category-level-3 > .menu__list::before { left: 3.375rem; }
+.theme-doc-sidebar-item-category-level-4 > .menu__list::before { left: 4.375rem; }
+
+/* Top-level rows: icon + full-strength label. */
+.theme-doc-sidebar-item-link-level-1 > .menu__link,
+.theme-doc-sidebar-item-category-level-1 > .menu__list-item-collapsible > .menu__link {
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--tca-text);
+}
+.theme-doc-sidebar-item-link-level-1 > .menu__link::before,
+.theme-doc-sidebar-item-category-level-1 > .menu__list-item-collapsible > .menu__link::before {
+  content: '';
+  flex: none;
+  width: 18px;
+  height: 18px;
+  background-color: var(--tca-text-faint);
+  -webkit-mask: var(--sb-icon, var(--sb-icon-fallback)) center / contain no-repeat;
+  mask: var(--sb-icon, var(--sb-icon-fallback)) center / contain no-repeat;
+  transition: background-color var(--tca-fast);
+}
+.theme-doc-sidebar-item-link-level-1 > .menu__link:hover::before,
+.theme-doc-sidebar-item-category-level-1 > .menu__list-item-collapsible:hover > .menu__link::before { background-color: var(--tca-text-dim); }
+
+/* Section icons, by route (V2 + V3). Unmapped top-level rows fall back to a chevron. */
+.menu__link[href$='/intro'] { --sb-icon: var(--sb-icon-intro); }
+.menu__link[href$='/category/getting-started'] { --sb-icon: var(--sb-icon-start); }
+.menu__link[href$='/category/using-tcadmin'] { --sb-icon: var(--sb-icon-using); }
+.menu__link[href$='/category/misc'] { --sb-icon: var(--sb-icon-misc); }
+.menu__link[href$='/category/database'] { --sb-icon: var(--sb-icon-database); }
+.menu__link[href$='/category/customizations'] { --sb-icon: var(--sb-icon-custom); }
+.menu__link[href$='/category/billing-api'] { --sb-icon: var(--sb-icon-api); }
+.menu__link[href$='/category/faq'] { --sb-icon: var(--sb-icon-faq); }
+.menu__link:is([href$='/billing-modules'], [href$='/billing-modules/']) { --sb-icon: var(--sb-icon-billing); }
+.menu__link:is([href$='/releases'], [href$='/releases/']) { --sb-icon: var(--sb-icon-releases); }
+.menu__link[href$='/update-tcadmin'] { --sb-icon: var(--sb-icon-update); }
+.menu__link[href$='/category/troubleshooting'] { --sb-icon: var(--sb-icon-trouble); }
+
+/* Current page: accent text, 9% accent wash, 2px rail on the drawer edge. */
+.menu__link[aria-current='page'] {
+  color: var(--tca-accent);
+  font-weight: 500;
+  background-color: var(--ifm-menu-color-background-active);
+  box-shadow: inset 2px 0 0 var(--tca-accent);
+}
+.menu__link[aria-current='page']::before { background-color: var(--tca-accent) !important; }
+/* Groups that merely contain the current page stay in text colour (panel: open group header). */
+.menu__link--sublist.menu__link--active:not([aria-current='page']) { color: var(--tca-text); background-color: transparent; }
+.menu__link--sublist.menu__link--active:not([aria-current='page'])::before { background-color: var(--tca-text-dim); }
+
+/* Collapsed sidebar: the expand strip becomes a drawer-coloured rail. */
+.theme-doc-sidebar-container [class*='expandButton'] {
+  background-color: var(--tca-drawer);
+  transition: background-color var(--tca-fast);
+}
+.theme-doc-sidebar-container [class*='expandButton']:hover,
+.theme-doc-sidebar-container [class*='expandButton']:focus {
+  background-color: color-mix(in srgb, var(--tca-accent) 8%, var(--tca-drawer));
+}
+
+/* ---- Table of contents ---- */
+.table-of-contents__link { color: var(--tca-text-dim); }
+.table-of-contents__link:hover,
+.table-of-contents__link--active { color: var(--tca-accent); }
+
+/* ---- Version tag (site .tag-v3) ---- */
+.theme-doc-version-badge {
+  font-family: var(--tca-font-display);
+  font-weight: 700;
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--tca-accent);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--tca-accent) 45%, transparent);
+  border-radius: var(--tca-r);
+  padding: 1px 7px;
+}
+
+/* ---- Admonitions: tinted plate, 1px edge, 2px severity rail, mono heading ---- */
+.theme-admonition {
+  --tca-sev: var(--tca-accent);
+  --ifm-alert-border-left-width: 0;
+  --ifm-alert-shadow: none;
+  --ifm-alert-foreground-color: var(--ifm-font-color-base);
+  background-color: color-mix(in srgb, var(--tca-sev) 7%, var(--tca-surface));
+  border: 1px solid color-mix(in srgb, var(--tca-sev) 30%, var(--tca-line-soft));
+  border-radius: var(--tca-r);
+  box-shadow: inset 2px 0 0 var(--tca-sev);
+}
+.theme-admonition-note { --tca-sev: var(--tca-text-faint); }
+.theme-admonition-tip { --tca-sev: var(--tca-online); }
+.theme-admonition-info { --tca-sev: var(--tca-accent); }
+.theme-admonition-warning, .theme-admonition-caution { --tca-sev: var(--tca-starting); }
+.theme-admonition-danger { --tca-sev: var(--tca-offline); }
+.theme-admonition > div:first-child {
+  font-family: var(--tca-font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--tca-sev);
+}
+.theme-admonition > div:first-child svg { fill: var(--tca-sev); }
+
+/* ---- Code: console plates (the panel keeps its console dark in both modes) ---- */
+.theme-code-block {
+  --tca-cutk: var(--tca-cut);
+  position: relative;
+  border: 1px solid var(--tca-line);
+  border-radius: 0;
+  box-shadow: none;
+  clip-path: polygon(var(--tca-cutk) 0, 100% 0, 100% calc(100% - var(--tca-cutk)), calc(100% - var(--tca-cutk)) 100%, 0 100%, 0 var(--tca-cutk));
+}
+html[data-theme='light'] .theme-code-block { border-color: #12406b; }
+.theme-code-block::before, .theme-code-block::after {
+  content: '';
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+  width: var(--tca-cutk);
+  height: var(--tca-cutk);
+  background: linear-gradient(to bottom right, transparent calc(50% - 0.8px), var(--tca-line) calc(50% - 0.8px), var(--tca-line) calc(50% + 0.8px), transparent calc(50% + 0.8px));
+}
+html[data-theme='light'] .theme-code-block::before,
+html[data-theme='light'] .theme-code-block::after { --tca-line: #12406b; }
+.theme-code-block::before { top: -1px; left: -1px; }
+.theme-code-block::after { bottom: -1px; right: -1px; }
+.theme-code-block [class*='codeBlockTitle'] {
+  font-family: var(--tca-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: #a3b6cf;
+  border-bottom-color: #12406b !important;
+}
+.theme-code-block button { border-radius: var(--tca-r); }
+
+/* Inline code */
+:not(pre) > code {
+  border: 1px solid var(--tca-line-soft);
+  color: var(--ifm-font-color-base);
+  padding: 0.1rem 0.35rem;
+}
+
+/* ---- Tables: mono uppercase heads on a sunken band, soft row lines, accent wash ---- */
+.markdown table { border-collapse: collapse; }
+.markdown table th {
+  font-family: var(--tca-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--tca-text-dim);
+  border-bottom-color: var(--tca-line);
+}
+.markdown table tr { border-top: 0; }
+.markdown table tbody tr:hover { background-color: color-mix(in srgb, var(--tca-accent) 6%, transparent); }
+
+/* ---- Tabs: condensed uppercase labels, glowing 2px slider ---- */
+.tabs__item {
+  font-family: var(--tca-font-display);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--tca-text-dim);
+  border-radius: 0;
+  border-bottom-width: 2px;
+}
+.tabs__item:hover { color: var(--tca-text); background-color: color-mix(in srgb, var(--tca-accent) 5%, transparent); }
+.tabs__item--active {
+  color: var(--tca-accent);
+  border-bottom-color: var(--tca-accent);
+  box-shadow: 0 6px 10px -8px var(--tca-accent);
 }
 
 .unique-tabs .tabs__item {
   line-height: 16px;
   margin-right: 8px;
 }
-
 .unique-tabs .tabs__item--active {
   border: 0;
   color: #fff;
-  border-radius: var(--ifm-global-radius);
-  background-color: var(--ifm-tabs-color-active);
+  border-radius: var(--tca-r);
+  background-color: var(--tca-accent);
+  box-shadow: none;
+}
+html[data-theme='dark'] .unique-tabs .tabs__item--active { color: #021428; }
+
+/* ---- Buttons: display face, cut corners ---- */
+.button {
+  --tca-cutk: var(--tca-cut);
+  --tca-edge: transparent;
+  font-family: var(--tca-font-display);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-::-webkit-scrollbar {
-  background-color: #0f1114;
-  height: 6px;
-  width: 6px;
+/* ---- Prev / next: cut-corner plates ---- */
+.pagination-nav__link {
+  --tca-cutk: var(--tca-cut-lg);
+  --tca-edge: var(--tca-line-soft);
+  background-color: color-mix(in srgb, var(--tca-surface) 70%, transparent);
+  border: 1px solid var(--tca-edge);
+  transition: border-color var(--tca-fast), background-color var(--tca-fast);
 }
-::-webkit-scrollbar-button {
-  display: none;
+.pagination-nav__link:hover {
+  --tca-edge: color-mix(in srgb, var(--tca-accent) 55%, var(--tca-line));
+  background-color: var(--tca-surface-2);
 }
-::-webkit-scrollbar-corner {
-  background: transparent;
+.pagination-nav__sublabel {
+  font-family: var(--tca-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tca-text-faint);
 }
-::-webkit-scrollbar-thumb {
-  background-color: var(--ifm-tabs-color-active);
-  border: 4px solid transparent;
-  border-radius: 8px;
-  cursor: pointer;
-}
-::-webkit-scrollbar-track {
-  border: 4px solid transparent;
-  box-shadow: inset 0 0 14px 14px transparent;
-}
-
-/* Gecko (Firefox) */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #1062FE #0f1114;
+.pagination-nav__label {
+  font-family: var(--tca-font-display);
+  font-weight: 700;
+  font-size: 1.125rem;
+  letter-spacing: 0.01em;
 }
 
-/* Edge (Blink-based) */
-*::-ms-scrollbar {
-  background-color: #0f1114;
-  height: 6px;
-  width: 6px;
+/* ---- Doc footer meta (edit link / last updated) ---- */
+.theme-doc-footer { font-size: 0.875rem; color: var(--tca-text-faint); }
+
+/* ---- Site footer: bar plate with the accent hairline (panel bottom bar) ---- */
+.footer {
+  position: relative;
+  border-top: 1px solid var(--tca-line-soft);
 }
-*::-ms-scrollbar-thumb {
-  background-color: var(--ifm-tabs-color-active);
-  border: 4px solid transparent;
-  border-radius: 8px;
+.footer::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1px;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--tca-accent) 60%, transparent), transparent);
 }
-*::-ms-scrollbar-track {
-  border: 4px solid transparent;
-  box-shadow: inset 0 0 14px 14px transparent;
+.footer--dark {
+  --ifm-footer-background-color: var(--tca-chrome);
+  --ifm-footer-color: var(--tca-text-dim);
+  --ifm-footer-link-color: var(--tca-text-dim);
+  --ifm-footer-title-color: var(--tca-text);
+}
+.footer__copyright {
+  font-family: var(--tca-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--tca-text-faint);
 }
 
-/* Capitalize the h1 tags */
-h1 {
-  text-transform: Capitalize;
+/* ---- Search modal: a panel dialog — cut-corner plate, accent top edge, recessed input,
+   mono section heads, hit rows with an accent rail, sunken command bar ----
+   Rules that fight DocSearch's lazily loaded stylesheet are scoped under .DocSearch-Modal
+   (or .DocSearch-Container) so they keep winning after it arrives. */
+.DocSearch {
+  --docsearch-primary-color: var(--tca-accent);
+  --docsearch-highlight-color: var(--tca-accent);
+  --docsearch-text-color: var(--ifm-font-color-base);
+  --docsearch-muted-color: var(--tca-text-faint);
+  --docsearch-container-background: color-mix(in srgb, var(--tca-chrome) 72%, transparent);
+  --docsearch-modal-width: 640px;
+  --docsearch-modal-background: var(--tca-surface);
+  --docsearch-modal-shadow: none;
+  --docsearch-searchbox-height: 52px;
+  --docsearch-searchbox-background: var(--tca-well);
+  --docsearch-searchbox-focus-background: var(--tca-well);
+  --docsearch-searchbox-shadow: none;
+  --docsearch-hit-height: 54px;
+  --docsearch-hit-color: var(--ifm-font-color-base);
+  --docsearch-hit-active-color: var(--tca-accent);
+  --docsearch-hit-background: color-mix(in srgb, var(--tca-bg) 45%, var(--tca-surface));
+  --docsearch-hit-shadow: inset 0 0 0 1px var(--tca-line-soft);
+  --docsearch-footer-height: 46px;
+  --docsearch-footer-background: color-mix(in srgb, var(--tca-bg-deep) 35%, var(--tca-surface));
+  --docsearch-footer-shadow: inset 0 1px 0 var(--tca-line-soft);
+  --docsearch-logo-color: var(--tca-text-faint);
+  --docsearch-spacing: 14px;
 }
 
-/* Capitalize the sidebar label */
-nav li a {
-  text-transform: Capitalize;
+.DocSearch-Container {
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
 }
 
-/* General settings for all icon containers */
+.DocSearch-Container .DocSearch-Modal {
+  --tca-cutk: var(--tca-cut-lg);
+  --tca-edge: var(--tca-line);
+  --tca-corner: linear-gradient(to bottom right, transparent calc(50% - 0.8px), var(--tca-edge) calc(50% - 0.8px), var(--tca-edge) calc(50% + 0.8px), transparent calc(50% + 0.8px));
+  margin-top: 10vh;
+  border: 1px solid var(--tca-line);
+  border-top-color: transparent;
+  border-radius: 0;
+  /* 3rd layer = the top edge itself: line → accent → line. */
+  background:
+    var(--tca-corner) 0 0 / var(--tca-cutk) var(--tca-cutk) no-repeat border-box,
+    var(--tca-corner) 100% 100% / var(--tca-cutk) var(--tca-cutk) no-repeat border-box,
+    linear-gradient(90deg, var(--tca-line), var(--tca-accent) 50%, var(--tca-line)) 0 0 / 100% 1px no-repeat border-box,
+    var(--tca-surface);
+  clip-path: polygon(var(--tca-cutk) 0, 100% 0, 100% calc(100% - var(--tca-cutk)), calc(100% - var(--tca-cutk)) 100%, 0 100%, 0 var(--tca-cutk));
+}
+
+.DocSearch-Modal .DocSearch-SearchBar { padding: var(--docsearch-spacing); border-bottom: 1px solid var(--tca-line-soft); }
+
+.DocSearch-Modal .DocSearch-Form {
+  --tca-cutk: var(--tca-cut-sm);
+  border: 1px solid var(--tca-line);
+  border-radius: 0;
+  clip-path: polygon(var(--tca-cutk) 0, 100% 0, 100% calc(100% - var(--tca-cutk)), calc(100% - var(--tca-cutk)) 100%, 0 100%, 0 var(--tca-cutk));
+  transition: border-color var(--tca-fast);
+}
+.DocSearch-Modal .DocSearch-Form:focus-within { border-color: var(--tca-accent); }
+.DocSearch-Modal .DocSearch-Input {
+  padding-left: 10px;
+  font-family: var(--tca-font-body);
+  font-size: 1.0625rem;
+}
+.DocSearch-Modal .DocSearch-MagnifierLabel svg,
+.DocSearch-Modal .DocSearch-LoadingIndicator svg { width: 20px; height: 20px; }
+.DocSearch-Modal .DocSearch-Reset { color: var(--tca-text-faint); border-radius: var(--tca-r); }
+.DocSearch-Modal .DocSearch-Reset:hover { color: var(--tca-accent); }
+.DocSearch-Modal .DocSearch-Cancel {
+  font-family: var(--tca-font-display);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.DocSearch-Modal .DocSearch-Dropdown { padding-top: 4px; scrollbar-color: var(--tca-scroll) transparent; }
+
+/* Section heads: mono route readout. */
+.DocSearch-Modal .DocSearch-Hit-source {
+  margin: 0 -2px;
+  padding: 12px 2px 4px;
+  font-family: var(--tca-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tca-text-faint);
+  background: var(--tca-surface);
+}
+
+.DocSearch-Modal .DocSearch-Hit { padding-bottom: 4px; }
+.DocSearch-Modal .DocSearch-Hit a {
+  border-radius: 0;
+  transition: background-color var(--tca-fast), box-shadow var(--tca-fast);
+}
+.DocSearch-Modal .DocSearch-Hit[aria-selected='true'] a {
+  background-color: color-mix(in srgb, var(--tca-accent) 11%, var(--tca-surface));
+  box-shadow: inset 2px 0 0 var(--tca-accent), inset 0 0 0 1px color-mix(in srgb, var(--tca-accent) 35%, var(--tca-line-soft));
+}
+.DocSearch-Modal .DocSearch-Hit-title { font-size: 0.9375rem; font-weight: 500; }
+.DocSearch-Modal .DocSearch-Hit-path {
+  margin-top: 2px;
+  font-family: var(--tca-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+/* Selected row: accent title and icon, but keep the path and snippet readable. */
+.DocSearch-Modal .DocSearch-Hit[aria-selected='true'] .DocSearch-Hit-path { color: var(--tca-text-faint) !important; }
+.DocSearch-Modal .DocSearch-Hit[aria-selected='true'] .DocSearch-Hit-text { color: var(--tca-text-dim) !important; }
+.DocSearch-Modal .DocSearch-Hits mark { color: var(--tca-accent); background: color-mix(in srgb, var(--tca-accent) 14%, transparent); border-radius: 2px; }
+.DocSearch-Modal .DocSearch-Hit[aria-selected='true'] mark { text-decoration: none; }
+.DocSearch-Modal .DocSearch-Hit-icon { color: var(--tca-text-faint); }
+.DocSearch-Modal .DocSearch-Hit-Tree { color: var(--tca-line); opacity: 1; }
+
+/* Empty / start / error screens */
+.DocSearch-Modal :is(.DocSearch-StartScreen, .DocSearch-NoResults, .DocSearch-ErrorScreen) { padding: 40px 0; }
+.DocSearch-Modal .DocSearch-Help {
+  font-family: var(--tca-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.DocSearch-Modal .DocSearch-Title { font-family: var(--tca-font-display); font-size: 1.25rem; font-weight: 700; letter-spacing: 0.01em; }
+.DocSearch-Modal .DocSearch-Screen-Icon { color: var(--tca-line); }
+.DocSearch-Modal .DocSearch-Prefill { color: var(--tca-accent); font-weight: 500; }
+
+/* Command bar */
+.DocSearch-Modal .DocSearch-Footer { border-radius: 0; }
+.DocSearch-Modal .DocSearch-Commands {
+  font-family: var(--tca-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.DocSearch-Modal .DocSearch-Commands li:not(:last-of-type) { margin-right: 1.1em; }
+.DocSearch-Modal .DocSearch-Commands-Key { margin-right: 0.45em; }
+.DocSearch-Modal .DocSearch-Logo { font-size: 0.6875rem; }
+
+@media (max-width: 768px) {
+  .DocSearch-Container .DocSearch-Modal { margin: 0; clip-path: none; border: 0; }
+}
+
+/* ---- Header icon links: square HUD hit areas with a tooltip plate ---- */
 .header-github-link,
 .header-discord-link,
 .header-website-link,
 .header-billing-link,
 .header-forum-link {
-  display: flex; /* Flexbox for centering */
-  align-items: center; /* Vertically align content */
-  justify-content: center; /* Horizontally align content */
-  width: 42px; /* Set the circle size (adjust if needed) */
-  height: 42px;
-  border-radius: 50%; /* Makes the container circular */
-  transition: background var(--ifm-transition-fast); /* Smooth hover transition */
-  -webkit-tap-highlight-color: transparent; /* Prevent tap highlight for touch devices */
-  background-color: transparent; /* Start with no background */
-  position: relative; /* For tooltip positioning */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 9px;
+  margin: 0 2px;
+  border-radius: var(--tca-r);
+  transition: background-color var(--tca-fast);
+  -webkit-tap-highlight-color: transparent;
+  background-color: transparent;
+  position: relative;
 }
 
-/* Hover effect for all icons */
 .header-github-link:hover,
 .header-discord-link:hover,
 .header-website-link:hover,
 .header-billing-link:hover,
 .header-forum-link:hover {
-  background-color: var(--ifm-color-emphasis-200); /* Change background color on hover */
+  background-color: color-mix(in srgb, var(--tca-accent) 10%, transparent);
 }
 
-/* Tooltip styling */
 .header-github-link::after,
 .header-discord-link::after,
 .header-website-link::after,
@@ -176,28 +972,22 @@ nav li a {
 .header-forum-link::after {
   content: attr(aria-label);
   position: absolute;
-  bottom: -35px;
+  bottom: -34px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: var(--ifm-color-emphasis-800);
-  color: var(--ifm-color-white);
+  background-color: var(--tca-tip-bg);
+  color: var(--tca-tip-fg);
+  box-shadow: 0 0 0 1px var(--tca-line), 0 10px 24px -12px rgb(0 0 0 / 0.6);
   padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
+  border-radius: var(--tca-r);
+  font-family: var(--tca-font-body);
+  font-weight: 500;
+  font-size: 0.75rem;
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s;
   z-index: 1000;
-}
-
-[data-theme="dark"] .header-github-link::after,
-[data-theme="dark"] .header-discord-link::after,
-[data-theme="dark"] .header-website-link::after,
-[data-theme="dark"] .header-billing-link::after,
-[data-theme="dark"] .header-forum-link::after {
-  background-color: var(--ifm-color-emphasis-200);
-  color: var(--ifm-color-emphasis-900);
 }
 
 .header-github-link:hover::after,
@@ -208,7 +998,6 @@ nav li a {
   opacity: 1;
 }
 
-/* General icon (pseudo-element) settings */
 .header-github-link::before,
 .header-discord-link::before,
 .header-website-link::before,
@@ -216,11 +1005,11 @@ nav li a {
 .header-forum-link::before {
   content: "";
   display: block;
-  width: 100%; /* Scale icon proportionally within the container */
+  width: 100%;
   height: 100%;
-  background-repeat: no-repeat; /* Prevent icon tiling */
-  background-position: center; /* Center the icon visually */
-  background-size: contain; /* Ensure the icon fits within the container */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
 }
 
 /* GitHub icon settings */
@@ -228,7 +1017,7 @@ nav li a {
   background-image: url("/img/github-mark.svg");
 }
 [data-theme="dark"] .header-github-link::before {
-  background-image: url("/img/github-mark-white.svg"); /* Adjust if needed for dark mode */
+  background-image: url("/img/github-mark-white.svg");
 }
 
 /* Discord icon settings */
@@ -250,11 +1039,11 @@ nav li a {
 /* Billing icon settings */
 .header-billing-link::before {
   background-image: url("/img/money-check-dollar-solid.svg");
-
 }
 [data-theme="dark"] .header-billing-link::before {
   background-image: url("/img/money-check-dollar-solid-white.svg");
 }
+
 /* Forum icon settings */
 .header-forum-link::before {
   background-image: url("/img/comments-solid-full.svg");
@@ -263,7 +1052,12 @@ nav li a {
   background-image: url("/img/comments-solid-full-white.svg");
 }
 
-/* Release notes card grid */
+/* Capitalize the sidebar label */
+nav li a {
+  text-transform: Capitalize;
+}
+
+/* ---- Release notes / billing module cards: cut-corner plates ---- */
 .releases-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -278,42 +1072,57 @@ nav li a {
 }
 
 .release-card {
+  --tca-cutk: var(--tca-cut-lg);
+  --tca-edge: var(--tca-line-soft);
   display: block;
   padding: 1.25rem;
-  border: 1px solid var(--ifm-color-emphasis-300);
-  border-radius: 8px;
+  background-color: var(--tca-surface);
+  border: 1px solid var(--tca-edge);
   text-decoration: none !important;
   color: inherit !important;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color var(--tca-fast), background-color var(--tca-fast);
 }
 
 .release-card:hover {
-  border-color: var(--ifm-color-primary);
-  box-shadow: 0 2px 12px rgba(9, 157, 255, 0.15);
+  --tca-edge: color-mix(in srgb, var(--tca-accent) 55%, var(--tca-line));
+  background-color: var(--tca-surface-2);
 }
 
 .release-card__version {
-  font-size: 1.15rem;
-  font-weight: 700;
-  margin-bottom: 0.35rem;
+  font-family: var(--tca-font-display);
+  font-size: 1.375rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--ifm-heading-color);
+  margin-bottom: 0.4rem;
 }
 
+.release-card:hover .release-card__version { color: var(--tca-accent); }
+
 .release-card__date {
-  font-size: 0.85rem;
-  color: var(--ifm-color-emphasis-600);
-  margin-bottom: 0.5rem;
+  font-family: var(--tca-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tca-text-faint);
+  margin-bottom: 0.6rem;
 }
 
 .release-card__summary {
   font-size: 0.9rem;
-  color: var(--ifm-color-emphasis-700);
+  color: var(--tca-text-dim);
   line-height: 1.45;
 }
 
-[data-theme='dark'] .release-card {
-  border-color: var(--ifm-color-emphasis-200);
-}
+/* Keyboard focus: an outside outline would be cut away by the clip-paths, so draw it inside. */
+:focus-visible { outline: 2px solid var(--tca-accent); outline-offset: 2px; }
+.release-card:focus-visible,
+.pagination-nav__link:focus-visible,
+.button:focus-visible,
+.navbar .DocSearch-Button:focus-visible { outline: 2px solid var(--tca-accent); outline-offset: -4px; }
 
-[data-theme='dark'] .release-card__summary {
-  color: var(--ifm-color-emphasis-600);
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }

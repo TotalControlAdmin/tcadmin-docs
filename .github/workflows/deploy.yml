@@ -23,6 +23,14 @@ jobs:
           cache: 'npm'
 
       - run: npm ci
+
+      # Refresh the V3 supported-games list from the plugin repos. Never fails the build:
+      # on any error the script keeps the committed src/data/v3-games.json.
+      - name: Sync V3 game list
+        run: npm run sync-games
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - run: npm run build
 
       - name: Deploy

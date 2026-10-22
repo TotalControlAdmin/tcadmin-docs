@@ -1,0 +1,232 @@
+/* Game cards after the panel's service-picker cards. Tokens come from src/css/custom.css. */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 12.5rem), 1fr));
+  gap: 0.75rem;
+  margin: 1.25rem 0 1rem;
+}
+
+/* The intro's six featured games: fixed columns so they always fill whole rows. */
+.featured { grid-template-columns: repeat(2, 1fr); }
+
+@media (min-width: 640px) {
+  .featured { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Cut-corner plate with the edge redrawn across each cut (as a top layer over the art). */
+.card {
+  --cut: var(--tca-cut);
+  --edge: var(--tca-line-soft);
+  --corner: linear-gradient(to bottom right, transparent calc(50% - 0.8px), var(--edge) calc(50% - 0.8px), var(--edge) calc(50% + 0.8px), transparent calc(50% + 0.8px));
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  color: inherit;
+  background-color: var(--tca-surface);
+  border: 1px solid var(--edge);
+  clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+}
+
+.card::before,
+.card::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  width: var(--cut);
+  height: var(--cut);
+  background: var(--corner);
+  pointer-events: none;
+}
+
+.card::before { top: -1px; left: -1px; }
+.card::after { bottom: -1px; right: -1px; }
+
+/* Steam header art is 460×215. */
+.art {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 460 / 215;
+  overflow: hidden;
+  background:
+    radial-gradient(80% 120% at 0% 0%, color-mix(in srgb, var(--tca-accent) 18%, transparent), transparent 70%),
+    var(--tca-surface-2);
+  border-bottom: 1px solid var(--tca-line-soft);
+}
+
+/* Store art is bright next to the navy plates; knock it back so the names lead. */
+.art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.72;
+}
+
+html[data-theme='light'] .art img { opacity: 0.88; }
+
+.artFallback {
+  width: 2.25rem;
+  height: 2.25rem;
+  color: var(--tca-accent);
+  opacity: 0.8;
+}
+
+.community {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0 6px;
+  font-family: var(--tca-font-display);
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: #eaf1fa;
+  background-color: rgb(2 9 22 / 0.78);
+  border: 1px solid rgb(127 220 255 / 0.35);
+  border-radius: var(--tca-r);
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.7rem 0.85rem 0.8rem;
+}
+
+.name {
+  font-family: var(--tca-font-display);
+  font-weight: 800;
+  font-size: 1.0625rem;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--ifm-heading-color);
+}
+
+.platforms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: auto;
+}
+
+.platform {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0 6px;
+  font-family: var(--tca-font-mono);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  line-height: 1.8;
+  text-transform: uppercase;
+  color: var(--tca-text-dim);
+  background-color: var(--tca-surface-2);
+  border-radius: var(--tca-r);
+  box-shadow: inset 0 0 0 1px var(--tca-line);
+}
+
+.more {
+  margin: 0.25rem 0 2.5rem;
+  font-family: var(--tca-font-display);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.more a { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+/* ---- Filter toolbar ---- */
+.browser { margin-top: 1.5rem; }
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.search {
+  --cut: var(--tca-cut-sm);
+  display: flex;
+  flex: 1 1 14rem;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.75rem;
+  color: var(--tca-text-faint);
+  background-color: var(--tca-well);
+  border: 1px solid var(--tca-line);
+  clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+  transition: border-color var(--tca-fast);
+}
+
+.search:focus-within { border-color: var(--tca-accent); color: var(--tca-accent); }
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  height: 2.375rem;
+  font: inherit;
+  font-size: 0.9375rem;
+  color: var(--ifm-font-color-base);
+  background: transparent;
+  border: 0;
+  outline: none;
+}
+
+.search input::placeholder { color: var(--tca-text-faint); }
+
+.segments {
+  display: inline-flex;
+  border: 1px solid var(--tca-line);
+  border-radius: var(--tca-r);
+  overflow: hidden;
+}
+
+.segment {
+  padding: 0.4rem 0.85rem;
+  font-family: var(--tca-font-display);
+  font-weight: 700;
+  font-size: 0.875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--tca-text-dim);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  transition: color var(--tca-fast), background-color var(--tca-fast);
+}
+
+.segment + .segment { border-left: 1px solid var(--tca-line); }
+.segment:hover { color: var(--tca-text); background-color: color-mix(in srgb, var(--tca-accent) 6%, transparent); }
+.segment:focus-visible { outline-offset: -3px; }
+
+.segmentActive,
+.segmentActive:hover {
+  color: var(--tca-accent);
+  background-color: color-mix(in srgb, var(--tca-accent) 12%, transparent);
+  box-shadow: inset 0 -2px 0 var(--tca-accent);
+}
+
+.count {
+  font-family: var(--tca-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--tca-text-faint);
+}
+
+.empty {
+  margin: 2rem 0;
+  font-family: var(--tca-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tca-text-faint);
+}

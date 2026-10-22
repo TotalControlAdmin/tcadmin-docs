@@ -1,9 +1,30 @@
 // @ts-check
 /** @type {import('@docusaurus/types').Config} */
-import { themes as prismThemes } from "prism-react-renderer";
 
 const lightLogo = "img/tcadmin-logo.png";
 const darkLogo = "img/TCAdmin_White.png";
+
+// Code blocks use the panel console palette (TCADMIN — Total Control theme bundle).
+// The panel keeps its console dark in light mode too, so both themes share the
+// token colours and differ only in background.
+/** @param {string} background */
+function consoleTheme(background) {
+  return {
+    plain: { color: "#d6e2f0", backgroundColor: background },
+    styles: [
+      { types: ["comment", "prolog", "doctype", "cdata"], style: { color: "#7189aa", fontStyle: "italic" } },
+      { types: ["punctuation", "operator"], style: { color: "#a3b6cf" } },
+      { types: ["keyword", "atrule", "important", "selector"], style: { color: "#c678dd" } },
+      { types: ["function", "tag"], style: { color: "#2bbcf0" } },
+      { types: ["class-name", "builtin", "namespace"], style: { color: "#5fd0f7" } },
+      { types: ["string", "char", "attr-value", "regex", "inserted"], style: { color: "#1fc77e" } },
+      { types: ["number", "boolean", "constant", "symbol", "entity"], style: { color: "#f5a524" } },
+      { types: ["property", "attr-name", "variable", "parameter"], style: { color: "#3b8eea" } },
+      { types: ["deleted"], style: { color: "#f0454f" } },
+      { types: ["url"], style: { color: "#2bbcf0", textDecorationLine: "underline" } },
+    ],
+  };
+}
 
 // Parse a release label like "3.10 TBD" or "3.9.11.15408" into a numeric key
 // for sorting. Splitting on dots AND whitespace handles both the spaced sidebar
@@ -51,6 +72,15 @@ const config = {
       onBrokenMarkdownLinks: "warn",
     },
   },
+
+  // The panel's type system: Saira Condensed (display), IBM Plex Sans (body), JetBrains Mono.
+  headTags: [
+    { tagName: "link", attributes: { rel: "preconnect", href: "https://fonts.googleapis.com" } },
+    { tagName: "link", attributes: { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "anonymous" } },
+  ],
+  stylesheets: [
+    "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Saira+Condensed:wght@600;700;800&display=swap",
+  ],
 
   i18n: {
     defaultLocale: "en",
@@ -167,6 +197,15 @@ const config = {
           type: "docsVersionDropdown",
           position: "left",
         },
+        // Custom items: src/theme/NavbarItem/ComponentTypes.js
+        {
+          type: "custom-sectionLinks",
+          position: "left",
+        },
+        {
+          type: "custom-latestBuild",
+          position: "right",
+        },
         {
           href: "https://github.com/TotalControlAdmin/tcadmin-docs",
           position: "right",
@@ -205,12 +244,18 @@ const config = {
       copyright: `Copyright © ${new Date().getFullYear()} TCADMIN.COM, ALL RIGHTS RESERVED.`,
     },
     prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      theme: consoleTheme("#071a33"),
+      darkTheme: consoleTheme("#020916"),
       additionalLanguages: ["php", "cshtml", "csharp", "lua", "powershell"],
     },
     colorMode: {
       respectPrefersColorScheme: true,
+    },
+    docs: {
+      sidebar: {
+        // Collapse control lives in the sidebar footer (src/components/SidebarFooter.jsx).
+        hideable: true,
+      },
     },
   },
 };
