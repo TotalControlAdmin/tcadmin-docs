@@ -107,20 +107,24 @@ const config = {
                     sorted.sort((/** @type {any} */ a, /** @type {any} */ b) =>
                       compareReleasesDesc(a.label ?? "", b.label ?? "")
                     );
-                    // Keep the sidebar short: show only the newest few releases, then a
-                    // "More…" link to the full Release Notes index — the same page the
-                    // "Releases" category header opens. (Newest-first from the sort above.)
-                    // Use a "link" item, NOT a "doc": a doc item's label is overridden by the
-                    // target page's own sidebar_label ("Release Notes"), whereas a link keeps the
-                    // label we set here. The index is at this version's "/releases/" route; V3 is
-                    // served under "/3/" today (lastVersion is "2"). onBrokenLinks:"throw" guards it.
+                    // Keep the sidebar short: show the newest few releases, and fold the rest
+                    // into a collapsed "Older releases" group (newest-first from the sort above).
+                    // Every release must stay IN the sidebar: Docusaurus renders a doc that no
+                    // sidebar contains without a sidebar at all, so dropping older releases (the
+                    // old "More…" link) made their pages lose the sidebar. The group auto-expands
+                    // while one of its pages is open.
                     const MAX_VISIBLE_RELEASES = 4;
                     if (sorted.length > MAX_VISIBLE_RELEASES) {
-                      const versionName = args.version && args.version.versionName;
-                      const versionBase =
-                        versionName && versionName !== "2" ? `/${versionName}` : "";
-                      sorted = sorted.slice(0, MAX_VISIBLE_RELEASES);
-                      sorted.push({ type: "link", label: "More…", href: `${versionBase}/releases/` });
+                      sorted = [
+                        ...sorted.slice(0, MAX_VISIBLE_RELEASES),
+                        {
+                          type: "category",
+                          label: "Older releases",
+                          collapsible: true,
+                          collapsed: true,
+                          items: sorted.slice(MAX_VISIBLE_RELEASES),
+                        },
+                      ];
                     }
                   }
                   return { ...item, items: sorted };

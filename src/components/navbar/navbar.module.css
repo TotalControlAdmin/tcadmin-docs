@@ -112,3 +112,27 @@
 }
 
 .build:hover .buildVersion { color: var(--tca-online); }
+
+/* ---- Mobile drawer (main menu) ----
+   :global prefix: out-ranks the drawer's `.menu__list-item:not(:first-child)` spacing reset. */
+:global(.navbar-sidebar) li.drawerHeading {
+  margin: 1rem 0 0.25rem;
+  padding: 0 1rem;
+  font-family: var(--tca-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tca-text-faint);
+}
+
+.drawerBuild {
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+  font-family: var(--tca-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-top: 1px solid var(--tca-line-soft);
+  border-bottom: 1px solid var(--tca-line-soft);
+}

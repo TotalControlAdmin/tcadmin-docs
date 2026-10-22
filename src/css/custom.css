@@ -320,12 +320,15 @@ h3, h4, h5, h6 { font-weight: 700; letter-spacing: 0.01em; }
 
 /* Right cluster: link icons | colour mode | search, split by hairlines like the panel's tray. */
 .navbar__items--right { gap: 0.125rem; }
-.navbar__items--right > [class*='colorModeToggle'] {
-  display: flex;
-  align-items: center;
-  margin-left: 0.5rem;
-  padding-left: 0.625rem;
-  border-left: 1px solid var(--tca-line-soft);
+/* Desktop only: below 997px Docusaurus hides this toggle and shows its twin in the drawer header. */
+@media (min-width: 997px) {
+  .navbar__items--right > [class*='colorModeToggle'] {
+    display: flex;
+    align-items: center;
+    margin-left: 0.5rem;
+    padding-left: 0.625rem;
+    border-left: 1px solid var(--tca-line-soft);
+  }
 }
 .navbar__items--right > [class*='colorModeToggle'] .clean-btn {
   width: 38px;
@@ -596,6 +599,23 @@ h3, h4, h5, h6 { font-weight: 700; letter-spacing: 0.01em; }
   background-color: color-mix(in srgb, var(--tca-accent) 8%, var(--tca-drawer));
 }
 
+/* ---- Mobile "On this page" toggle: a recessed well with a mono label ---- */
+div.theme-doc-toc-mobile {
+  background-color: var(--tca-well);
+  border: 1px solid var(--tca-line-soft);
+  border-radius: var(--tca-r);
+}
+.theme-doc-toc-mobile button.clean-btn {
+  padding: 0.55rem 0.9rem;
+  font-family: var(--tca-font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tca-text-dim);
+}
+.theme-doc-toc-mobile .table-of-contents { padding: 0.25rem 0.9rem 0.75rem; border-top: 1px solid var(--tca-line-soft); }
+
 /* ---- Table of contents ---- */
 .table-of-contents__link { color: var(--tca-text-dim); }
 .table-of-contents__link:hover,
@@ -701,8 +721,13 @@ html[data-theme='light'] .theme-code-block::after { --tca-line: #12406b; }
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--tca-text-dim);
+  white-space: nowrap;
   border-radius: 0;
   border-bottom-width: 2px;
+}
+/* Phones: the tab bar scrolls sideways (Infima) — keep labels on one line and compact. */
+@media (max-width: 640px) {
+  .tabs__item { padding: 0.6rem 0.75rem; font-size: 0.875rem; }
 }
 .tabs__item:hover { color: var(--tca-text); background-color: color-mix(in srgb, var(--tca-accent) 5%, transparent); }
 .tabs__item--active {
@@ -1051,6 +1076,44 @@ html[data-theme='dark'] .unique-tabs .tabs__item--active { color: #021428; }
 [data-theme="dark"] .header-forum-link::before {
   background-image: url("/img/comments-solid-full-white.svg");
 }
+
+/* Below the desktop breakpoint Infima hides navbar items (they move into the drawer);
+   the display:flex above would otherwise keep these icons in the bar, over the logo. */
+@media (max-width: 996px) {
+  .navbar__items .header-github-link,
+  .navbar__items .header-discord-link,
+  .navbar__items .header-website-link,
+  .navbar__items .header-billing-link,
+  .navbar__items .header-forum-link { display: none; }
+}
+
+/* In the drawer the same links become labelled rows: icon + the aria-label as text. */
+.navbar-sidebar .menu__list :is(.header-github-link, .header-discord-link, .header-website-link, .header-billing-link, .header-forum-link) {
+  justify-content: flex-start;
+  gap: 0.75rem;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0.55rem 1rem;
+  border-radius: 0;
+}
+.navbar-sidebar .menu__list :is(.header-github-link, .header-discord-link, .header-website-link, .header-billing-link, .header-forum-link)::before {
+  flex: none;
+  width: 18px;
+  height: 18px;
+}
+.navbar-sidebar .menu__list :is(.header-github-link, .header-discord-link, .header-website-link, .header-billing-link, .header-forum-link)::after {
+  position: static;
+  transform: none;
+  opacity: 1;
+  padding: 0;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  color: var(--tca-text-dim);
+  background: none;
+  box-shadow: none;
+}
+.navbar-sidebar .menu__list :is(.header-github-link, .header-discord-link, .header-website-link, .header-billing-link, .header-forum-link):hover::after { color: var(--tca-text); }
 
 /* Capitalize the sidebar label */
 nav li a {
