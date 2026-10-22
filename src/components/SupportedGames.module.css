@@ -7,6 +7,11 @@
   margin: 1.25rem 0 1rem;
 }
 
+/* Phones: two compact cards per row rather than one tall one. */
+@media (max-width: 640px) {
+  .grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+}
+
 /* The intro's six featured games: fixed columns so they always fill whole rows. */
 .featured { grid-template-columns: repeat(2, 1fr); }
 
@@ -97,6 +102,7 @@ html[data-theme='light'] .art img { opacity: 0.88; }
   gap: 0.45rem;
   padding: 0.7rem 0.85rem 0.8rem;
 }
+
 
 .name {
   font-family: var(--tca-font-display);
@@ -229,4 +235,15 @@ html[data-theme='light'] .art img { opacity: 0.88; }
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--tca-text-faint);
+}
+
+/* Phones: tighter card bodies for the two-up grid (after the base rules so it wins). */
+@media (max-width: 640px) {
+  .body { padding: 0.55rem 0.6rem 0.65rem; }
+  .name { font-size: 0.9375rem; }
+  /* Filter box on its own row; the platform toggle and count share the next. */
+  .toolbar { gap: 0.5rem; }
+  .search { flex-basis: 100%; }
+  .segments { flex: 1; }
+  .segment { flex: 1; padding: 0.4rem 0.5rem; }
 }

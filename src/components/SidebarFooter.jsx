@@ -1,5 +1,4 @@
 import React from "react";
-import clsx from "clsx";
 import Link from "@docusaurus/Link";
 import { usePluginData } from "@docusaurus/useGlobalData";
 import { useDocsVersion } from "@docusaurus/plugin-content-docs/client";
@@ -50,14 +49,14 @@ export default function SidebarFooter({ onCollapse }) {
       </ul>
 
       <div className={styles.status}>
-        <span className={clsx(styles.dot, isV3 ? styles.beta : styles.stable)} aria-hidden="true" />
+        <span className={styles.dot} aria-hidden="true" />
         <span className={styles.readout}>
           {label} // {isV3 ? "Beta" : "Stable"}
           {latest && (
             <>
               {" "}
-              <Link to={`/3/releases/${latest.slug}`} className={styles.build}>
-                {latest.title}
+              <Link to={`/3/releases/${latest.slug}`} className={styles.build} title={`Release notes for ${latest.title}`}>
+                {latest.title.split(".").slice(0, 2).join(".")}
               </Link>
             </>
           )}

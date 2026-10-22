@@ -47,11 +47,30 @@ export default function SectionLinks({ mobile }) {
   const { pathname } = useLocation();
   const [version] = useDocsVersionCandidates(undefined);
   const sections = SECTIONS[version?.name];
-  // The mobile drawer already shows the docs sidebar.
-  if (mobile || !sections) return null;
+  if (!sections) return null;
 
   const scores = sections.map((s) => matchLength(pathname, s.match));
   const best = Math.max(...scores);
+
+  // Mobile drawer (main menu): plain menu rows under a mono heading.
+  if (mobile) {
+    return (
+      <>
+        <li className={clsx("menu__list-item", styles.drawerHeading)}>Sections</li>
+        {sections.map((s, i) => (
+          <li key={s.to} className="menu__list-item">
+            <Link
+              to={s.to}
+              className={clsx("menu__link", best > 0 && scores[i] === best && "menu__link--active")}
+              aria-current={best > 0 && scores[i] === best ? "true" : undefined}
+            >
+              {s.label}
+            </Link>
+          </li>
+        ))}
+      </>
+    );
+  }
 
   return (
     <nav className={styles.sections} aria-label="Documentation sections">
