@@ -1,25 +1,39 @@
 name: Discord Release Notification
 
 "on":
-  push:
+  # Run after the site deploy instead of on push, so the release page exists
+  # before the embed links to it. Pushes to master always run the deploy.
+  workflow_run:
+    workflows: ["Deployment to GH Pages"]
+    types: [completed]
     branches:
       - master
-    paths:
-      - "versioned_docs/version-3/releases/**.mdx"
 
 jobs:
   notify:
+    # Deliberately not gated on the deploy's conclusion: a failed search
+    # scraper step still leaves the site deployed, and the notify script waits
+    # for the release page to be live anyway (and fails if it never appears).
+    if: github.event.workflow_run.event == 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
+          ref: ${{ github.event.workflow_run.head_sha }}
           fetch-depth: 2
 
       - name: Detect new release files
         id: detect
         run: |
           NEW_FILES=$(git diff --name-status HEAD~1 HEAD -- 'versioned_docs/version-3/releases/*.mdx' | grep '^A' | awk '{print $2}' | grep -v 'index.mdx' || true)
-          echo "files=$NEW_FILES" >> $GITHUB_OUTPUT
+          # Multi-line values need the delimiter form, or only the first file survives
+          if [ -n "$NEW_FILES" ]; then
+            {
+              echo "files<<EOF"
+              echo "$NEW_FILES"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Set up Node.js
         if: steps.detect.outputs.files != ''
@@ -27,9 +41,10 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Install gray-matter
+      # Installed outside the repo so npm doesn't pull the whole Docusaurus tree
+      - name: Install @11ty/gray-matter
         if: steps.detect.outputs.files != ''
-        run: npm install gray-matter
+        run: npm install --prefix "$RUNNER_TEMP/notify-deps" @11ty/gray-matter
 
       - name: Send Discord notification
         if: steps.detect.outputs.files != ''
@@ -38,10 +53,28 @@ jobs:
           DISCORD_ROLE_ID: ${{ secrets.DISCORD_RELEASE_ROLE_ID }}
           NEW_FILES: ${{ steps.detect.outputs.files }}
           SITE_URL: https://docs.tcadmin.com
+          NODE_PATH: ${{ runner.temp }}/notify-deps/node_modules
         run: |
           node << 'EOF'
           const fs = require('fs');
-          const matter = require('gray-matter');
+          const matter = require('@11ty/gray-matter');
+
+          // The deploy workflow only pushes to the gh-pages branch; GitHub Pages
+          // then publishes it separately, so poll until the page is really live.
+          async function waitForPage(url, { timeoutMs = 15 * 60 * 1000, intervalMs = 15 * 1000 } = {}) {
+            const deadline = Date.now() + timeoutMs;
+            while (Date.now() < deadline) {
+              try {
+                const res = await fetch(url, { headers: { 'Cache-Control': 'no-cache' } });
+                if (res.ok) return;
+                console.log(`${url} returned ${res.status}, retrying...`);
+              } catch (err) {
+                console.log(`${url} fetch failed (${err.message}), retrying...`);
+              }
+              await new Promise((r) => setTimeout(r, intervalMs));
+            }
+            throw new Error(`${url} was not live after ${timeoutMs / 60000} minutes`);
+          }
 
           (async () => {
           const files = process.env.NEW_FILES.trim().split('\n').filter(Boolean);
@@ -57,6 +90,7 @@ jobs:
             const date = data.date ? new Date(data.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : null;
             const slug = file.replace(/.*\//, '').replace(/\.mdx?$/, '');
             const url = `${siteUrl}/3/releases/${slug}`;
+            await waitForPage(url);
 
             // Count new features and bug fixes
             const featuresMatch = content.match(/###\s+New Features([\s\S]*?)(?:###|$)/);

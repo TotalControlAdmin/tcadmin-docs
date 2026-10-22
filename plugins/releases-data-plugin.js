@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const matter = require("gray-matter");
+const matter = require("@11ty/gray-matter");
 
 const RELEASES_DIR_REL = path.join("versioned_docs", "version-3", "releases");
 

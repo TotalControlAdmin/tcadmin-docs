@@ -1,0 +1,104 @@
+/* Sunken band pinned to the bottom of the docs sidebar. Tokens come from src/css/custom.css. */
+.footer {
+  display: none;
+}
+
+@media (min-width: 997px) {
+  .footer {
+    display: block;
+    flex: none;
+    border-top: 1px solid var(--tca-line-soft);
+    background-color: color-mix(in srgb, var(--tca-bg-deep) 40%, transparent);
+  }
+}
+
+.links {
+  list-style: none;
+  margin: 0;
+  padding: 0.375rem 0;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.9375rem;
+  color: var(--tca-text-dim);
+  transition: color var(--tca-fast), background-color var(--tca-fast);
+}
+
+.link:hover {
+  color: var(--tca-text);
+  text-decoration: none;
+  background-color: color-mix(in srgb, var(--tca-surface-2) 70%, transparent);
+}
+
+.icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--tca-text-faint);
+  transition: color var(--tca-fast);
+}
+
+.link:hover .icon { color: var(--tca-accent); }
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.75rem;
+  padding: 0 0.5rem 0 1rem;
+  border-top: 1px solid var(--tca-line-soft);
+}
+
+.dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--state);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--state) 70%, transparent);
+}
+
+.stable { --state: var(--tca-online); }
+.beta { --state: var(--tca-starting); }
+
+.readout {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--tca-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tca-text-faint);
+}
+
+.build { color: var(--tca-text-dim); }
+.build:hover { color: var(--tca-accent); text-decoration: none; }
+
+.collapse {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  font-size: 1.05rem;
+  color: var(--tca-text-faint);
+  background: transparent;
+  border: 0;
+  border-radius: var(--tca-r);
+  cursor: pointer;
+  transition: color var(--tca-fast), background-color var(--tca-fast);
+}
+
+.collapse:hover {
+  color: var(--tca-accent);
+  background-color: color-mix(in srgb, var(--tca-accent) 10%, transparent);
+}

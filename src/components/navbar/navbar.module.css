@@ -1,0 +1,114 @@
+/* Custom top-bar items. Tokens come from src/css/custom.css. */
+
+/* ---- Section links: condensed uppercase tabs with the glowing 2px slider ---- */
+.sections {
+  display: none;
+  align-self: stretch;
+  align-items: stretch;
+  margin-left: 0.75rem;
+}
+
+@media (min-width: 1280px) {
+  .sections { display: flex; }
+}
+
+.section {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0 0.85rem;
+  font-family: var(--tca-font-display);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--tca-text-dim);
+  transition: color var(--tca-fast), background-color var(--tca-fast);
+}
+
+.section::after {
+  content: '';
+  position: absolute;
+  left: 0.85rem;
+  right: 0.85rem;
+  bottom: -1px;
+  height: 2px;
+  background: var(--tca-accent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--tca-accent) 60%, transparent);
+  opacity: 0;
+  transform: scaleX(0.4);
+  transition: opacity var(--tca-fast), transform 0.2s ease;
+}
+
+.section:hover {
+  color: var(--tca-text);
+  text-decoration: none;
+  background-color: color-mix(in srgb, var(--tca-accent) 5%, transparent);
+}
+
+.section:focus-visible { outline-offset: -4px; }
+
+.sectionActive,
+.sectionActive:hover { color: var(--tca-accent); }
+
+.sectionActive::after {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---- Latest build chip ---- */
+.build {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 0.5rem;
+  padding: 0.3rem 0.65rem;
+  font-family: var(--tca-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tca-text-dim);
+  border: 1px solid var(--tca-line-soft);
+  border-radius: var(--tca-r);
+  background-color: color-mix(in srgb, var(--tca-surface) 50%, transparent);
+  transition: border-color var(--tca-fast), color var(--tca-fast);
+}
+
+@media (min-width: 1100px) {
+  .build { display: inline-flex; }
+}
+
+.build:hover {
+  color: var(--tca-text);
+  text-decoration: none;
+  border-color: color-mix(in srgb, var(--tca-online) 55%, var(--tca-line));
+}
+
+.build:focus-visible { outline-offset: 2px; }
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--tca-online);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--tca-online) 70%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dot { animation: pulse 2.4s ease-in-out infinite; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+.buildLabel { color: var(--tca-text-faint); }
+
+.buildVersion {
+  font-weight: 600;
+  color: var(--tca-text);
+}
+
+.build:hover .buildVersion { color: var(--tca-online); }
