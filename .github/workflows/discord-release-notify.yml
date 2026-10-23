@@ -39,7 +39,8 @@ jobs:
         if: steps.detect.outputs.files != ''
         uses: actions/setup-node@v6
         with:
-          node-version: '24'
+          node-version: '26'
+          check-latest: true
 
       # Installed outside the repo so npm doesn't pull the whole Docusaurus tree
       - name: Install @11ty/gray-matter
