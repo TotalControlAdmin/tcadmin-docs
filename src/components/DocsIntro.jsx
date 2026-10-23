@@ -241,7 +241,7 @@ export function SupportCards({ version = "3" }) {
           title="Game configs"
           actions={
             <Link
-              to="https://community.tcadmin.com/files/category/1-game-configs"
+              to="https://community.tcadmin.com/files/"
               className={clsx(styles.btn, styles.btnGhost)}
             >
               Browse game configs
