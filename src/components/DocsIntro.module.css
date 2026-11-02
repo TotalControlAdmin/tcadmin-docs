@@ -1,0 +1,348 @@
+/* Version intro page blocks. Tokens (--tca-*) come from src/css/custom.css. */
+
+/* Shared cut-corner plate: top-left + bottom-right cut, 1px edge redrawn across each cut. */
+.hero,
+.tile,
+.tileIcon,
+.panel,
+.btn {
+  --corner: linear-gradient(to bottom right, transparent calc(50% - 0.8px), var(--edge) calc(50% - 0.8px), var(--edge) calc(50% + 0.8px), transparent calc(50% + 0.8px));
+  clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+  background-image: var(--corner), var(--corner);
+  background-size: var(--cut) var(--cut);
+  background-position: 0 0, 100% 100%;
+  background-repeat: no-repeat;
+  background-origin: border-box;
+}
+
+.mono {
+  font-family: var(--tca-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tca-text-faint);
+}
+
+/* ---- Hero: service-header plate with an accent glow and a stat strip ---- */
+.hero {
+  --cut: var(--tca-cut-lg);
+  --edge: var(--tca-line-soft);
+  margin: 0.5rem 0 2.5rem;
+  padding: 1.5rem 1.5rem 0;
+  border: 1px solid var(--edge);
+  background-color: var(--tca-surface);
+  background-image:
+    var(--corner), var(--corner),
+    radial-gradient(70% 120% at 0% 0%, color-mix(in srgb, var(--tca-accent) 12%, transparent), transparent 70%);
+  background-size: var(--cut) var(--cut), var(--cut) var(--cut), auto;
+  background-position: 0 0, 100% 100%, 0 0;
+}
+
+.heroMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.status {
+  --state: var(--tca-starting);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 1px 8px;
+  font-family: var(--tca-font-display);
+  font-weight: 700;
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--state);
+  border: 1px solid color-mix(in srgb, var(--state) 45%, transparent);
+  border-radius: var(--tca-r);
+}
+
+.stable { --state: var(--tca-online); }
+.beta { --state: var(--tca-starting); }
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--state);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--state) 70%, transparent);
+}
+
+.lead {
+  max-width: 40rem;
+  margin: 0 0 1.5rem;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--tca-text-dim);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin: 0 -1.5rem;
+  border-top: 1px solid var(--tca-line-soft);
+}
+
+@media (min-width: 768px) {
+  .stats { grid-template-columns: repeat(4, 1fr); }
+}
+
+.stat {
+  padding: 1rem 1.5rem;
+  border-right: 1px solid var(--tca-line-soft);
+  border-bottom: 1px solid var(--tca-line-soft);
+}
+
+.stat:last-child { border-right: 0; }
+
+@media (min-width: 768px) {
+  .stat { border-bottom: 0; }
+}
+
+.statLabel {
+  margin: 0 0 0.25rem;
+  font-family: var(--tca-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tca-text-faint);
+}
+
+.statValue {
+  margin: 0;
+  font-family: var(--tca-font-display);
+  font-weight: 800;
+  font-size: 1.375rem;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  color: var(--ifm-heading-color);
+}
+
+.statValue a { color: var(--tca-accent); }
+
+/* ---- Buttons ---- */
+.btn {
+  --cut: var(--tca-cut);
+  --edge: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.1rem;
+  font-family: var(--tca-font-display);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid var(--edge);
+  transition: background-color var(--tca-fast), border-color var(--tca-fast), color var(--tca-fast);
+}
+
+.btn:hover { text-decoration: none; }
+.btn:focus-visible { outline-offset: -4px; }
+
+.btnPrimary {
+  color: #fff;
+  background-color: var(--tca-accent);
+}
+html[data-theme='dark'] .btnPrimary { color: #021428; }
+.btnPrimary:hover { color: #fff; background-color: var(--tca-accent-hot); }
+html[data-theme='dark'] .btnPrimary:hover { color: #021428; }
+
+.btnGhost {
+  --edge: var(--tca-line);
+  color: var(--ifm-font-color-base);
+  background-color: color-mix(in srgb, var(--tca-surface) 60%, transparent);
+}
+
+.btnGhost:hover { --edge: var(--tca-accent); color: var(--tca-accent); }
+
+/* ---- Section tiles: settings-hub cards with glowing icon wells ---- */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin: 1.25rem 0 2.5rem;
+}
+
+@media (min-width: 640px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.tile {
+  --cut: var(--tca-cut);
+  --edge: var(--tca-line-soft);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: 1rem 1.1rem;
+  color: inherit;
+  border: 1px solid var(--edge);
+  background-color: color-mix(in srgb, var(--tca-bg) 45%, var(--tca-surface));
+  transition: border-color var(--tca-fast), background-color var(--tca-fast);
+}
+
+.tile:hover {
+  --edge: color-mix(in srgb, var(--tca-accent) 55%, var(--tca-line));
+  color: inherit;
+  text-decoration: none;
+  background-color: var(--tca-surface-2);
+}
+
+.tile:focus-visible { outline-offset: -4px; }
+
+.tileIcon {
+  --cut: 9px;
+  --edge: color-mix(in srgb, var(--tca-accent) 45%, var(--tca-line));
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 1.15rem;
+  color: var(--tca-accent);
+  background-color: var(--tca-surface);
+  border: 1px solid var(--edge);
+  box-shadow: inset 0 0 16px color-mix(in srgb, var(--tca-accent) 18%, transparent);
+  clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+  transition: border-color var(--tca-fast), box-shadow var(--tca-fast);
+}
+
+.tile:hover .tileIcon {
+  --edge: var(--tca-accent);
+  box-shadow: inset 0 0 18px color-mix(in srgb, var(--tca-accent) 32%, transparent);
+}
+
+.tileBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.tileTitle {
+  font-family: var(--tca-font-display);
+  font-weight: 800;
+  font-size: 1.1875rem;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--ifm-heading-color);
+}
+
+.tile:hover .tileTitle { color: var(--tca-accent); }
+
+.tileText {
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--tca-text-dim);
+}
+
+/* ---- Supported games: squared chips in the display face ---- */
+.games {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 1.25rem;
+  padding: 0;
+  list-style: none;
+}
+
+.game {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 !important;
+  padding: 0.3rem 0.7rem;
+  font-family: var(--tca-font-display);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  letter-spacing: 0.04em;
+  color: var(--tca-text-dim);
+  background-color: var(--tca-surface-2);
+  border-radius: var(--tca-r);
+  box-shadow: inset 0 0 0 1px var(--tca-line);
+}
+
+.game svg { color: var(--tca-accent); }
+
+/* ---- Latest releases footer link ---- */
+.more {
+  margin: 1rem 0 2.5rem;
+  font-family: var(--tca-font-display);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.more a { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+/* ---- Community / issue tracker panels ---- */
+.support {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin: 1.25rem 0 1rem;
+}
+
+@media (min-width: 768px) {
+  .support { grid-template-columns: 1fr 1fr; }
+}
+
+.panel {
+  --cut: var(--tca-cut-lg);
+  --edge: var(--tca-line-soft);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 1.25rem;
+  border: 1px solid var(--edge);
+  background-color: var(--tca-surface);
+}
+
+.panelTitle {
+  margin: 0.9rem 0 0.4rem;
+  font-family: var(--tca-font-display);
+  font-weight: 800;
+  font-size: 1.375rem;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--ifm-heading-color);
+}
+
+.panelText {
+  flex: 1;
+  margin: 0 0 1.1rem;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--tca-text-dim);
+}
+
+.panelActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.textLink {
+  font-family: var(--tca-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

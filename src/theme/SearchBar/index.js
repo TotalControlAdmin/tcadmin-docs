@@ -1,6 +1,6 @@
 // TCAdmin: ejected from docusaurus-theme-search-typesense@0.26.0 lib/theme/SearchBar/index.js. Deviations:
-// - Imports re-pointed at the theme package (@site/node_modules/..., /client); DocsPreferredVersionContextProvider comes
-//   from the theme's NESTED @docusaurus/plugin-content-docs (~3.9), the copy its contextual-search hook reads.
+// - Imports re-pointed at the theme package (@site/node_modules/..., /client). Since 0.27 the theme shares the site's
+//   @docusaurus/plugin-content-docs, so DocsPreferredVersionContextProvider comes from the root /client entry.
 // - ResultsFooter appends `&version=<active docs version>` to the "See all results" link (useActivePluginAndVersion).
 /**
  * Copyright (c) Facebook, Inc. and its affiliates.
@@ -28,9 +28,8 @@ import { useTypesenseContextualFilters } from 'docusaurus-theme-search-typesense
 import Translate from '@docusaurus/Translate';
 // @ts-ignore
 import translations from '@theme/SearchTranslations';
-import { DocsPreferredVersionContextProvider } from '@site/node_modules/docusaurus-theme-search-typesense/node_modules/@docusaurus/plugin-content-docs/lib/client/index.js';
 // TCAdmin deviation: the active docs version for the "See all results" link.
-import { useActivePluginAndVersion } from '@docusaurus/plugin-content-docs/client';
+import { useActivePluginAndVersion, DocsPreferredVersionContextProvider } from '@docusaurus/plugin-content-docs/client';
 let DocSearchModal = null;
 function Hit({ hit, children, }) {
     return <Link to={hit.url}>{children}</Link>;

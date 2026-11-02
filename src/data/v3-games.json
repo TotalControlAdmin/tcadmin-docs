@@ -1,0 +1,364 @@
+{
+  "sources": [
+    "TotalControlAdmin/TCA3PluginRepo",
+    "TotalControlAdmin/TCA3CommunityRepo"
+  ],
+  "games": [
+    {
+      "name": "7 Days to Die",
+      "identifier": "Community.Games.7DaystoDie",
+      "version": "1.0.1",
+      "author": "TCAdmin",
+      "description": "7 Days to Die is an open-world game that is a unique combination of first-person shooter, survival horror, tower defense, and role-playing games. Play the definitive zombie survival sandbox RPG that came first. Navezgane awaits!",
+      "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/251570/header.jpg",
+      "platforms": [
+        "Windows",
+        "Linux"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "AA Proving Grounds",
+      "identifier": "Community.Games.AAProvingGrounds",
+      "version": "1.0.1",
+      "author": "TCAdmin",
+      "description": "America’s Army: Proving Grounds is the official game of the U.S. Army and part of the highly acclaimed America’s Army game series. This free military game focuses on small unit tactical maneuvers and puts you to the test in a wide variety of new America’s Army maps and AA fan favorites.",
+      "image": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/203290/ss_d33fa90532510f13aca8a420a9304bac33d449d8.jpg",
+      "platforms": [
+        "Windows"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "America's Army",
+      "identifier": "Community.Games.AmericasArmy",
+      "version": "1.0.1",
+      "author": "TCAdmin",
+      "description": "America's Army is a multiplayer video game that enables players to act as soldiers in the U.S. Army in a round-based team tactical shooter with combat at squad-level and three fireteams.",
+      "image": null,
+      "platforms": [
+        "Windows"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "ARK: Survival Evolved",
+      "identifier": "Community.Games.ARKSurvivalEvolved",
+      "version": "1.0.1",
+      "author": "TCAdmin",
+      "description": "Ark: Survival Evolved (stylized as ARK) is a 2017 action-adventure survival video game developed by Studio Wildcard. In the game, players must survive being stranded on one of several maps filled with roaming dinosaurs, fictional fantasy monsters, and other prehistoric animals, natural hazards, and potentially hostile human players.",
+      "image": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/346110/ss_2fd997a2f7151cb2187043a1f41589cc6a9ebf3a.jpg",
+      "platforms": [
+        "Windows",
+        "Linux"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "Call of Duty 2",
+      "identifier": "Community.Games.CallOfDuty2",
+      "version": "1.0.0",
+      "author": "mox",
+      "description": "COD2",
+      "image": "https://gamesbeat.com/wp-content/uploads/2025/05/call-of-duty-2-2.jpg",
+      "platforms": [
+        "Windows"
+      ],
+      "source": "community"
+    },
+    {
+      "name": "Conan",
+      "identifier": "Community.Games.Conan",
+      "version": "1.0.0",
+      "author": "TCAdmin",
+      "description": "Conan",
+      "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/440900/6c1deec9379cbfb34b887cbcbf518294b38625b9/ss_6c1deec9379cbfb34b887cbcbf518294b38625b9.1920x1080.jpg?t=1781618428",
+      "platforms": [
+        "Windows",
+        "Linux"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "Counter-Strike 2",
+      "identifier": "Community.Games.CounterStrike2",
+      "version": "1.0.1",
+      "author": "TCAdmin",
+      "description": "Counter-Strike 2",
+      "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/730/ss_13bb35638c0267759276f511ee97064773b37a51.1920x1080.jpg?t=1780435263",
+      "platforms": [
+        "Windows",
+        "Linux"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "Counter-Strike: Global Offensive",
+      "identifier": "Community.Games.CounterStrikeGlobalOffensive",
+      "version": "1.0.0",
+      "author": "TCAdmin",
+      "description": "CS:GO",
+      "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/730/ss_13bb35638c0267759276f511ee97064773b37a51.1920x1080.jpg?t=1780435263",
+      "platforms": [
+        "Windows",
+        "Linux"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "Counter-Strike: Source",
+      "identifier": "Community.Games.CounterStrikeSource",
+      "version": "1.0.0",
+      "author": "TCAdmin",
+      "description": "CS:S",
+      "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/240/0000000031.1920x1080.jpg?t=1745368575",
+      "platforms": [
+        "Windows",
+        "Linux"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "Day of Defeat: Source",
+      "identifier": "Community.Games.DayOfDefeatSource",
+      "version": "1.0.0",
+      "author": "TCAdmin",
+      "description": "DoD:S",
+      "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/300/0000000045.1920x1080.jpg?t=1763407002",
+      "platforms": [
+        "Windows",
+        "Linux"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "Enshrouded",
+      "identifier": "Community.Games.Enshrouded",
+      "version": "1.0.0",
+      "author": "TCAdmin",
+      "description": "Enshrouded",
+      "image": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1203620/9c2db32975d266f1051f77e46d347a118c824c57/ss_9c2db32975d266f1051f77e46d347a118c824c57.jpg",
+      "platforms": [
+        "Windows"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "Fistful of Frags",
+      "identifier": "Community.Games.FistfulOfFrags",
+      "version": "1.0.0",
+      "author": "TCAdmin",
+      "description": "FoF",
+      "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/265630/ss_11400f0e04e49e08ac5fab27c290dded1ec4a818.1920x1080.jpg?t=1709219464",
+      "platforms": [
+        "Windows",
+        "Linux"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "FiveM",
+      "identifier": "TCA.Games.FiveM",
+      "version": "1.0.1",
+      "author": "TCAdmin",
+      "description": "FiveM game config for TCAdmin 3",
+      "image": "https://i.pinimg.com/originals/96/15/c4/9615c4807307ae00ee0b4cbdaca2b1f0.jpg",
+      "platforms": [
+        "Windows"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "Garry's Mod",
+      "identifier": "TCA.Games.GarrysMod",
+      "version": "1.0.3",
+      "author": "TCAdmin",
+      "description": "A sandbox game where players use tools and physics to build, experiment, and create their own gameplay experiences.",
+      "image": "https://getwallpapers.com/wallpaper/full/9/4/e/1027889-widescreen-gmod-wallpapers-1920x1080-phone.jpg",
+      "platforms": [
+        "Windows",
+        "Linux"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "Half Life - Counter-Strike 1.6",
+      "identifier": "Community.Games.HalfLifeCounterStrike16",
+      "version": "1.0.0",
+      "author": "TCAdmin",
+      "description": "Half Life - Counter-Strike 1.6",
+      "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/10/0000000134.1920x1080.jpg?t=1745368572",
+      "platforms": [
+        "Windows",
+        "Linux"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "Holdfast: Nations At War",
+      "identifier": "Community.Games.HoldfastNationsAtWar",
+      "version": "1.0.0",
+      "author": "TCAdmin",
+      "description": "Holdfast",
+      "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/589290/d4cad516a50da670d27950538127dac08742257d/ss_d4cad516a50da670d27950538127dac08742257d.1920x1080.jpg?t=1781206709",
+      "platforms": [
+        "Windows",
+        "Linux"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "Minecraft",
+      "identifier": "TCA.Games.MC",
+      "version": "1.0.16",
+      "author": "TCAdmin",
+      "description": "Minecraft game config for TCAdmin 3",
+      "image": "https://img.primaservers.dk/minecraft/index.php",
+      "platforms": [
+        "Windows",
+        "Linux"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "Minecraft Bedrock Edition | Vanilla",
+      "identifier": "Community.Games.MinecraftBedrockEditionVanilla",
+      "version": "1.0.0",
+      "author": "TCAdmin",
+      "description": "MC:BE | Vanilla",
+      "image": "https://img.primaservers.dk/minecraft/index.php",
+      "platforms": [
+        "Windows",
+        "Linux"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "Mordhau",
+      "identifier": "Community.Games.Mordhau",
+      "version": "1.0.0",
+      "author": "TCAdmin",
+      "description": "Mordhau",
+      "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/629760/ss_ce604b8561e7d1cb26ddf74e3db97d94662e2d5b.1920x1080.jpg?t=1777933284",
+      "platforms": [
+        "Windows",
+        "Linux"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "Multi Theft Auto",
+      "identifier": "TCA.Games.MTA",
+      "version": "1.0.7",
+      "author": "TCAdmin",
+      "description": "Multi Theft Auto game config for TCAdmin 3",
+      "image": "https://pbs.twimg.com/media/E5j5TInX0AQWwAC?format=jpg&name=4096x4096",
+      "platforms": [
+        "Windows",
+        "Linux"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "Palworld",
+      "identifier": "Community.Games.Palworld",
+      "version": "1.0.1",
+      "author": "TCAdmin",
+      "description": "Palworld",
+      "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1623730/ss_b3cea7c9f04a67d784d4c6a0c157a11d6268b189.1920x1080.jpg?t=1780702171",
+      "platforms": [
+        "Windows",
+        "Linux"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "Rust",
+      "identifier": "Community.Games.Rust",
+      "version": "1.0.2",
+      "author": "TCAdmin",
+      "description": "Rust",
+      "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/252490/ss_d0fdacaeef5a28a7cee525fd73376adfe083c964.1920x1080.jpg?t=1781536981",
+      "platforms": [
+        "Windows",
+        "Linux"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "Satisfactory",
+      "identifier": "Community.Games.Satisfactory",
+      "version": "1.0.1",
+      "author": "mox",
+      "description": "satisfactory",
+      "image": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/526870/ss_c42d82beff342eb1ce7a40b3015a27968655df40.jpg",
+      "platforms": [
+        "Windows",
+        "Linux"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "Scum",
+      "identifier": "Community.Games.Scum",
+      "version": "1.0.1",
+      "author": "TCAdmin",
+      "description": "Scum",
+      "image": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/513710/ss_62f56143b1c35cb843a4f3e29290a09176532ee5.jpg",
+      "platforms": [
+        "Windows"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "Squad",
+      "identifier": "Community.Games.Squad",
+      "version": "1.0.0",
+      "author": "TCAdmin",
+      "description": "Squad",
+      "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/393380/ss_a50882d54e8fdf8478bbbe5cd8df4bd086fc1a0f.1920x1080.jpg?t=1781548039",
+      "platforms": [
+        "Windows",
+        "Linux"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "V Rising",
+      "identifier": "Community.Games.VRising",
+      "version": "1.0.0",
+      "author": "TCAdmin",
+      "description": "V Rising",
+      "image": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1604030/227d19e9aedac1933bffcdb373ccdbd9250a6bdc/ss_227d19e9aedac1933bffcdb373ccdbd9250a6bdc.jpg",
+      "platforms": [
+        "Windows"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "Valheim",
+      "identifier": "Community.Games.Valheim",
+      "version": "1.0.0",
+      "author": "TCAdmin",
+      "description": "Valheim",
+      "image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/892970/ss_a600a7d4ca954543e22f571a9629521a13f82143.1920x1080.jpg?t=1765967243",
+      "platforms": [
+        "Windows",
+        "Linux"
+      ],
+      "source": "official"
+    },
+    {
+      "name": "Wolfenstein: Enemy Territory",
+      "identifier": "TCA.Games.WolfET",
+      "version": "1.0.0",
+      "author": "TCAdmin",
+      "description": "WolfET game config for TCAdmin 3",
+      "image": "https://upload.wikimedia.org/wikipedia/it/8/83/Etscreen.jpg",
+      "platforms": [
+        "Windows"
+      ],
+      "source": "official"
+    }
+  ]
+}

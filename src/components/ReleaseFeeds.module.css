@@ -1,0 +1,135 @@
+/* Release feed subscribe panel. Tokens come from src/css/custom.css. */
+
+/* Cut-corner plate with an accent wash, edge redrawn across each cut. */
+.panel,
+.btn,
+.icon {
+  --corner: linear-gradient(to bottom right, transparent calc(50% - 0.8px), var(--edge) calc(50% - 0.8px), var(--edge) calc(50% + 0.8px), transparent calc(50% + 0.8px));
+  clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+  background-image: var(--corner), var(--corner);
+  background-size: var(--cut) var(--cut);
+  background-position: 0 0, 100% 100%;
+  background-repeat: no-repeat;
+  background-origin: border-box;
+}
+
+.panel {
+  --cut: var(--tca-cut-lg);
+  --edge: color-mix(in srgb, var(--tca-accent) 35%, var(--tca-line-soft));
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.25rem;
+  margin: 1.5rem 0 2rem;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--edge);
+  background-color: var(--tca-surface);
+  background-image:
+    var(--corner), var(--corner),
+    radial-gradient(60% 160% at 0% 0%, color-mix(in srgb, var(--tca-accent) 12%, transparent), transparent 70%);
+  background-size: var(--cut) var(--cut), var(--cut) var(--cut), auto;
+  background-position: 0 0, 100% 100%, 0 0;
+}
+
+.icon {
+  --cut: 9px;
+  --edge: color-mix(in srgb, var(--tca-accent) 45%, var(--tca-line));
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  font-size: 1.25rem;
+  color: var(--tca-accent);
+  background-color: var(--tca-surface);
+  border: 1px solid var(--edge);
+  box-shadow: inset 0 0 16px color-mix(in srgb, var(--tca-accent) 22%, transparent);
+}
+
+.text {
+  display: flex;
+  flex: 1 1 14rem;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.title {
+  font-family: var(--tca-font-display);
+  font-weight: 800;
+  font-size: 1.375rem;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--ifm-heading-color);
+}
+
+.lead {
+  font-size: 0.9375rem;
+  color: var(--tca-text-dim);
+}
+
+.feeds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+/* Feed button + its copy-URL button read as one split control. */
+.feed {
+  display: inline-flex;
+  align-items: stretch;
+}
+
+.btn {
+  --cut: var(--tca-cut);
+  --edge: color-mix(in srgb, var(--tca-accent) 55%, var(--tca-line));
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-family: var(--tca-font-display);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--tca-accent);
+  border: 1px solid var(--edge);
+  border-right-width: 0;
+  background-color: color-mix(in srgb, var(--tca-accent) 8%, var(--tca-surface));
+  /* Only the top-left corner is cut; the copy button carries the bottom-right one. */
+  clip-path: polygon(var(--cut) 0, 100% 0, 100% 100%, 0 100%, 0 var(--cut));
+  background-image: var(--corner);
+  background-position: 0 0;
+  transition: background-color var(--tca-fast), color var(--tca-fast), border-color var(--tca-fast);
+}
+
+.btn:hover {
+  --edge: var(--tca-accent);
+  color: var(--ifm-heading-color);
+  text-decoration: none;
+  background-color: color-mix(in srgb, var(--tca-accent) 18%, var(--tca-surface));
+}
+
+.btn:focus-visible { outline-offset: -4px; }
+
+.copy {
+  --cut: var(--tca-cut-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  padding: 0;
+  font-size: 1rem;
+  color: var(--tca-text-dim);
+  background:
+    linear-gradient(to bottom right, transparent calc(50% - 0.8px), color-mix(in srgb, var(--tca-accent) 55%, var(--tca-line)) calc(50% - 0.8px), color-mix(in srgb, var(--tca-accent) 55%, var(--tca-line)) calc(50% + 0.8px), transparent calc(50% + 0.8px)) 100% 100% / var(--cut) var(--cut) no-repeat border-box,
+    var(--tca-well);
+  border: 1px solid color-mix(in srgb, var(--tca-accent) 55%, var(--tca-line));
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%);
+  cursor: pointer;
+  transition: color var(--tca-fast), background-color var(--tca-fast);
+}
+
+.copy:hover { color: var(--tca-accent); }
+.copy:focus-visible { outline: 2px solid var(--tca-accent); outline-offset: -4px; }
