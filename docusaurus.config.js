@@ -1,8 +1,8 @@
 // @ts-check
 /** @type {import('@docusaurus/types').Config} */
 
-const lightLogo = "img/tcadmin-logo.png";
-const darkLogo = "img/TCAdmin_White.png";
+const lightLogo = "img/brand/tcadmin-lockup.png";
+const darkLogo = "img/brand/tcadmin-lockup-white.png";
 
 // Code blocks use the panel console palette (TCADMIN — Total Control theme bundle).
 // The panel keeps its console dark in light mode too, so both themes share the
@@ -174,7 +174,7 @@ const config = {
   themes: ["docusaurus-theme-search-typesense"],
 
   themeConfig: {
-    image: "img/tcadmin-logo.png",
+    image: "img/brand/tcadmin-lockup.png",
     typesense: {
       typesenseCollectionName: "tcadmin-docs",
       typesenseServerConfig: {

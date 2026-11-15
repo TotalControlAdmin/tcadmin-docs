@@ -1,0 +1,128 @@
+---
+sidebar_label: Custom Pages and API Functions
+sidebar_position: 4
+---
+
+# Custom Pages and API Functions
+
+A **custom page** is a small web page you write for a game or Docker blueprint. It appears inside a service's own screens, so you can give customers a purpose-built tool, such as a player list, a mod manager or a settings form, instead of a generic button.
+
+A page does not run code on the server by itself. When it needs to do something, it calls an **API function**: an ordinary script that runs on the service's server and hands a result back to the page.
+
+## Creating a page
+
+Pages belong to a game blueprint, a Docker blueprint or the global scripts. A service owner cannot create one for a single service.
+
+1. Open the blueprint's **Scripts** page and choose **New Script**, then **Custom Page**.
+2. The editor opens with a starter page. The **Script Engine** field shows **Custom Page** and cannot be changed.
+3. In **Events**, choose where the page appears.
+
+| Event | Where the page shows up |
+|---|---|
+| `CustomServiceIcon` | As an entry in the service's side menu. |
+| `CustomServiceAction` | In the service's **Actions** menu. |
+
+You can pick one or both. Every viewer who opens the page sees it inside a frame on the service screen, styled with the viewer's current theme and light or dark setting.
+
+## Writing the page
+
+The page code is an HTML fragment: write only the content, not a full document with `<html>` or `<body>`. You can include your own `<style>` and `<script>` blocks.
+
+### Tokens
+
+Text such as `${ServiceId}` in the page is replaced with the service's value when the page loads. Values are HTML-encoded, so they are safe to print.
+
+| Token | Value |
+|---|---|
+| `${HostnameOrIP}` | The service's hostname or IP address. |
+| `${IPAddress}` | The service's IP address. |
+| `${IPHostname}` | The hostname of the service's IP address. |
+| `${ServiceId}` | The service's id. |
+| `${RootDirectory}` | The service's root folder. |
+| `${WorkingDirectory}` | The service's working folder. |
+| `${Executable}` | The service's executable. |
+| `${Slots}` | The slot count (game services only). |
+
+Port ids and service variables work as tokens too. A token that matches nothing is left as written.
+
+The editor's **Variables** menu inserts tokens, and its **Helpers** menu inserts the snippets below.
+
+### Calling a function
+
+The page can use a small built-in helper:
+
+| Helper | What it does |
+|---|---|
+| `TCAdmin.Script.Execute(name, inputs)` | Runs an API function by name and returns `success`, `returnValue`, `error` and `output`. |
+| `TCAdmin.Service.OnStatusChange(callback)` | Calls you with `status` and `previousStatus` when the service starts, stops or changes state. |
+| `TCAdmin.Toast.Show(message, severity)` | Shows a message in the panel's notification area. |
+| `TCAdmin.Dialog.Alert`, `Confirm`, `Prompt` | Show the panel's own message boxes instead of the browser's. |
+| `TCAdmin.Context` | Holds the current service, user and theme colours. |
+
+```js
+const r = await TCAdmin.Script.Execute("ListItems", { ItemAction: "list" });
+if (r.success) {
+  console.log(r.returnValue);
+} else {
+  TCAdmin.Toast.Error(r.error);
+}
+```
+
+Asking for a function that does not exist, or that the viewer may not run, fails with `Unknown API function`.
+
+:::tip
+Read the service's current status from `TCAdmin.Context.ThisService.Status` and subscribe with `OnStatusChange`. The context value is only a snapshot from when the page loaded.
+:::
+
+## API functions
+
+An API function is a script whose **Events** contain `ApiFunction`. It runs only when a page, the REST API or the AI assistant calls it, and never appears as a button of its own.
+
+- **Inputs** are blueprint variables that you select in the script's **Input Variables**. Each needs the script-parameter option and an editor. A value the page sends that is not a declared input is dropped. Inputs are checked but never saved to the service.
+- **The return value** is whatever the script assigns to `Globals.ReturnValue`. It reaches the page as `returnValue`, converted to JSON.
+- **Errors** reach the page as `error`. An uncaught exception, a value that cannot be converted to JSON, or a refused run (see Limits) all set `success` to false.
+
+A function that a page polls would fill the activity log, so executions are not logged by default. Tick **Log API executions in the activity log** on the function to record them.
+
+## Permissions and limits
+
+Every call runs as the person viewing the page, not as the author.
+
+- A page or function with no roles is visible to admins only. To let customers use a tool, give the customer roles to the page **and** to every function it calls, on the blueprint's **Scripts** page under **Execute Permissions**.
+- Sub-users also need the script permission their owner grants them.
+- Opening a page is never written to the activity log.
+
+A function called from a page waits for the result for up to 120 seconds and cannot ask the user questions. It counts toward the same run limits as custom icons and actions: the script's **Max concurrent runs per service** and the blueprint's **Max concurrent script runs per service**. See [Background script runs](./background-script-runs.mdx) for both.
+
+## Scripting
+
+| Event | When it fires |
+|---|---|
+| `ApiFunction` | On demand, when a page, the REST API or the assistant calls the function. |
+| `CustomServiceIcon` | Page only: the entry in the service's side menu. |
+| `CustomServiceAction` | Page only: the entry in the **Actions** menu. |
+
+The standard objects (`ThisService`, `ThisServer`, `ThisGame`, `ScriptConsole` and the managers) are described on [Script Objects](./script-objects.mdx). An `ApiFunction` script also has:
+
+| Variable | Type | Description |
+|---|---|---|
+| Each declared input, for example `ItemAction` | `object` | Read it with `Variables.Parse<string>("ItemAction", "list")`, or `Variables["ItemAction"]`. |
+| `Globals.ReturnValue` | `object` | Assign any value that converts to JSON; the page receives it as `returnValue`. |
+
+Throwing an exception makes the call report `success: false`.
+
+```csharp
+//refAssemblies: TCAdmin.SDK.dll, TCAdmin.GameHosting.SDK.dll, TCAdmin.Scripting.dll, TCAdmin.Monitor.dll
+var Globals = new TCAdmin.Scripting.Engines.Addons.CSharpGameGlobals(); // DO NOT MODIFY THIS LINE
+
+var action = Variables.Parse<string>("ItemAction", "list");
+
+if (action == "list")
+{
+    Globals.ReturnValue = new { service = ThisService.ServiceId, items = new[] { "alpha", "beta" } };
+}
+else
+{
+    throw new Exception("Unknown action '" + action + "'.");
+}
+```

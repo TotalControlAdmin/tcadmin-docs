@@ -81,8 +81,8 @@ export default function Home() {
           <ThemedImage
             alt="TCAdmin"
             sources={{
-              light: '/img/tcadmin-logo.png',
-              dark: '/img/TCAdmin_White.png',
+              light: '/img/brand/tcadmin-lockup.png',
+              dark: '/img/brand/tcadmin-lockup-white.png',
             }}
             className={styles.logo}
           />

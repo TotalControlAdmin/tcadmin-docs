@@ -1,0 +1,124 @@
+---
+sidebar_position: 0
+sidebar_label: Quick Installation
+---
+
+# Quick Installation
+
+The quick install scripts set up a TCAdmin server with a single command. They install either a new **master** (the panel) or a **[remote server](#adding-a-remote-server)** that joins an existing panel with a deployment token.
+
+Either way they install the system requirements, MariaDB and the TCAdmin Monitor, and set up the MySQL Manager. A master also gets the TCAdmin Web and the TCAdmin database. Ubuntu also gets Docker, and Windows gets the Visual C++ and DirectX runtimes.
+
+:::info[When to use the regular installers instead]
+The quick install is for a **fresh server**. Use the [Linux Installation](./linux-installation.mdx) or [Windows Installation](./windows-installation.mdx) guide if you run another Linux distribution, the server already has TCAdmin or a database server, or you want to use your own database.
+:::
+
+## Ubuntu
+
+Supported: Ubuntu **22.04, 24.04 and 26.04** (64-bit).
+
+The script checks that:
+
+- You are running as **root**
+- The server is fresh: no TCAdmin, no database server, and the TCAdmin ports are free
+- At least **5 GB** of disk space is free
+
+As root:
+
+```bash
+apt update && apt install -y curl && bash <(curl -fsSL https://v3.tcafiles.com/ubuntu-quick-install.sh)
+```
+
+With sudo:
+
+```bash
+sudo bash -c 'apt update && apt install -y curl && bash <(curl -fsSL https://v3.tcafiles.com/ubuntu-quick-install.sh)'
+```
+
+| Switch | What it does |
+|---|---|
+| `--no-docker` | Skips the Docker installation |
+| `--channel <name>` | Installs from the named update channel (the default is Beta) |
+| `--version <version>` | Installs a specific version |
+| `--flash-token <token>` | Sets up a remote server from a deployment token instead of a master |
+
+Add a switch after the closing parenthesis:
+
+```bash
+bash <(curl -fsSL https://v3.tcafiles.com/ubuntu-quick-install.sh) --no-docker
+```
+
+## Windows
+
+Supported: 64-bit Windows Server **2019, 2022 and 2025**, and Windows **10 (1809 or later) and 11**.
+
+The script checks that:
+
+- PowerShell was opened **as Administrator**
+- The server is fresh: no TCAdmin, no database server, and the TCAdmin ports are free
+- At least **5 GB** of disk space is free on the system drive
+
+```powershell
+& ([scriptblock]::Create((irm "https://v3.tcafiles.com/windows-quick-install.ps1")))
+```
+
+| Parameter | What it does |
+|---|---|
+| `-Channel <name>` | Installs from the named update channel (the default is Beta) |
+| `-Version <version>` | Installs a specific version |
+| `-FlashToken <token>` | Sets up a remote server from a deployment token instead of a master |
+
+```powershell
+& ([scriptblock]::Create((irm "https://v3.tcafiles.com/windows-quick-install.ps1"))) -Channel Stable
+```
+
+## Adding a Remote Server
+
+With a deployment token, the script sets up a **remote server** of an existing panel. It installs the requirements, MariaDB and **only the Monitor** (no Web), and sets up the server's MySQL Manager to use the local MariaDB. On Ubuntu, Docker is still installed unless you use `--no-docker`. No TCAdmin database is created.
+
+Create the server and its deployment token in the panel first. A master set up with the quick install is already prepared for remote servers; for any other master, see [Remote Server Configuration](../initial-configuration/remote-server-configuration.mdx).
+
+Ubuntu:
+
+```bash
+bash <(curl -fsSL https://v3.tcafiles.com/ubuntu-quick-install.sh) --flash-token YOUR-TOKEN
+```
+
+Windows:
+
+```powershell
+& ([scriptblock]::Create((irm "https://v3.tcafiles.com/windows-quick-install.ps1"))) -FlashToken "YOUR-TOKEN"
+```
+
+:::warning
+Keep the deployment token safe. If it is exposed, reset it on the server's **Flash / Deployment** tab.
+:::
+
+## After Installation
+
+When the script finishes it prints the next steps. For a master:
+
+- Your control panel is at **`https://YOUR-SERVER-IP:31001`**
+- Default login: **admin** / **Password!23** (you are asked to change it at first login)
+- A **summary file** holds the panel address and the generated database and MySQL Manager credentials. Keep it safe.
+
+| | Ubuntu | Windows |
+|---|---|---|
+| Summary file | `/root/tcadmin-quick-install.txt` | `C:\ProgramData\TCAdminQuickInstall\summary.txt` |
+| Log | `/var/log/tcadmin-quick-install.log` | `C:\ProgramData\TCAdminQuickInstall\install.log` |
+
+For a master, sign in, enter your **license key**, import your game configs from the [Plugin Repository](../initial-configuration/plugin-repository.mdx) and create your first service. See [Master Server Configuration](../initial-configuration/master-server-configuration.mdx) for details.
+
+A remote server has no panel address, login or license step. It shows as online under **Servers** in your existing panel, and its summary file holds the MySQL Manager credentials (and the MariaDB root password on Windows).
+
+## Good to Know
+
+- On a master, MariaDB accepts connections from other servers, and the master's IP is saved as the database host and the Redis server under **Settings > Global Server Configuration**. That is what remote servers use to reach both.
+- If remote servers reach the master through another address, such as a public IP in front of a private one, enter that address for both there.
+- On a remote server, the database only accepts local connections.
+- If a run fails, fix the problem and run the same command again. It continues from the failed step.
+- For a remote server, run the command again **with the deployment token**. The script does not store it.
+- If the server's MySQL Manager is already configured in the panel, the script leaves it alone and prints the values to enter if you want this server's MariaDB.
+- **Ubuntu:** if the `ufw` firewall is active, the script opens the TCAdmin ports and, on a master, the database (3306) and Redis (6379) ports that remote servers use. You still need to open the ports of your game servers yourself.
+- **Windows:** the script adds the TCAdmin firewall rules, but each game server needs its own inbound rule. It may recommend a restart when it finishes.
+- **Windows:** Docker is not installed. You can add it later from the **Docker** card on the server's page.

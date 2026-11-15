@@ -69,8 +69,8 @@ export function ErrorConsole({ error }) {
 
 export default function ErrorScreen({ error, tryAgain, standalone = false }) {
   const home = useBaseUrl("/");
-  const lightLogo = useBaseUrl("/img/tcadmin-logo.png");
-  const darkLogo = useBaseUrl("/img/TCAdmin_White.png");
+  const lightLogo = useBaseUrl("/img/brand/tcadmin-lockup.png");
+  const darkLogo = useBaseUrl("/img/brand/tcadmin-lockup-white.png");
 
   return (
     <main className={clsx(styles.screen, standalone && styles.standalone)}>

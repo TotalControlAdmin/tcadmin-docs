@@ -14,13 +14,14 @@ By default, TCAdmin uses a self-signed certificate for HTTPS, which causes your 
 An SSL certificate encrypts the connection between your browser and the TCAdmin panel, keeping your login credentials and data safe. A **self-signed** certificate provides encryption but isn't trusted by browsers (hence the warning). A **Let's Encrypt** certificate is free, trusted by all browsers, and auto-renews.
 :::
 
-TCAdmin supports three ways to set up a trusted certificate:
+TCAdmin supports four ways to set up a trusted certificate:
 
 | Method | Best For | Requirements |
 |--------|----------|--------------|
 | [**HTTP Validation**](#method-1-http-validation) | Most setups — fully automatic | Domain name, ports 80 & 443 open |
 | [**DNS Validation**](#method-2-dns-validation) | Servers behind firewalls or NAT | Domain name, access to DNS records |
 | [**Custom Certificate**](#method-3-custom-certificate) | Using your own certificate (purchased or from another CA) | A `.pfx` or `.p12` certificate file |
+| [**Monitor's Certificate**](#method-4-use-the-monitors-certificate) | Accessing the panel through your server's `<name>.tca.sv` hostname | The web panel and a monitor on the same server |
 
 ## Before You Begin
 
@@ -30,6 +31,8 @@ For **HTTP Validation** or **DNS Validation**, you need:
 
 For **Custom Certificate**, you just need your certificate file in `.pfx` or `.p12` format with the private key included.
 
+For the **Monitor's Certificate**, you don't need a domain; see [Method 4](#method-4-use-the-monitors-certificate).
+
 ## Method 1: HTTP Validation
 
 This is the simplest method. Let's Encrypt automatically verifies you own the domain by connecting to your server over HTTP.
@@ -37,7 +40,7 @@ This is the simplest method. Let's Encrypt automatically verifies you own the do
 ### Requirements
 
 - Ports **80** and **443** open and accessible from the internet
-- No other web server (like Apache or Nginx) running on ports 80/443
+- No other web server (like Apache or Nginx) running on ports 80/443, unless it forwards port 80 of your domain to the panel (the panel can sit behind IIS or another reverse proxy)
 
 ### Step 1: Change TCAdmin to Use Ports 80 and 443
 
@@ -128,9 +131,11 @@ TCAdmin will:
 2. If the test passes, create the real certificate
 3. Automatically configure the web service to use it
 
+The new certificate is applied immediately, with no web-service restart. The page shows "Applying the new certificate..." and then confirms.
+
 ### Automatic Renewal
 
-Let's Encrypt certificates are valid for **90 days**. TCAdmin automatically renews HTTP certificates **30 days** before they expire — you don't need to do anything.
+Let's Encrypt certificates are valid for **90 days**. TCAdmin automatically renews HTTP certificates **30 days** before they expire — you don't need to do anything. A renewed certificate is also applied immediately, with no web-service restart.
 
 ## Method 2: DNS Validation
 
@@ -205,6 +210,30 @@ TCAdmin will validate the certificate, check that it contains a private key, and
 Custom certificates are **not** automatically renewed. You will need to upload a new certificate before the current one expires. The system health indicator will warn you when your certificate is approaching expiry.
 :::
 
+## Method 4: Use the Monitor's Certificate
+
+Every licensed server is assigned a public hostname by the TCAdmin license server, in the form `<name>.tca.sv`, which points to the server's public IP address. The monitor on that server automatically obtains a trusted certificate for that hostname and renews it, with no setup and no restart.
+
+### Requirements
+
+- The web panel runs on the same server as a monitor (the usual all-in-one install)
+- The monitor has already received its certificate (it checks daily, and a fresh install gets it shortly after the license is validated)
+
+### Use the Certificate
+
+1. Log in to your control panel
+2. Go to **Settings** > **Web Certificate**
+3. Select the **Use the monitor's certificate** option
+4. Click **Use monitor certificate**
+
+The panel switches to the monitor's certificate and follows its renewals automatically. Open the panel through its `<name>.tca.sv` hostname so your browser trusts the certificate.
+
+This method needs no port 80, no DNS records and no Let's Encrypt terms.
+
+:::note[When the option is missing]
+The option isn't shown on a web-only (standalone) panel without a monitor on the same server, or while the monitor has not yet received its certificate. If you already use your own domain, you can keep using Methods 1-3.
+:::
+
 ## Dynamic DNS
 
 If you don't have a domain name, TCAdmin offers a free dynamic DNS service. Use this as your domain:
@@ -238,9 +267,9 @@ The system health indicator in the bottom status bar also monitors your certific
 
 ## Troubleshooting
 
-### "Website must be accessible over http on port 80"
+### "This website is not listening on port 80" warning
 
-The web service isn't listening on port 80. Go back to [Step 1 of HTTP Validation](#step-1-change-tcadmin-to-use-ports-80-and-443) and make sure you updated the config file and restarted the service. This only applies to the HTTP Validation method.
+The web service isn't listening on port 80. This is a warning, not a block: you can still click **Create**, and automatic renewal still runs. It works as long as port 80 of your domain reaches this panel some other way, such as an IIS or Nginx reverse proxy or a router port forward that sends `http://YOUR-DOMAIN/.well-known/acme-challenge/` to the panel's HTTP port. If nothing forwards port 80 to the panel, go back to [Step 1 of HTTP Validation](#step-1-change-tcadmin-to-use-ports-80-and-443) and change the port, or use DNS Validation instead. This only applies to the HTTP Validation method.
 
 ### Certificate generation fails (HTTP Validation)
 
@@ -249,7 +278,7 @@ The web service isn't listening on port 80. Go back to [Step 1 of HTTP Validatio
 | **Port 80 not accessible** | Open port 80 in your firewall. Test by visiting `http://YOUR-DOMAIN` — you should see the TCAdmin panel (without HTTPS). |
 | **Domain doesn't point to your server** | Make sure your domain's DNS A record points to your server's public IP. You can check with `nslookup YOUR-DOMAIN` or an online DNS checker. DNS changes can take up to 24 hours to propagate, but usually take 5-30 minutes. |
 | **Rate limiting** | Let's Encrypt limits how many certificates you can request per domain per week. If you've been testing repeatedly, wait an hour and try again. |
-| **Another service on port 80** | If Apache, Nginx, or another web server is using port 80, stop it first. Only one service can listen on a port at a time. |
+| **Another service on port 80** | If Apache, Nginx, IIS, or another web server is using port 80, either stop it or configure it as a reverse proxy that forwards `/.well-known/acme-challenge/` (or the whole site) to the panel's HTTP port. Only one service can listen on a port at a time. |
 
 ### DNS validation fails
 

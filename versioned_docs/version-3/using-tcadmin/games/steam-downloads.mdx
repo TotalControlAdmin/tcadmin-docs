@@ -1,0 +1,66 @@
+---
+sidebar_label: Steam Downloads
+sidebar_position: 4
+---
+
+# Steam Downloads
+
+TCAdmin uses a Steam account to install and update Steam games and to download Steam Workshop items. This page explains which account is used, when Steam Guard asks for approval, and what customers see in the task log.
+
+## Which Steam account is used
+
+- **The game's own account** — set on the game's **Steam** tab.
+- **The default account** — set in **Settings → Default Steam Settings**. It is used by every game that leaves its own account blank.
+- **Anonymous** — enter `anonymous` as the game's account to download without signing in. Many dedicated servers allow this, and anonymous downloads never ask for Steam Guard.
+
+The same account is used for installs, updates, Workshop downloads, and the check a scheduled Steam update makes before it downloads anything.
+
+## Workshop and game update detection
+
+The first master server regularly asks Steam whether anything newer exists than what is installed on your services. It checks each Steam game's build and every installed Steam Workshop item. A Workshop collection counts as updated when it, or any item inside it, has changed.
+
+Set how often under **Settings → Default Steam Settings → Update Checks → Update check interval (minutes, 0 = disabled)**. The default is 60 minutes, and 0 turns the check off.
+
+When something newer exists:
+
+- The **Steam Update** link in the service's side menu shows a red **!** badge.
+- The Steam Workshop link shows a red number: how many installed items have an update.
+- On the Workshop page, an item with an update has an **Update** button. The **Updatable content** view lists them, and **Batch actions → Update all** updates them together.
+
+To check straight away, open the Workshop page, choose **Installed content** (or **Updatable content**) and click **Check for updates**. A message tells you how many installed items have updates, or that Steam could not be reached.
+
+A badge clears once the update has been installed. Services imported from TCAdmin V2 bring their Workshop items with them, so they are checked too.
+
+A **Steam Update** scheduled task can also update Workshop items. Tick **Update workshop files** on the task's Configuration tab, alone or together with **Run the Steam update**.
+
+:::note
+The Workshop count only appears for services whose game has Steam Workshop enabled.
+:::
+
+## Steam Guard asks for approval only when needed
+
+Steam remembers a sign-in on a server once it has been approved. TCAdmin always tries that remembered sign-in first, so most downloads run without any Steam Guard request.
+
+The stored password is used only when there is no remembered sign-in yet, or the remembered one has expired. Steam then asks the account owner to approve the sign-in in the Steam Mobile app. Once approved, Steam remembers it and later downloads run silently.
+
+When this happens the task log shows:
+
+```text
+Cached Steam credentials are not available. Signing in with the stored password...
+```
+
+:::info[Accounts protected by e-mail codes]
+A background download cannot enter an e-mail code, so protect the download account with the Steam Mobile app authenticator.
+:::
+
+When a sign-in with the password fails, because the password is wrong or the request was not approved, the task fails with "Steam login failed" and does not try again. Other download problems are retried according to **Download Retries** on the game's Steam tab.
+
+## What customers see in the task log
+
+Customers see `***` instead of the Steam account name and Steam ID in the task log, in the progress window, and in the e-mail they receive when a task fails. File paths are shown relative to the server's folder, so `gearbox\maps\of2a4.bsp` instead of the full path on the machine. Admins and top-level sub-admins see the real values and full paths in the task's **Debug** tab.
+
+## If downloads keep asking for Steam Guard
+
+- Check the account and password on the game's Steam tab or in Default Steam Settings.
+- Approve the request in the Steam Mobile app when it arrives. Steam asks once for each server, and once for each Windows or Linux user account that runs downloads there. Games with **Run As Service User** enabled download as the service's own user, so expect a request for each of those users.
+- If the account uses e-mail codes, switch it to the Steam Mobile app.

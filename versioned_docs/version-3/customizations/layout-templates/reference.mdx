@@ -36,6 +36,10 @@ that applies whenever the template is active.
 | `GameService.Header` | A game server's header strip — shown on **every** page of the service (Home, Console, File Manager, …). |
 | `DockerService.Home` | A Docker server's home page content. |
 | `DockerService.Header` | A Docker server's header strip, on every page of the service. |
+| `Page.<Name>` | Wraps one app page (`Dashboard`, `Services`, `Users`, `Roles`, `Servers`, `VirtualServers`, `Games`, `DockerBlueprints`, `Databases`, `Settings`, `Profile`, `Messages`, `ActivityLogs` or `Announcements`) in your markup. **Must** contain `{% component "page-content" %}` exactly once. |
+| `Page.CreateService` | The Create New Service page, rebuilt from the [Create Service components](#app-page-components). Nothing is required. |
+
+An unknown `Page.` name is rejected on save and import. Each app page also sets `data-tca-page` on the document root to its name (for example `Dashboard`), so a base-stylesheet rule can restyle one page without any `Page.` surface. See [App pages](./index.mdx#app-pages).
 
 **Blueprint variants.** A service surface key may carry a numeric suffix: `GameService.Home.526`
 applies only to servers of game `526` and wins over the plain `GameService.Home`. The editor's
@@ -413,6 +417,7 @@ too. `service-…` components work on both service types; `game-…` / `docker-�
 | Component | What it adds |
 |---|---|
 | `body` | The current page's content (required in a hand-built shell). |
+| `page-content` | The app page inside its `Page.<Name>` surface (required there, exactly once). |
 | `shell` | The entire built-in shell — a quick base when you only want to restyle with CSS. |
 | `menu` | The navigation drawer and menu. |
 | `menu-toggle` | The button that opens and collapses the drawer. |
@@ -585,6 +590,32 @@ Pieces of the composed blocks, for templates that own all the surrounding chrome
 
 Each power atom appears and disappears with the service's state on its own — the row above needs no
 conditions beyond the permission around your wrapper.
+
+### App page components
+
+Each belongs to one app page and renders nothing anywhere else.
+
+**Create Service** — for `Page.CreateService`. A step panel shows only while its step is active and has its own Back and Continue buttons (Create on the last step), so place every step you want reachable.
+
+| Component | What it adds |
+|---|---|
+| `create-service-steps` | The step indicator. |
+| `create-service-owner` | The owner step. |
+| `create-service-server` | The server step. |
+| `create-service-category` | The service category step. |
+| `create-service-blueprint` | The game or Docker blueprint step. |
+| `create-service-configure` | The configuration step, present when the chosen blueprint has editable config files (always for Docker). |
+| `create-service-confirm` | The review step, with the Create button. |
+| `create-service-summary` | The always-visible summary of the selections so far. |
+| `create-service-wizard` | The whole stock wizard in one piece. |
+
+**Services list** — for the `Page.Services` surface, around `page-content`. They follow the category the user is viewing.
+
+| Component | What it adds |
+|---|---|
+| `services-stats` | Tiles for running, stopped, other and total services, plus players online for game and voice categories; refreshes every 15 seconds. |
+| `services-create` | The **New Service** button for the category, shown only to users who can create services in it. |
+| `services-title` | The category name as plain text, for your own heading. |
 
 ## Live styling
 

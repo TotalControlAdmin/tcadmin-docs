@@ -193,16 +193,32 @@ Open **PowerShell** as Administrator and run:
   </TabItem>
   <TabItem value="linux" label="Linux">
 
-Run as root:
+Run as root, using the command for your distribution.
+
+**Ubuntu / Debian** — installs `curl` first, because minimal images don't include it:
+
+```bash
+apt update && apt install -y curl && bash <(curl -fsSL https://v3.tcafiles.com/linux-beta.sh)
+```
+
+**RHEL-based distros** (AlmaLinux, Rocky Linux, CentOS Stream):
 
 ```bash
 bash <(curl -fsSL https://v3.tcafiles.com/linux-beta.sh)
 ```
 
-Or with sudo:
+Not logged in as root? Wrap the command in `sudo bash -c '...'` (putting `sudo` directly in front of `bash <(curl ...)` does not work).
+
+Ubuntu / Debian:
 
 ```bash
-sudo bash <(curl -fsSL https://v3.tcafiles.com/linux-beta.sh)
+sudo bash -c 'apt update && apt install -y curl && bash <(curl -fsSL https://v3.tcafiles.com/linux-beta.sh)'
+```
+
+RHEL-based distros:
+
+```bash
+sudo bash -c 'bash <(curl -fsSL https://v3.tcafiles.com/linux-beta.sh)'
 ```
 
   </TabItem>

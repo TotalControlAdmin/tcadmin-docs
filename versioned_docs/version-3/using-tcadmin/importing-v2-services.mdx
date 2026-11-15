@@ -33,20 +33,20 @@ A few things to prepare in V3 first:
 
 | Imported | Not imported |
 |---|---|
-| Game services | Sub-users |
+| Game services | Sub-user script and custom-link permissions |
 | The users that own them (created if needed) | Reseller packages |
 | Per-service custom command lines | Scheduled / recurring tasks |
 | Service variables | Support tickets |
-| Billing ID and billing status | TeamSpeak services |
-| | Virtual-server limits (CPU/memory/disk — set these up in V3 yourself) |
-| | V2 per-user/per-role permissions (only the role *type* carries over) |
+| Billing ID and billing status | Virtual-server limits (CPU/memory/disk — set these up in V3 yourself) |
+| TeamSpeak 3 masters and their virtual servers (see below) | |
+| Sub-users with access to an imported game service (see below) | V2 per-user/per-role permissions (only the role *type* carries over) |
 
 ## Running the import
 
 The tool is a four-step wizard:
 
 1. **Before you start** — the warnings above.
-2. **V2 database** — enter your V2 database connection and test it. The wizard then loads your V2 servers and games and auto-matches them to V3 (servers by IP, games by the V2 Game ID you set).
+2. **V2 database** — enter your V2 database connection and test it. The wizard then loads your V2 servers and the games that have at least one service, and auto-matches them to V3 (servers by IP, games by the V2 Game ID you set).
 3. **Mapping** — for each V2 server, the wizard lists its services and shows which are ready to import and which have already been imported.
 4. **Services** — pick the services to import and press **Start import**. Progress is shown in the standard task dialog, so you can leave the page and come back.
 
@@ -64,16 +64,44 @@ By default the Services step shows only services that are **Ready** to import. T
 
 There's also a **Try to keep V2 service IDs** option. When enabled, imported services keep their original V2 ID numbers in V3 where those numbers are still free; otherwise V3 assigns new ones.
 
+### Sub-users
+
+**Import sub-users with access to these services** on the Services step is on by default and applies to game imports only. Each V2 sub-user who had access to an imported service is created under the same owner with their V2 password, and their V2 permissions are mapped to the matching V3 features, but only features the owner also holds.
+
+- The owner must be a regular user. A username already used by another account is skipped, never taken over.
+- Running the import again creates no duplicates, but services imported by an earlier run are not caught up.
+- Script and custom-link permissions, Backups, Databases, Kill and the custom root folder are not carried over.
+
+The task log ends with a summary of sub-users created, matched and skipped, and the number of services access was granted on.
+
 ## What happens to each service
 
 For every service you import, the tool:
 
 1. **Stops it in V2** (if it was running) and **disables it** there, so the V2 monitor can't relaunch it later.
-2. **Creates the V3 service**, pointing at the same files and carrying over its variables, command lines, ports, and owner.
+2. **Creates the V3 service**, pointing at the same files and carrying over its variables, command lines (including a V2 custom command line that overrides the default), custom port names, ports, and owner.
 3. **Re-applies file permissions** so the V3 service account can read and run the files (V2 and V3 use different system accounts).
 4. **Starts it on V3** if it was running in V2 — so live services stay up across the migration.
 
 A service that was **disabled in V2** is imported as **Suspended** in V3, so it won't start automatically.
+
+## Importing TeamSpeak 3
+
+On the wizard's first step, **What to import** offers *Game services* or *TeamSpeak 3*. The TeamSpeak 3 option imports a V2 TeamSpeak 3 master as a V3 [host service](games/hosted-services.mdx) and each virtual server you select as a hosted service inside it, matched by its voice port.
+
+Files are adopted in place and TeamSpeak keeps running.
+
+You choose the V3 blueprint for the master and the blueprint for its virtual servers, and the wizard picks them for you when only one fits.
+
+The master's server-admin password, slots, owners, billing ID and status, and the running or suspended state carry over.
+
+The wizard lists what is **not** imported:
+
+- Masters that V2 did not manage the process of, and TeamSpeak 2
+- Sub-user owners and V2 TeamSpeak permissions
+- TSDNS, snapshots, packages and privilege keys
+
+If you run the wizard again on a master you already imported, it shows **Imported as V3 service #N** and adds any newly selected virtual servers to it.
 
 ## Passwords
 
