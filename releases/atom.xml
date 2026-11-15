@@ -4,8 +4,15 @@
   <link href="https://docs.tcadmin.com/3/releases"/>
   <link rel="self" href="https://docs.tcadmin.com/releases/atom.xml"/>
   <id>https://docs.tcadmin.com/releases/atom.xml</id>
-  <updated>2026-10-13T00:00:00.000Z</updated>
+  <updated>2026-11-15T00:00:00.000Z</updated>
   <rights>Copyright © 2026 TCADMIN.COM</rights>
+  <entry>
+    <title>3.23.129.36413</title>
+    <link href="https://docs.tcadmin.com/3/releases/3.23.129.36413"/>
+    <id>https://docs.tcadmin.com/3/releases/3.23.129.36413</id>
+    <updated>2026-11-15T00:00:00.000Z</updated>
+    <summary>Custom pages and API functions, hosted services, a Processing status while tasks run, a RAM-based memory limit on Windows, background script runs, browser notifications, and more.</summary>
+  </entry>
   <entry>
     <title>3.22.68.45743</title>
     <link href="https://docs.tcadmin.com/3/releases/3.22.68.45743"/>
