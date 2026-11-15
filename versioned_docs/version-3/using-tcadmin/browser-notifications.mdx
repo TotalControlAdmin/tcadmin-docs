@@ -1,0 +1,56 @@
+---
+sidebar_label: Browser Notifications
+sidebar_position: 4.5
+---
+
+# Browser Notifications
+
+Browser notifications tell you when something needs your attention, even when the panel is closed. They work on desktop browsers and on Android. On iPhone and iPad they work only after you add the panel to your Home Screen and open it from there.
+
+## Turning them on
+
+Notifications are switched on per browser, so repeat these steps in each browser you use.
+
+1. Open **Profile** and select the **Notifications** tab.
+2. Under **This browser**, switch on **Receive notifications in this browser**.
+3. Allow notifications when the browser asks.
+4. Select **Send a test notification** to check that it works.
+
+You can also choose **Enable browser notifications** in the running-scripts badge, which asks for the same permission.
+
+:::note
+If the browser has blocked notifications for the panel, the page says so. Allow them in the browser's site settings, then switch the option on again.
+:::
+
+## Choosing what you receive
+
+Under **Notification types**, switch each type on or off. Every type is on by default, and your choice applies to all your browsers.
+
+| Type | When it arrives |
+|---|---|
+| Script run finished | A script you started in the background finished, failed or was cancelled. |
+| Script run waiting for input | A background script is waiting for you to answer a prompt. |
+| New message | A message arrives in your panel inbox, with its subject as the title. |
+| Announcement | An administrator publishes an announcement that is also sent as a browser notification. |
+
+Selecting a notification opens the run, the message or the announcements page.
+
+## Panel open or closed
+
+When the panel is closed, the notification appears on your device. When you are looking at the panel, the panel already tells you, so nothing is added.
+
+- Script run and message notifications are skipped when the relevant page is already open and in front of you.
+- Announcement notifications are skipped whenever a panel window is in front of you, because the announcement shows on screen.
+
+If you allowed notifications but the browser cannot receive them while the panel is closed, for example on an iPad without the Home Screen install, the panel shows a browser notification while a tab is open. Without permission, it shows an on-screen message instead.
+
+## Your browsers
+
+The **Devices** card lists each browser that receives your notifications and when it was last used. Select **Remove** to stop notifications in that browser.
+
+- Logging out stops notifications in that browser.
+- If another user turns on notifications in the same browser, that browser moves to them.
+
+## For administrators
+
+There is no server setting to configure. To send an announcement as a notification, switch on **Also send as browser notification** in the announcement editor. See [Announcements](./announcements.mdx#browser-notification).

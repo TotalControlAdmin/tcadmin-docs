@@ -1,0 +1,64 @@
+---
+sidebar_label: Background Script Runs
+sidebar_position: 5
+---
+
+# Background Script Runs
+
+Custom icons and actions on a service run as **script runs**. A run can keep going in the background, so a long script does not tie up the page that started it, and anyone who is allowed to can come back later to read its output, answer a question it asked, or cancel it.
+
+## Running a script
+
+Open a custom icon or action from the service. If the script asks for inputs, fill them in, then choose:
+
+| Button | What it does |
+|---|---|
+| **Run** | Starts the script and shows its output live. Leaving the page cancels the run. |
+| **Run in background** | Starts the script and lets it keep running when you leave the page. |
+
+If the blueprint author ticked **Always run in background** on the script, only **Run in background** is offered.
+
+## Sending a run to the background
+
+A run you started with **Run** shows a **Send to background** button above its output, next to **Cancel**. Choose it and the page confirms that the script keeps running, so you can leave.
+
+The run has its own address, so refreshing the page or opening the link later reattaches to it. While it runs you see the output so far and the live output after that. Once it finishes, the saved output is shown instead.
+
+## Answering prompts later
+
+A script can stop and ask a question. The run shows **Waiting for input** until someone answers, and it stays that way when nobody is looking at it.
+
+- The top-bar icon changes colour while one of your runs is waiting.
+- If [browser notifications](../../using-tcadmin/browser-notifications.mdx) are on in your profile, you also get a notification, even with the panel closed.
+- If nobody answers within the script's **Input timeout (minutes)**, the run is cancelled.
+
+## Limits
+
+A blueprint author sets these. The run counts on the service it was started from; a run over a limit fails at once with a message that names the limit.
+
+| Setting | Where | Default | What it controls |
+|---|---|---|---|
+| **Input timeout (minutes)** | The script's editor | 15 | How long an unanswered prompt waits before the run is cancelled (1 to 10080). |
+| **Max concurrent runs per service** | The script's editor | 1 | How many runs of that one script can be active on a service; 0 leaves only the blueprint limit. |
+| **Max concurrent script runs per service** | The game or Docker blueprint's **General** tab | 5 | How many runs across all of the service's custom icons and actions can be active together. |
+
+The run settings appear in the script editor for custom icons and actions and for API functions. Runs started from a custom page count toward the same limits, as described on [Custom Pages and API Functions](./custom-pages-and-api-functions.mdx).
+
+## Where runs appear
+
+| Place | What you see |
+|---|---|
+| Service page, **Script runs** menu | The service's recent runs that you may open, newest first. |
+| Top bar, **My running scripts** | The runs you started that are still active, with a count. |
+| Task status dialog | An **Open console** button that opens the run's output. |
+| **Task Calendar** | Runs are hidden by default; turn on **Show script runs** to see them. |
+
+Both menus stay hidden while they have nothing to show.
+
+## Cancelled runs
+
+A run ends as **Cancelled** when someone chooses **Cancel**, when you leave a foreground run, or when a prompt times out. Its output ends with "The script run was cancelled." or, for a timeout, "Nobody answered the script's prompt in time, so the run was cancelled." The top bar reports "*script* on *service* was cancelled".
+
+:::note
+Runs in progress when the server's monitor restarts are marked as failed, because the script stopped with it.
+:::

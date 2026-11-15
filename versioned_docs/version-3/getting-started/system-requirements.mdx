@@ -30,6 +30,10 @@ If you're just starting out, a **Windows Server 2022** or **Ubuntu 24.04** VPS/d
 
 ### Dependencies
 
+:::tip[Skip this with the quick install]
+On a fresh server you can use the [Windows quick install script](./Installation/quick-installation.mdx#windows) instead. It installs MariaDB, the Visual C++ runtimes and DirectX for you, so you don't need to install the dependencies below yourself. Java for Minecraft is downloaded automatically when it is needed.
+:::
+
 #### MySQL Database (Required)
 
 TCAdmin stores all of its data (users, game servers, settings) in a MySQL-compatible database. You need to install one before setting up TCAdmin.
@@ -87,7 +91,7 @@ These are **not** needed for TCAdmin itself, but certain game servers won't run 
 | Fedora                   | 41      | No             | Support ended December 15th, 2025.                                                    |
 
 :::tip[Recommended for beginners]
-If you're new to Linux, **Ubuntu 24.04 LTS** or **Debian 12** are the easiest to work with and have the most community support.
+If you're new to Linux, **Ubuntu 24.04 LTS** is the easiest to work with and has the most community support.
 :::
 
 :::note[ARM64 servers]
@@ -95,6 +99,10 @@ TCAdmin also runs on 64-bit ARM (ARM64) Linux machines — as the master server,
 :::
 
 ### Dependencies
+
+:::tip[Skip this with the quick install]
+On a fresh **Ubuntu** server you can use the [Ubuntu quick install script](./Installation/quick-installation.mdx#ubuntu) instead. It installs MariaDB, the 32-bit libraries for SteamCMD and Docker for you, so you don't need to install the dependencies below yourself. Java for Minecraft is downloaded automatically when it is needed.
+:::
 
 #### MySQL Database (Required)
 

@@ -1,0 +1,106 @@
+---
+sidebar_label: Hosted Services
+sidebar_position: 5
+---
+
+# Hosted Services
+
+A hosted service lives inside another service, its **host**, instead of running a process of its own. The classic example is a TeamSpeak 3 virtual server inside a TeamSpeak 3 master: the master is one running program, and the panel creates, starts, stops and deletes each virtual server through it.
+
+Otherwise it is an ordinary service, with an owner, roles, files, FTP, backups, scheduled tasks and an activity log. It is not a Virtual Server, which is a CPU and memory partition of a physical server.
+
+## Setting up the host and the hosted blueprint
+
+Two game blueprints take part. The **Hosting** section in the game editor is shown only to administrators who may edit every game, not to sub-administrators limited to specific games.
+
+| Setting | Meaning |
+|---|---|
+| **Hosting role** | **None**, **Hosts other services** or **Hosted by another service**; a blueprint has one role. |
+| **Hosted blueprints** | On a host, the hosted blueprints it accepts, which must use the host's operating system. |
+| **Default max hosted services** | On a host, how many services it may hold; 0 means unlimited. |
+
+A hosted blueprint has no process, so the editor hides its Console, Command Lines, Steam and Run As tabs and its Updates entry, and disables the executable fields. Give it a game port, slots and variables as usual; the port is assigned on the host's IP address.
+
+:::note
+Add File System Permissions rows for the customer roles on the hosted blueprint. Without them, owners cannot reach the service files.
+:::
+
+## Creating a hosted service
+
+In the Create Service wizard, turn on the **Host Services** filter on the server step. Each host is a card marked **Host** with its count, such as `2 / 10`. A host that is **Offline** or shows **Limit reached** cannot be chosen.
+
+The next step lists only the blueprints that host accepts, and the confirmation step shows a **Hosted by** row. The service takes the host's server and IP address, and the blueprint's create script runs on the host's server. The host must be running.
+
+## What the owner sees
+
+| Works | Not available |
+|---|---|
+| Start, Stop, Restart | Kill |
+| Live status, players and query | Console, CPU, memory and network graphs |
+| Settings, config files, variables | Reinstall |
+| File manager and FTP | Steam Update and Updates |
+| Backups, databases, mods, Fast Downloads | Moving or copying on its own |
+| Scheduled tasks, scripts, logs, activity | |
+| Repair, Delete, Detach | |
+
+- **Start** is refused while the host is not running.
+- Stopping the host marks every service it hosts as Stopped; starting the host does not start them.
+- The status is refreshed every 5 seconds.
+- Deleting a service whose files link into the host's folders removes only the link.
+
+Staff see a **Hosted by** line on the service and a **Host** column in the services list. A host's settings page has a **Max hosted services** field (empty uses the blueprint default) and a list of its services.
+
+## Moving, copying and deleting hosts
+
+| Action | Host that has hosted services | Hosted service |
+|---|---|---|
+| Delete | Refused until they are deleted. | Allowed. |
+| Detach | Refused until they are deleted or detached. | Allowed; use it when the delete script keeps failing. |
+| Reinstall | Refused. | Not available. |
+| Copy | Refused. | Not available. |
+| Move | Allowed; they move with it. | Not available on its own. |
+
+:::note Sharing and importing blueprints
+
+A blueprint keeps a unique identifier through export, import and the plugin repository, so a host blueprint stays linked to its hosted blueprint when both are imported on another panel. If the hosted blueprint is imported first, the link is made when the host arrives.
+
+:::
+
+## Scripting
+
+Declare these events on the **hosted** blueprint; they run on the host's server. The script editor lists them only when the role is **Hosted by another service**.
+
+| Event | Required | Purpose |
+|---|---|---|
+| `CreateHostedService` | Yes | Create the service inside the host; may set `ThisService.Variables` and link the service root to a host folder. |
+| `DeleteHostedService` | Yes | Remove it; also undoes a create that failed afterwards. |
+| `StartHostedService` | Yes | Start it. |
+| `StopHostedService` | Yes | Stop it. |
+| `HostedServiceStatus` | No | Set `ReturnValue` to `"Started"` or `"Stopped"`. |
+
+A failing delete script keeps the service. The status script runs every 5 seconds with a 10-second timeout; any other result reads as Unknown. Without it, the service keeps the status of its last start or stop.
+
+### Available variables
+
+Scripts also receive the standard objects on the [Script Objects](../../customizations/scripts/script-objects.mdx) page.
+
+| Variable | Type | Description |
+|---|---|---|
+| `ThisService` | `GameService` | The hosted service. |
+| `ThisGame` | `Game` | The hosted blueprint. |
+| `HostService` | `GameService` | The host, with its server and IP address. |
+| `HostGame` | `Game` | The host's blueprint. |
+| `ForceKill` | `bool` | `StopHostedService` only; true when a kill was requested. |
+| `ReturnValue` | `object` | `HostedServiceStatus` only; `"Started"` or `"Stopped"`. |
+
+### Example
+
+This `HostedServiceStatus` script reports Started while a marker file exists in the service folder.
+
+```csharp
+//refAssemblies: TCAdmin.SDK.dll, TCAdmin.GameHosting.SDK.dll, TCAdmin.Scripting.dll, TCAdmin.Monitor.dll
+var Globals = new TCAdmin.Scripting.Engines.Addons.CSharpGameGlobals(); // DO NOT MODIFY THIS LINE
+
+var marker = System.IO.Path.Combine(ThisService.RootDirectory, "running.flag");
+Globals.ReturnValue = System.IO.File.Exists(marker) ? "Started" : "Stopped";
+```

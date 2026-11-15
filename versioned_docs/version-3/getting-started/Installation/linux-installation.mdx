@@ -23,22 +23,38 @@ Install MariaDB first. On Ubuntu/Debian: `sudo apt install mariadb-server`, then
 
 ## Install TCAdmin
 
-Run the automated installer as **root**:
+Run the automated installer as **root**, using the command for your distribution.
+
+**Ubuntu / Debian** — installs `curl` first, because minimal images don't include it:
+
+```bash
+apt update && apt install -y curl && bash <(curl -fsSL https://v3.tcafiles.com/linux-beta.sh)
+```
+
+**RHEL-based distros** (AlmaLinux, Rocky Linux, CentOS Stream) — `curl` is already installed:
 
 ```bash
 bash <(curl -fsSL https://v3.tcafiles.com/linux-beta.sh)
 ```
 
 :::tip[Using sudo instead of root?]
-If you're not logged in as root, prefix the command with `sudo`:
+If you're not logged in as root, wrap the command in `sudo bash -c '...'`. Putting `sudo` directly in front of `bash <(curl ...)` does not work.
+
+Ubuntu / Debian:
 
 ```bash
-sudo bash <(curl -fsSL https://v3.tcafiles.com/linux-beta.sh)
+sudo bash -c 'apt update && apt install -y curl && bash <(curl -fsSL https://v3.tcafiles.com/linux-beta.sh)'
+```
+
+RHEL-based distros:
+
+```bash
+sudo bash -c 'bash <(curl -fsSL https://v3.tcafiles.com/linux-beta.sh)'
 ```
 :::
 
 :::info[What does this command do?]
-It downloads the official TCAdmin installer script from `v3.tcafiles.com` and runs it. The script will:
+It downloads the official TCAdmin installer script from `v3.tcafiles.com` and runs it (on Ubuntu / Debian it installs `curl` first, which is needed for the download). The script will:
 - Install any missing system dependencies automatically
 - Download the TCAdmin components
 - Set up systemd services so TCAdmin starts on boot

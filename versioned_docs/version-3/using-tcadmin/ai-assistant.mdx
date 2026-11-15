@@ -76,6 +76,14 @@ don't want the current page shared.
 
 The assistant replies in your panel language.
 
+Long conversations do not simply end. When a chat grows large, the assistant
+summarizes the earlier messages in place and carries on — up to three times
+per chat, with a line in the chat telling you when it happened.
+
+It can also read your own earlier chats. Click **Continue a previous chat** in
+an empty chat window, or ask it to show your previous chats, and it picks up
+where you left off.
+
 ### What it can do
 
 The assistant can do almost anything you can do from the web interface — if
@@ -87,9 +95,11 @@ to look at it or do it for you. Some examples:
   live information from your panel.
 - **Investigate problems** — read service status and query results, console
   output, log files, configuration files and variables, the activity log, and
-  the status and progress of tasks, and search a service's files by name and
-  content.
-- **Manage services** — start/stop/restart, edit configuration files and
+  the status and progress of tasks, search a service's files by name and
+  content, and (for administrators) search a server's Monitor and Web logs for
+  an error.
+- **Manage services** — start/stop/restart (or kill a service that will not
+  stop), edit configuration files and
   variables, manage command lines, install mods, run Steam updates, switch
   game builds, send console and RCON commands, schedule tasks, and repair a
   service.
@@ -98,6 +108,11 @@ to look at it or do it for you. Some examples:
   services between servers, import services from TCAdmin V2, edit layout
   templates, manage sub-users, and update TCAdmin itself — across the whole
   cluster or on a single outdated server.
+- **Research before building** — when creating a blueprint, it can search
+  Docker image registries and read an image's documentation without
+  downloading it, and look up a Steam app's supported systems, launch options
+  and files. When a customer's Docker service misbehaves, it can read the
+  documentation of the image that service runs.
 - **Write scripts** — it can create and edit custom scripts for your games and
   Docker blueprints, and it can also create visual (flowchart) scripts on
   individual services — something administrators and regular users alike can
@@ -156,6 +171,11 @@ TCAdmin client account, so all licenses on the same account share one balance.
   shows its total requests and credits spent and can be expanded to a
   per-user breakdown, biggest spender first — so you can always see who is
   using the credits.
+- **Free (promotional) credits** — your account may also receive free credits
+  that expire on a set date. They are spent before purchased credits, soonest
+  expiring first, and count toward your balance. Hover the chat's credits
+  display to see how many are purchased and how many are free, with the
+  expiry date.
 - **Daily limits** — the per-user daily limits from the settings page protect
   the balance from any single account. A user who reaches their limit is
   politely refused until the next day; full administrators are never limited.

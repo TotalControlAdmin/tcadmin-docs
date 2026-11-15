@@ -586,6 +586,44 @@ Saved as `GameService.Header` — replaces the title / connection / power band o
 </TabItem>
 </Tabs>
 
+## App pages
+
+A template can also remake the main pages of the panel. Each page has its own surface, named `Page.` followed by the page name:
+
+`Page.Dashboard`, `Page.Services`, `Page.Users`, `Page.Roles`, `Page.Servers`, `Page.VirtualServers`, `Page.Games`, `Page.DockerBlueprints`, `Page.Databases`, `Page.Settings`, `Page.Profile`, `Page.Messages`, `Page.ActivityLogs`, `Page.Announcements` and `Page.CreateService`.
+
+`Page.Services` is the service list of every category (game, voice and Docker). `Page.Settings` is the main Settings page. Any other `Page.` name is rejected when you save or import a template. A page without a surface looks as it always does.
+
+### Wrapping a page
+
+Every app page except Create Service is **wrapped**: you write your own markup around it and place the page itself with `{% component "page-content" %}`.
+
+```html
+<div class="my-banner">
+  <h2>Welcome back</h2>
+</div>
+{% component "page-content" %}
+```
+
+- Include `page-content` exactly once. A surface without it is rejected, because the page would be blank. Placed twice, the page appears twice.
+- The surface renders inside the theme's main content area, so a full-width banner needs negative margins rather than a wrapper outside that area.
+- The surface also wraps the access-denied message a user without permission sees, so keep it decorative and do not promise page content in it.
+- Surface CSS applies to the whole panel, so scope your rules to the page (see below) or to your own class.
+
+### Rebuilding Create Service and the Services list
+
+`Page.CreateService` is the Create New Service page, broken into pieces you arrange: the step indicator, one panel for each step, and the selection summary. It does not require `page-content`; a surface containing only `{% component "page-content" %}` is the stock page, and `create-service-wizard` keeps the stock wizard inside your own markup.
+
+`Page.Services` is a wrapper that also offers three pieces for around the list: status tiles, a New Service button and the category name. They show nothing outside a service list. The [reference](./reference.mdx#app-page-components) lists every piece.
+
+### Restyling with CSS only
+
+Every app page sets `data-tca-page` on the document root to its name (for example `Dashboard`), with or without a surface. A rule in the template's base stylesheet can restyle one page and nothing else:
+
+```css
+html[data-tca-page="Dashboard"] .mud-table { border-radius: 12px; }
+```
+
 ## Sharing templates
 
 A finished template can move between installations:

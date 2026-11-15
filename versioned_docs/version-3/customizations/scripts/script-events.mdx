@@ -35,8 +35,9 @@ Event names are case-sensitive. A script's **Operating System** setting means th
 | `AfterServiceReinstalled` | After a game service reinstalls. | — |
 | `BeforeServiceMoved` | **Source** server, before the move (incl. host↔VS). Not fired for copies. | — |
 | `AfterServiceMoved` | **Target** server, after the moved service registers. Not fired for copies. | — |
+| `AfterServiceUpdated` | After a service's settings are saved from the Settings page, the API or the AI assistant. A failing script does not undo the save; its error is shown as a warning. | `Source` (string: `Panel`, `Api` or `AiAssistant`), `ApiKeyId` (long, 0 from the panel), `UserId` (long), `ThisUser` (User, may be null), `ChangedProperties` (Dictionary&lt;string, object&gt; of property name → its value before the save; the new value is on `ThisService`). |
 
-Delete and move apply to game **and** Docker services. Create/reinstall are **game**-only; a Docker reinstall runs delete instead.
+Delete, move and update apply to game **and** Docker services. Create/reinstall are **game**-only; a Docker reinstall runs delete instead.
 
 ## Power (start, stop, kill)
 
