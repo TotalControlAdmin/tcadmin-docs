@@ -131,6 +131,9 @@ These additional objects are available when the script runs in a **game service*
 | `ThisGame` | `Game` | The game configuration for the current service. |
 | `ThisService` | `GameService` | The current game service (overrides the base `Service` type). |
 | `GameServiceManager` | `GameServiceManager` | Query and manage game services. |
+| `ThisNewBlueprint` | `Game` | `BeforeServiceSwitched` only: the game the service switches to. |
+| `ThisPreviousBlueprint` | `Game` | `AfterServiceSwitched` only: the game the service was on. |
+| `ThisSwitchServiceInfo` | `SwitchServiceInfo` | Both switch events: the details of the switch. See [Script Events](script-events.mdx#switching-to-another-blueprint). |
 
 ### Game Entity
 
@@ -178,6 +181,9 @@ These additional objects are available when the script runs in a **Docker servic
 | `ThisService` | `DockerService` | The current Docker service (overrides the base `Service` type). |
 | `DockerServiceManager` | `DockerServiceManager` | Query and manage Docker services. |
 | `ThisContainerStartParameters` | `CreateContainerParameters` | The Docker container creation parameters. Available in container creation scripts. |
+| `ThisNewBlueprint` | `DockerBlueprint` | `BeforeServiceSwitched` only: the blueprint the service switches to. |
+| `ThisPreviousBlueprint` | `DockerBlueprint` | `AfterServiceSwitched` only: the blueprint the service was on. |
+| `ThisSwitchServiceInfo` | `SwitchServiceInfo` | Both switch events: the details of the switch. See [Script Events](script-events.mdx#switching-to-another-blueprint). |
 
 ### DockerService Entity
 

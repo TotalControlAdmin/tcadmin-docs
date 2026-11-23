@@ -1,0 +1,43 @@
+---
+sidebar_label: 3.24.35.23196
+date: 2026-11-23
+authors: [tcadmin]
+description: Blueprint switching for game and Docker services, a safer way to update an installed blueprint from the plugin repository, AI assistant improvements and a health check, a faster Task Calendar, and more.
+---
+
+import ReleaseDate from '@site/src/components/ReleaseDate';
+
+# Version 3.24.35.23196
+
+<ReleaseDate />
+
+### New Features
+
+- **Blueprint switching** — A service can now change to another game or Docker blueprint without being deleted and recreated. It keeps its owner, server, IP address, billing details, schedules, backups and databases, and only the new blueprint's files are installed. Which blueprints a service may switch to is set with switching profiles, and users need the **Switch Game / Blueprint** feature. The switch dialog shows the service's current blueprint and offers a backup before switching. Two new script events, `BeforeServiceSwitched` and `AfterServiceSwitched`, let a script prepare the service or cancel the switch. See [Blueprint Switching](../using-tcadmin/common/switching.mdx).
+- **Backups across blueprints** — After a switch, backups made on the old blueprint stay on the service and are marked with that blueprint's name. They cannot be restored until you switch back, and the first backup on the new blueprint is always a complete one, so incremental backups never mix files from two blueprints.
+- **Safer blueprint updates from the plugin repository** — Installing a game or Docker blueprint over one you already have now opens a dialog with three choices. **Update** keeps the rows you added on this panel and takes everything else from the repository. **Full overwrite** replaces the blueprint, as before. **Advanced** lists every difference, such as variables, scripts, config files and settings, and lets you keep your version or take the repository's for each one, with a side-by-side view of changed text. An import never removes updates and mods added on this panel. Game and Docker blueprints also keep a stable identity, so a re-import matches the same variables, scripts and config files instead of guessing by name. See [Plugin Repository](../getting-started/initial-configuration/plugin-repository.mdx).
+- **Faster plugin repository pages** — The repository's plugin list and each plugin's page now load only the parts they show, so large repositories open quicker.
+- **AI assistant health check** — **System Health** has a new AI Assistant card. It shows your credit balance and warns when it is low, and it checks that the assistant can reach the panel. When it cannot, one click on **Fix** saves an address that works. When the assistant fails for this reason, its error message now names the address and points to this card. See [AI Assistant](../using-tcadmin/ai-assistant.mdx).
+- **AI assistant improvements** — The assistant can switch a service to another blueprint after you confirm, or list the blueprints it could switch to. It can also update an installed blueprint from the plugin repository instead of adding a duplicate, and it can list the services on one server in pages instead of showing only the first few. A Start or Restart that is still starting is now reported as launched instead of failed. Passwords and other secrets are hidden in command lines it shows, in start command previews, and in config file templates, where one password line no longer hides the rest of the file. It also knows where things are in the panel, such as where a blueprint and its command line are edited, and it tells you why a variable cannot be set.
+- **Task Calendar improvements** — The calendar opens on today's Day view. The Month and Week views show how many tasks ended in each status for every day or hour instead of drawing each task, so a busy month opens at once. Click a day or a status to see its tasks. The Day view shows up to 500 tasks and tells you when a day holds more, so you can narrow it by status, server or service.
+- **Custom executable, command line and folder before start** — A script on the `BeforeServiceStarted` event can now change the executable, command line and working directory for that one start without saving them to the service. This applies to game services, not Docker or hosted services. See [Script Events](../customizations/scripts/script-events.mdx).
+- **Double-click to edit in the file manager** — Double-clicking an editable file opens it in the editor.
+- **`ServiceId` variable** — `${ServiceId}` can now be used in command lines, config files and other variable text. The variables popup in the game editor also lists variables that were missing from it.
+- **V2 import of file-system dropdowns** — A V2 dropdown that lists files from the service's folder is now imported as a file-system dropdown instead of an empty list.
+- **Docker bridge address not used for game servers** — The installer and **Import IPs** no longer mark a Docker, virtual machine or similar internal address, such as `172.17.0.1`, for game or voice services, so new services do not advertise an address players cannot reach. An address already ticked on an existing server stays as it is.
+- **Ubuntu quick install on locked-down hosts** — The Ubuntu quick install script now works when the root shell has a restrictive umask, which stopped it at the database step on hardened servers.
+- **Smaller improvements** — The start command preview is now limited to administrators and top-level sub-admins, because it shows the run-as password. Plugin cards in the repository have a more readable background. A panel contacting a monitor that is just starting up now retries for a few seconds instead of failing at once.
+
+### Bug Fixes
+
+- **Two tasks on one service** — A service could run two tasks at the same time. A second task is now refused while one is running.
+- **Tasks stuck as Pending** — A task that was refused because the service was busy could stay Pending forever, even after a restart. It now ends with a clear result.
+- **Task dialog opening twice** — The task status dialog could open twice, and a recurring task on a service opened it every time the task ran. It now opens once.
+- **Start reported as failed** — With "Show Starting until the service answers a query" on, the Start command always reported failure while the status was Starting.
+- **Process id missing** — A service started from a task was saved without its process id.
+- **Incremental backups** — Deleting a backup that others depended on broke the incremental backups that followed it.
+- **Saving a role** — Saving a role could fail with "Nullable object must have a value".
+- **File manager on Linux** — The file manager did not work on a Linux service that runs as Local System.
+- **Editing a config file** — Editing a registered config file whose extension is not normally editable gave an error.
+- **Docker console input** — Sending console input to a Docker service from a custom script did not work.
+- **Script output with braces** — A script line written to the console could fail when it contained a `{`, such as JSON.
