@@ -11,6 +11,16 @@ import ReleaseDate from '@site/src/components/ReleaseDate';
 
 <ReleaseDate />
 
+<video
+  controls
+  preload="none"
+  poster="https://v3.tcafiles.com/AutomaticUpdates/Beta/3.24.35.23196/3.24.35.23196.jpg"
+  style={{ width: '100%', maxWidth: '960px', display: 'block', margin: '0 auto 1.5rem', borderRadius: '8px' }}
+>
+  <source src="https://v3.tcafiles.com/AutomaticUpdates/Beta/3.24.35.23196/3.24.35.23196.mp4" type="video/mp4" />
+  Your browser does not support the video tag. [Download the video](https://v3.tcafiles.com/AutomaticUpdates/Beta/3.24.35.23196/3.24.35.23196.mp4).
+</video>
+
 ### New Features
 
 - **Blueprint switching** — A service can now change to another game or Docker blueprint without being deleted and recreated. It keeps its owner, server, IP address, billing details, schedules, backups and databases, and only the new blueprint's files are installed. Which blueprints a service may switch to is set with switching profiles, and users need the **Switch Game / Blueprint** feature. The switch dialog shows the service's current blueprint and offers a backup before switching. Two new script events, `BeforeServiceSwitched` and `AfterServiceSwitched`, let a script prepare the service or cancel the switch. See [Blueprint Switching](../using-tcadmin/common/switching.mdx).
