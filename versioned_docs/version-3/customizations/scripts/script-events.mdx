@@ -35,9 +35,38 @@ Event names are case-sensitive. A script's **Operating System** setting means th
 | `AfterServiceReinstalled` | After a game service reinstalls. | — |
 | `BeforeServiceMoved` | **Source** server, before the move (incl. host↔VS). Not fired for copies. | — |
 | `AfterServiceMoved` | **Target** server, after the moved service registers. Not fired for copies. | — |
+| `BeforeServiceSwitched` | Before a service switches to another blueprint. The service is already stopped and nothing has changed yet. A failing script with *Ignore errors* off cancels the switch. | `ThisNewBlueprint`, `ThisSwitchServiceInfo` — see [Switching to another blueprint](#switching-to-another-blueprint). |
+| `AfterServiceSwitched` | After the service is on its new blueprint, before it starts again. | `ThisPreviousBlueprint`, `ThisSwitchServiceInfo` — see [Switching to another blueprint](#switching-to-another-blueprint). |
 | `AfterServiceUpdated` | After a service's settings are saved from the Settings page, the API or the AI assistant. A failing script does not undo the save; its error is shown as a warning. | `Source` (string: `Panel`, `Api` or `AiAssistant`), `ApiKeyId` (long, 0 from the panel), `UserId` (long), `ThisUser` (User, may be null), `ChangedProperties` (Dictionary&lt;string, object&gt; of property name → its value before the save; the new value is on `ThisService`). |
 
-Delete, move and update apply to game **and** Docker services. Create/reinstall are **game**-only; a Docker reinstall runs delete instead.
+Delete, move, switch and update apply to game **and** Docker services. Create/reinstall are **game**-only; a Docker reinstall runs delete instead.
+
+### Switching to another blueprint
+
+The two switch events run the scripts of different blueprints:
+
+- `BeforeServiceSwitched` runs the scripts of the blueprint the service is **leaving**. `ThisGame` / `ThisDockerBlueprint` is still the old blueprint and the old files are still in place. A backup requested with the switch has already been created.
+- `AfterServiceSwitched` runs the scripts of the blueprint the service **switched to**. `ThisGame` / `ThisDockerBlueprint` is the new blueprint, the old files are gone, and the service has its new settings and ports.
+
+When a `BeforeServiceSwitched` script cancels the switch, the service keeps its blueprint and files, and starts again if it was running. For a game that updates from Steam after it is created, that update runs after `AfterServiceSwitched`.
+
+| Variable | Type | Available in | Description |
+|---|---|---|---|
+| `ThisNewBlueprint` | `Game` in a game script, `DockerBlueprint` in a Docker script | `BeforeServiceSwitched` | The blueprint the service switches to. |
+| `ThisPreviousBlueprint` | `Game` in a game script, `DockerBlueprint` in a Docker script | `AfterServiceSwitched` | The blueprint the service was on. |
+| `ThisSwitchServiceInfo` | `SwitchServiceInfo` | Both | The details of the switch (properties below). |
+
+`SwitchServiceInfo` properties:
+
+| Property | Type | Description |
+|---|---|---|
+| `ServiceId` | `long` | The service being switched. |
+| `TargetBlueprintId` | `long` | The blueprint the service switches to. |
+| `PreviousBlueprintId` | `long` | The blueprint the service was on. |
+| `SwitchingProfileId` | `long` | The switching profile that allowed the switch. |
+| `CreateBackup` | `bool` | Whether a backup was created before the switch. |
+
+In C# these three are typed like `ThisGame`, so a script reads `ThisNewBlueprint.Name` directly.
 
 ## Power (start, stop, kill)
 

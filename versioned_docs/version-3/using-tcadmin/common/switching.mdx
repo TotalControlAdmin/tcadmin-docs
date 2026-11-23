@@ -1,0 +1,95 @@
+---
+sidebar_label: Switching
+sidebar_position: 4
+---
+
+# Blueprint Switching
+
+Switching lets a service change to a different blueprint without being deleted and recreated. A customer running one game can move to another game, or a Docker service can move to another Docker blueprint, while the service keeps its owner, server, IP address, billing details, schedules, backups and databases. It replaces the "game switching" of TCAdmin V2.
+
+:::warning
+A switch **deletes every file** of the service. Only the files of the new blueprint are installed afterwards. Offer a backup first (see below) if the customer may want the old files again.
+:::
+
+## Switching profiles
+
+Which blueprints a service may switch to is decided by a **switching profile**: a named list of blueprints that can be switched between.
+
+Manage profiles from the **Settings** page: **Game Switching Profiles** (in the Game Hosting group) holds game profiles and **Docker Switching Profiles** (in the Docker Settings group) holds Docker profiles. A profile's type is set by the list it is created in and cannot be changed afterwards.
+
+| Setting | Description |
+|---|---|
+| **Name** | The profile's name, unique among profiles of the same type. |
+| **Blueprints** | The blueprints in the profile. Use **Add blueprint** to search for one. A profile needs at least one blueprint, and a game profile only lists games and a Docker profile only lists Docker blueprints. |
+
+A blueprint can be in several profiles.
+
+## Turning switching on
+
+Being in a profile does nothing by itself. Switching is enabled in one of two ways:
+
+| Where | Setting | Effect |
+|---|---|---|
+| Blueprint editor (**General** tab for games, **Configuration** tab for Docker blueprints) | **Default Switching Profile** | Every service of this blueprint can switch within that profile; blank means switching is off by default. |
+| Service settings | **Switching Profile** | Staff only. Overrides the blueprint's default for this one service, or **Inherit from blueprint** to follow it. |
+
+The default list only offers profiles that contain the blueprint, so add the blueprint to a profile first. The service override lets staff enable switching for a single service even when its blueprint has no default. Only administrators and top-level sub-admins who also hold the **Service settings** feature can change it; customers never see it.
+
+:::note
+Saving a service's settings never changes its blueprint. A switch is the only way to move a service to another one.
+:::
+
+## Who can switch
+
+The user's role needs the **Switch Game / Blueprint** feature on the service's *current* blueprint. To let a customer switch back again, grant the feature on every blueprint of the profile.
+
+To offer the backup option, the role also needs the **Backups** feature. A service that lives inside another service (see [Hosted Services](../games/hosted-services.mdx)) cannot be switched.
+
+## Which blueprints are offered
+
+The target list contains the other blueprints of the service's profile, minus those that do not fit:
+
+| Service type | A blueprint is left out when |
+|---|---|
+| Game | It runs on another operating system than the current game, the server (or virtual server) does not allow it, or either game is a host or hosted blueprint. A host that still has hosted services cannot switch. |
+| Docker | Its container type cannot run on the service's server, it has no image, or it is not on the server's allowed Docker blueprint list. There is **no same-operating-system rule**: on a node with both Linux and Windows Docker, a service can switch either way. |
+
+## Switching a service
+
+Open the service and choose **Switch Game** (**Switch Blueprint** for Docker) from its advanced actions. The action only appears when switching is enabled for the service and the user holds the feature.
+
+1. Pick the blueprint under **Switch to**.
+2. Optionally tick **Create a backup before switching**. It appears only when backups are enabled for the current blueprint and the user may use them.
+3. Confirm. A task dialog shows progress, and the page reloads when it closes.
+
+What happens:
+
+- A running service is **stopped**. If a backup was requested it is made first, so a failed backup stops the switch before anything is deleted.
+- All files are deleted and the new blueprint's files are installed. Mod records and custom command lines of the old blueprint are removed.
+- The service starts again only if it was running before the switch.
+
+| Kept | Reset to the new blueprint | Cleared |
+|---|---|---|
+| Owner, server, IP address, root folder, billing, startup, priority and resource limits, category override, scripts, scheduled tasks, backups, databases, Fast Downloads setting | Command line, working directory, executable, slot count (adjusted to the new limits), variables (only hostname and passwords carry over; the rest take the new defaults), Docker image | Files, installed mods, custom command lines, the Docker container. Ports are kept only when both blueprints define identical ports; otherwise new ones are assigned. |
+
+:::info
+Backups taken on the old blueprint stay on the service but can only be restored after switching back. The first backup on the new blueprint is always a complete one.
+:::
+
+If something fails **before** the files are deleted, for example a script cancels the switch or new ports cannot be allocated, the service is put back as it was and started again if it was running. If it fails **after** that point, the service is a working service of the new blueprint with missing files; **Reinstall** it to recover.
+
+## Removing a blueprint from a profile
+
+Removing a blueprint from a profile, or deleting a profile, clears that profile as the blueprint's default and as any service override that points at it. The editor asks before it saves. Services already switched stay on their new blueprint.
+
+:::note
+Switching profiles are not included when a blueprint is exported, imported or copied. A new blueprint starts with no default.
+:::
+
+The AI assistant can also switch a service on request; it shows a confirmation card that includes the file-deletion warning.
+
+## Scripting
+
+Two script events run during a switch: `BeforeServiceSwitched` (on the blueprint the service is leaving, before anything changes; it can cancel the switch) and `AfterServiceSwitched` (on the blueprint it switched to, before it starts again).
+
+See [Switching to another blueprint](../../customizations/scripts/script-events.mdx#switching-to-another-blueprint) for when each event fires, the variables they provide and the full details.
