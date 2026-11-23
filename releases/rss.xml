@@ -5,9 +5,16 @@
     <link>https://docs.tcadmin.com/3/releases</link>
     <description>Latest TCAdmin v3 release notes</description>
     <language>en</language>
-    <lastBuildDate>Sun, 15 Nov 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 23 Nov 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://docs.tcadmin.com/releases/rss.xml" rel="self" type="application/rss+xml"/>
     <copyright>Copyright © 2026 TCADMIN.COM</copyright>
+    <item>
+      <title>3.24.35.23196</title>
+      <link>https://docs.tcadmin.com/3/releases/3.24.35.23196</link>
+      <guid isPermaLink="true">https://docs.tcadmin.com/3/releases/3.24.35.23196</guid>
+      <description>Blueprint switching for game and Docker services, a safer way to update an installed blueprint from the plugin repository, AI assistant improvements and a health check, a faster Task Calendar, and more.</description>
+      <pubDate>Mon, 23 Nov 2026 00:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>3.23.129.36413</title>
       <link>https://docs.tcadmin.com/3/releases/3.23.129.36413</link>
